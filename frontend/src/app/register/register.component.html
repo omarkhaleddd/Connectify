@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="w-75 m-auto py-5">
+        <form [formGroup]="registerForm" (ngSubmit)="registerUser(registerForm)">
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)">
+                {{ getErrorMessage('name') }}
+            </div>
+
+            <label for="name" class="text-capitalize my-1">name</label>
+            <input formControlName="name" class="form-control" type="text" id="name">
+
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)">
+                {{ getErrorMessage('email') }}
+            </div>
+
+            <label for="email" class="text-capitalize my-1">email</label>
+            <input formControlName="email" class="form-control" type="text" id="email">
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)">
+                {{ getErrorMessage('password') }}
+            </div>
+
+            <label for="password" class="text-capitalize my-1">password</label>
+            <input formControlName="password" class="form-control" type="password" id="password">
+
+            <div class="invalid-feedback"
+                *ngIf="registerForm.get('rePassword')?.invalid && (registerForm.get('rePassword')?.dirty || registerForm.get('rePassword')?.touched)">
+                {{ getErrorMessage('rePassword') }}
+            </div>
+
+            <label for="rePassword" class="text-capitalize my-1">rePassword</label>
+            <input formControlName="rePassword" class="form-control" type="password" id="rePassword">
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('phone')?.invalid && (registerForm.get('phone')?.dirty || registerForm.get('phone')?.touched)">
+                {{ getErrorMessage('phone') }}
+            </div>
+
+            <label for="phone" class="text-capitalize my-1">phone</label>
+            <input formControlName="phone" class="form-control" type="text" id="phone">
+            <div class="text-end">
+                <button [disabled]="registerForm.invalid" type="submit" class="btn btn-primary my-2">
+                    Register
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
