@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@lottiefiles/lottie-player": "^2.0.3",
+    "ngx-lottie": "^11.0.1"
+  }
+}

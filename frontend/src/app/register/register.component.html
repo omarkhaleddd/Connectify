@@ -1,6 +1,9 @@
 <div class="container">
     <div class="w-75 m-auto py-5">
         <form [formGroup]="registerForm" (ngSubmit)="registerUser(registerForm)">
+            <div *ngIf="errorMsg" class="alert alert-danger">
+                {{errorMsg}}
+            </div>
 
             <div class="alert alert-danger"
                 *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)">
@@ -42,9 +45,12 @@
 
             <label for="phone" class="text-capitalize my-1">phone</label>
             <input formControlName="phone" class="form-control" type="text" id="phone">
-            <div class="text-end">
+            <div class="text-end text-center d-flex justify-content-end ">
+                <p class="my-3 px-2 ">Already have account?<a class="text-decoration-none" routerLink="/login"> Login </a></p>
+            
                 <button [disabled]="registerForm.invalid" type="submit" class="btn btn-primary my-2">
-                    Register
+                    <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+                    <span *ngIf="!isLoading">Register</span> 
                 </button>
             </div>
         </form>

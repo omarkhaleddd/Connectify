@@ -1,6 +1,8 @@
+import { AuthService } from './../auth.service';
 //validators for validation
 import { FormControl, FormGroup , Validators } from '@angular/forms';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -8,17 +10,38 @@ import { Component } from '@angular/core';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  errorMsg = '';
+  isLoading:boolean =false;
   //form group -> form control
+
   registerForm = new FormGroup({
     name : new FormControl(null,[Validators.required,Validators.minLength(3),Validators.maxLength(10)]), //validation as a array in the arguments
     email: new FormControl(null,[Validators.required,Validators.email]),
     password: new FormControl(null,[Validators.required]),
     rePassword: new FormControl(null,[Validators.required])
   });
-
+  constructor(private _AuthService:AuthService , private _Router:Router){}
 //functions here 
   registerUser(data: FormGroup){
     console.log(data.value);
+    this.isLoading=true;
+    this._AuthService.register(data.value).subscribe({
+      next: (res)=>{ 
+        //navigate to login
+        console.log(res);
+        if(res.message == "success"){
+          localStorage.setItem('userToken',res.token);
+          this._Router.navigate(['/login']);
+        }
+      },
+      error: (myErrors)=>{ 
+        this.isLoading= false;
+        console.log(myErrors);
+        this.errorMsg=myErrors;
+        //show it in html
+      },
+      complete: ()=> { this.isLoading = false}
+    });
   }
   getErrorMessage(controlName: string): string {
     const control = this.registerForm.get(controlName);

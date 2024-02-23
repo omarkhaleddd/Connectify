@@ -1,1 +1,31 @@
-<p>login works!</p>
+<div class="w-75 m-auto py-5">
+    <form [formGroup]="loginForm" (ngSubmit)="loginUser(loginForm)">
+    <div *ngIf="errorMsg" class="alert alert-danger">{{errorMsg}}</div>
+
+    <div class="alert alert-danger"
+    *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
+    {{ getErrorMessage('email') }}
+    </div>
+    
+    <label for="email">email</label>
+    <input formControlName="email" type="text" class="form-control" id="password">
+    
+
+
+    <div class="alert alert-danger"
+    *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
+    {{ getErrorMessage('password') }}
+    </div>
+
+    <label for="password">password</label>
+    <input formControlName="password" type="password" class="form-control" id="password">
+    <div class="text-end text-center d-flex justify-content-end ">
+    <p class="my-3 px-2 ">Don't have account?<a class="text-decoration-none" routerLink="/register"> Register </a></p>
+
+    <button [disabled]="loginForm.invalid" type="submit" class="btn btn-primary my-2">
+        <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+        <span *ngIf="!isLoading">Login</span> 
+        </button>
+    </div>
+</form>
+</div>
