@@ -1,5 +1,5 @@
-<div class="container">
-    <div class="w-75 m-auto py-5">
+<div class="w-100 vh-100 bg-info-subtle">
+    <div class="w-75 m-auto py-5 ">
         <form [formGroup]="registerForm" (ngSubmit)="registerUser(registerForm)">
             <div *ngIf="errorMsg" class="alert alert-danger">
                 {{errorMsg}}
