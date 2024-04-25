@@ -9,12 +9,13 @@ namespace Talabat.APIs.Helpers
     {
         public MappingProfiles()
         {
-          
-        //   CreateMap<CustomerBasket, CustomerBasketDto>();
-            
 
+			CreateMap<AddressDto, Address>();
+			CreateMap<Address, AddressDto>();
 
+			CreateMap<UserDto, AppUser>();
+			CreateMap<AppUser, UserDto>();
 
-        }
+		}
     }
 }

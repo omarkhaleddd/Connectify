@@ -70,8 +70,8 @@ namespace Talabat.APIs.Controllers
 
         }
 
-        [Authorize]
-        [HttpGet("GetCurrentUser")]
+		[Authorize]
+		[HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
             var Email = User.FindFirstValue(ClaimTypes.Email);
@@ -84,18 +84,40 @@ namespace Talabat.APIs.Controllers
             };
             return Ok(ReturnedUser);
         }
+
         [Authorize]
         [HttpGet("Address")]
         public async Task<ActionResult<AddressDto>> GetUserAddress()
         {
 
             var user = await _manager.GetUserAddressAsync(User);
+            if (user == null) return NotFound("user null");
             var mappedUser = _mapper.Map<Address, AddressDto>(user.Address);
             return Ok(mappedUser);
 
         }
 
-        [Authorize]
+		[Authorize]
+		[HttpPost("Address")]
+		public async Task<ActionResult<AddressDto>> CreateAddress(AddressDto newAddress)
+		{
+			var user = await _manager.GetUserAddressAsync(User); 
+			if (user is null)
+				return Unauthorized(new ApiResponse(401));
+
+			var address = _mapper.Map<AddressDto, Address>(newAddress);
+			user.Address = address;
+
+			var result = await _manager.UpdateAsync(user); 
+
+			if (!result.Succeeded)
+				return BadRequest(new ApiResponse(400));
+
+			//var createdAddressDto = _mapper.Map<Address, AddressDto>(user.Address);
+			return Ok(newAddress);
+		}
+
+		[Authorize]
         [HttpPut("Address")]
         public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto updatedAddress)
         {
@@ -109,13 +131,26 @@ namespace Talabat.APIs.Controllers
             var result =await _manager.UpdateAsync(user);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             return Ok(updatedAddress);
-         
-
-
         }
 
+		[Authorize]
+		[HttpPut("UpdateProfile")]
+		public async Task<ActionResult<UserDto>> UpdateProfile(UserDto updateUser)
+		{
 
-        [HttpGet("EmailExist")]
+			var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401, $" ggg {user}"));
+            var appuser = _mapper.Map<UserDto, AppUser>(updateUser);
+            user.DisplayName = updateUser.DisplayName;
+            user.Email = updateUser.Email;
+			var result = await _manager.UpdateAsync(user);
+			if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+			return Ok(updateUser);
+		}
+
+
+		[HttpGet("EmailExist")]
         public async Task<ActionResult<bool>> checkDuplicateEmail(string email)
         {
             var user =await _manager.FindByEmailAsync(email);

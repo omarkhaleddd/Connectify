@@ -39,8 +39,9 @@ public class Program
             return ConnectionMultiplexer.Connect(ConnectionSting);
 
         });
-      
-        builder.Services.AddApplicationService();
+
+		builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
+		builder.Services.AddApplicationService();
         builder.Services.AddIdentityServices(builder.Configuration);
         using var app = builder.Build();
         #region Update Database
