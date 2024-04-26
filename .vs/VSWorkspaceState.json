@@ -1,16 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\backend",
-    "\\backend\\Talabat.Core",
-    "\\backend\\Talabat.Core\\Entities",
-    "\\backend\\Talabat.Core\\Entities\\Identity",
-    "\\backend\\TalabatAPIs",
-    "\\backend\\TalabatAPIs\\DTO",
-    "\\backend\\TalabatAPIs\\Exstentions",
-    "\\backend\\TalabatAPIs\\Helpers",
-    "\\backend\\TalabatAPIs\\MiddleWares"
+    "\\backend"
   ],
-  "SelectedNode": "\\backend\\Talabat.Core\\Entities\\Identity\\Address.cs",
+  "SelectedNode": "\\backend\\Connectify.sln",
   "PreviewInSolutionExplorer": false
 }
