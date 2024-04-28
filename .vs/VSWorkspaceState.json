@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\backend"
+    "\\backend",
+    "\\backend\\TalabatAPIs"
   ],
-  "SelectedNode": "\\backend\\Connectify.sln",
+  "SelectedNode": "\\backend\\TalabatAPIs\\appsettings.json",
   "PreviewInSolutionExplorer": false
 }

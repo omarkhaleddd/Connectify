@@ -13,7 +13,11 @@ namespace Connectify.Core.Entities.Core
         public string content { get; set; }
         public int likeCount { get; set; }
         public DateTime DatePosted { get; set; }
+        [ForeignKey("post")]
+        public int postId { get; set; }
         public Post post { get; set; }
+        [ForeignKey("AppUser")]
+        public string appUserId { get; set; }
         public AppUser AppUser { get; set; }
 
     }
