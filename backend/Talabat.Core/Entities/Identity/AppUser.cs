@@ -11,10 +11,6 @@ namespace Talabat.Core.Entities.Identity
     public class AppUser:IdentityUser
     {
         public string DisplayName { get; set; }
-
-        public ICollection<Post> posts { get; set; } = new HashSet<Post> ();
-        public ICollection<Comment> comments { get; set; } = new HashSet<Comment>();
-
         public Address Address { get; set; }
     }
 }

@@ -137,7 +137,9 @@ namespace Talabat.APIs.Controllers
 		[HttpPut("UpdateProfile")]
 		public async Task<ActionResult<UserDto>> UpdateProfile(UserDto updateUser)
 		{
-
+            //example of how to use get user main async
+            var userId = await _manager.GetUserMainAsync(User);
+            
 			var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401, $" ggg {user}"));

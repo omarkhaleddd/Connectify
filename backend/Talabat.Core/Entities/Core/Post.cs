@@ -4,21 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Talabat.Core.Entities;
 using Talabat.Core.Entities.Identity;
 
 namespace Connectify.Core.Entities.Core
 {
-    public class Post
+    public class Post : BaseEntity
     {
-        public int Id { get; set; }
         public string content { get; set; }
         public int likeCount { get; set; }
         public DateTime DatePosted { get; set; }
-        [ForeignKey("AppUser")]
-        public string appUserId { get; set; }
+        public string AuthorId { get; set; }
 
-        public AppUser AppUser { get; set; }
-
-        public ICollection<Comment> comments { get; set; } = new HashSet<Comment>();
+        public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
     }
 }

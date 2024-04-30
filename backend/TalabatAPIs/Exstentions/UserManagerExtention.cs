@@ -15,5 +15,12 @@ namespace Talabat.APIs.Exstentions
             return user;
 
         }
-    }
+		public static async Task<AppUser?> GetUserMainAsync(this UserManager<AppUser> userManager, ClaimsPrincipal User)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var user = await userManager.Users.Where(U => U.Id == userId).Include(a => a.Address).FirstOrDefaultAsync();
+			return user;
+
+		}
+	}
 }

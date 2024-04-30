@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talabat.Repository.Data;
 
@@ -11,9 +12,10 @@ using Talabat.Repository.Data;
 namespace Connectify.Repository.Migrations
 {
     [DbContext(typeof(ConnectifyContext))]
-    partial class ConnectifyContextModelSnapshot : ModelSnapshot
+    [Migration("20240430105037_postComment1")]
+    partial class postComment1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,9 +55,6 @@ namespace Connectify.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -70,9 +69,12 @@ namespace Connectify.Repository.Migrations
                     b.Property<int>("likeCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("postId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("postId");
 
                     b.ToTable("Comment");
                 });
@@ -129,18 +131,18 @@ namespace Connectify.Repository.Migrations
 
             modelBuilder.Entity("Connectify.Core.Entities.Core.Comment", b =>
                 {
-                    b.HasOne("Connectify.Core.Entities.Core.Post", "Post")
-                        .WithMany("Comments")
-                        .HasForeignKey("PostId")
+                    b.HasOne("Connectify.Core.Entities.Core.Post", "post")
+                        .WithMany("comments")
+                        .HasForeignKey("postId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("post");
                 });
 
             modelBuilder.Entity("Connectify.Core.Entities.Core.Post", b =>
                 {
-                    b.Navigation("Comments");
+                    b.Navigation("comments");
                 });
 #pragma warning restore 612, 618
         }
