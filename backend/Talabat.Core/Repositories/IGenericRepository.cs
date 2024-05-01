@@ -19,6 +19,7 @@ namespace Talabat.Core.Repositories
         Task Add(T item);
         void Delete(T item);
         void Update(T item);
+        void SaveChanges();
 
     }
 }

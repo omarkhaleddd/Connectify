@@ -10,6 +10,7 @@ using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Core.Specifications;
 using Talabat.Repository;
@@ -22,8 +23,8 @@ namespace Talabat.APIs.Controllers
     {
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
-        private readonly GenericRepository<Post> _repository;
-        public PostController(IMapper mapper, UserManager<AppUser> manager, GenericRepository<Post> genericRepository)
+        private readonly IGenericRepository<Post> _repository;
+        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository)
         {
             _mapper = mapper;
             _manager = manager;
@@ -58,7 +59,7 @@ namespace Talabat.APIs.Controllers
             post.AuthorId = user.Id;
             post.Comments = null;
             var result = _repository.Add(post);
-
+            _repository.SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
 
