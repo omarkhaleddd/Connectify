@@ -1,5 +1,4 @@
-﻿using Connectify.Core.Entities.Core;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 
 namespace Talabat.Repository.Data

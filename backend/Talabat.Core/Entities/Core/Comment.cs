@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Talabat.Core.Entities;
 using Talabat.Core.Entities.Identity;
 
-namespace Connectify.Core.Entities.Core
+namespace Talabat.Core.Entities.Core
 {
     public class Comment : BaseEntity
     {
         public string content { get; set; }
         public int likeCount { get; set; }
-        public DateTime DatePosted { get; set; }
+        public DateTime DatePosted { get; set; } 
 		public string AuthorId { get; set; }
 		[ForeignKey("post")]
         public int PostId { get; set; }
