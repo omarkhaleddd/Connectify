@@ -45,7 +45,7 @@ namespace Talabat.APIs.Controllers
 
         }
         //Get Post by id
-        //Pos Request
+        //Post Request
         [Authorize]
         [HttpPost("create-post")]
         public async Task<ActionResult<PostDto>> CreatePost(PostDto newPost) 
