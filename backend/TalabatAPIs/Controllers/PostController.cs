@@ -85,26 +85,6 @@ namespace Talabat.APIs.Controllers
 
         }
         //Put Request 
-        [Authorize]
-        [HttpPut("update-post")]
-        public async Task<ActionResult<PostDto>> UpdatePost(PostDto newPost)
-        {
-            var user = await _manager.GetUserAddressAsync(User);
-            if (user is null)
-                return Unauthorized(new ApiResponse(401));
-            var post = _mapper.Map<PostDto, Post>(newPost);
-            post.AuthorId = user.Id;
-            //for loop on comments to add
-            post.Comments = null;
-
-            var result = _repositoryPost.Add(post);
-            _repositoryPost.SaveChanges();
-            if (!result.IsCompletedSuccessfully)
-                return BadRequest(new ApiResponse(400));
-
-            return Ok(post);
-
-        }
         //Delete Post
         [Authorize]
         [HttpDelete("delete-post/{id}")]
