@@ -51,22 +51,22 @@ namespace Talabat.APIs.Controllers
         }
         //Get Post by id
         [Authorize]
-        [HttpGet("post/{id}")]
-        public async Task<ActionResult<PostDto>> GetPost()
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PostDto>> GetPost(int id)
         {
             //get by id in specs
-            var spec = new BaseSpecifications<Post>();
-            var Posts = await _repositoryPost.GetEntityWithSpecAsync(spec);
-            if (Posts == null)
+            var spec = new BaseSpecifications<Post>(P=>P.Id == id);
+            var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
+            if (post == null)
             {
                 return BadRequest("No posts");
             }
             else
-                return Ok(Posts);
+                return Ok(post);
         }
         //Post Request
         [Authorize]
-        [HttpPost("create-post")]
+        [HttpPost("")]
         public async Task<ActionResult<PostDto>> CreatePost(PostDto newPost) 
         {
             var user = await _manager.GetUserAddressAsync(User);
@@ -84,10 +84,32 @@ namespace Talabat.APIs.Controllers
             return Ok(post);
 
         }
-        //Put Request 
-        //Delete Post
-        [Authorize]
-        [HttpDelete("delete-post/{id}")]
+		//Get Post by id
+		[Authorize]
+		[HttpPut("{id}")]
+		public async Task<ActionResult<PostDto>> UpdatePost(PostDto newPost,int id)
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+            var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
+			if (user is null)
+				return Unauthorized(new ApiResponse(401));
+
+			if (oldPost is null)
+				return BadRequest(new ApiResponse(404));
+
+			var post = _mapper.Map<PostDto, Post>(newPost);
+            post = oldPost;
+            post.content = newPost.content;
+			_repositoryPost.Update(post);
+			_repositoryPost.SaveChanges();
+
+            return Ok(post);
+		}
+
+		//Put Request 
+		//Delete Post
+		[Authorize]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<PostDto>> DeletePost()
         {
             //get by id in specs

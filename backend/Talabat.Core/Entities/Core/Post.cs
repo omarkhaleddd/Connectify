@@ -11,6 +11,16 @@ namespace Talabat.Core.Entities.Core
 {
     public class Post : BaseEntity
     {
+
+        public Post() 
+        {
+			DatePosted = DateTime.Now;
+			IsDeleted = false;
+			InsertDate = DateTime.Now;
+			UpdateDate = DateTime.Now;
+			DeleteDate = null;
+		}
+
         public string content { get; set; }
         public int likeCount { get; set; }
         public DateTime DatePosted { get; set; } 
