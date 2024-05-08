@@ -23,8 +23,9 @@ export class LoginComponent {
     this._AuthService.login(data.value).subscribe({
       next: (res) => {  
         console.log(res);
-        if(res.message == "success"){
+        if(res.token){
           localStorage.setItem('userToken',res.token);
+          localStorage.setItem('displayName',res.displayName);
           this._Router.navigate(['/home']);
         }
       },

@@ -84,8 +84,8 @@ namespace Talabat.APIs.Controllers
             return Ok(post);
 
         }
-		//Get Post by id
-		[Authorize]
+        //Put Request 
+        [Authorize]
 		[HttpPut("{id}")]
 		public async Task<ActionResult<PostDto>> UpdatePost(PostDto newPost,int id)
 		{
@@ -106,7 +106,6 @@ namespace Talabat.APIs.Controllers
             return Ok(post);
 		}
 
-		//Put Request 
 		//Delete Post
 		[Authorize]
         [HttpDelete("{id}")]

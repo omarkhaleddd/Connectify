@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
-  name:string='Omar Khaled';
+  name =localStorage.getItem("displayName");
   isLogged:boolean=true;
   logout(){
     //removes token from the local storage and redirect to login page
