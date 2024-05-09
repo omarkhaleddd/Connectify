@@ -20,6 +20,9 @@ namespace Talabat.APIs.Helpers
             CreateMap<PostDto, Post>();
             CreateMap<Post, PostDto>();
 
+            CreateMap<CommentDto, Comment>();
+            CreateMap<Comment, CommentDto>();
+
         }
     }
 }
