@@ -20,12 +20,10 @@ namespace Talabat.Core.Entities.Core
 			UpdateDate = DateTime.Now;
 			DeleteDate = null;
 		}
-
         public string content { get; set; }
         public int likeCount { get; set; }
         public DateTime DatePosted { get; set; } 
         public string AuthorId { get; set; }
-
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
     }
 }

@@ -7,7 +7,6 @@ namespace Talabat.APIs.DTO
         public string content { get; set; }
         public int likeCount { get; set; }
         public DateTime DatePosted { get; set; }
-        public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
-
+        public ICollection<CommentDto>? Comments { get; set; } = new HashSet<CommentDto>();
     }
 }

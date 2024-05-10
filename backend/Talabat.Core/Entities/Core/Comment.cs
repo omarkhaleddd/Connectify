@@ -25,9 +25,6 @@ namespace Talabat.Core.Entities.Core
 		public string AuthorId { get; set; }
 		[ForeignKey("Post")]
         public int PostId { get; set; }
-        [JsonIgnore]
         public Post Post { get; set; }
-       
-
     }
 }

@@ -8,15 +8,13 @@ using Talabat.Core.Specifications;
 
 namespace Talabat.Core.Specifications
 {
-    public class PostWithCommentSpecs : BaseSpecifications<Post>
+    public class PostWithCommentSpecs : BaseSpecifications<Comment>
     {
         public PostWithCommentSpecs() :base() 
         {
-            Includes.Add(P => P.Comments);
         }
-        public PostWithCommentSpecs(int postId): base(p => p.Id == postId)
+        public PostWithCommentSpecs(int postId): base(C => C.PostId == postId)
         {
-            Includes.Add(P => P.Comments);
         }
     }
 }
