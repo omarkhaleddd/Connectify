@@ -1,0 +1,18 @@
+<div class="post-container">
+    <div class="post-header">
+        <!-- <img [src]="post.authorProfilePicture" alt="Profile Picture"> -->
+        <div class="author-info">
+            <span>{{ post?.authorId }}</span>
+            <span class="post-date">{{ post?.datePosted }}</span>
+        </div>
+    </div>
+    <div class="post-content">
+        <p>{{ post?.content }}</p>
+        <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
+    </div>
+    <div class="post-footer">
+        <button (click)="likePost()">Like</button>
+        <span>{{ post?.likeCount }} Likes</span>
+        <button (click)="commentPost()">Comment</button>
+    </div>
+</div>

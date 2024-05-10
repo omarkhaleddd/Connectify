@@ -8,9 +8,12 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { AppRoutingModule } from './app-routing.module';
 import { NavbarComponent } from './navbar/navbar.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from "@angular/common/http";
 import { ProfileComponent } from './profile/profile.component';
+import { PostsDisplayComponent } from './components/post/posts-display/posts-display.component';
+import { PostGetComponent } from './components/post/post-get/post-get.component';
+import { PostCreateComponent } from './components/post/post-create/post-create.component';
 
 @NgModule({
   declarations: [
@@ -20,13 +23,17 @@ import { ProfileComponent } from './profile/profile.component';
     LoginComponent,
     RegisterComponent,
     NavbarComponent,
-    ProfileComponent
+    ProfileComponent,
+    PostsDisplayComponent,
+    PostGetComponent,
+    PostCreateComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

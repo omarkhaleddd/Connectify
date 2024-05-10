@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting; 
 using System.Security.Claims;
 using Talabat.APIs.Controllers;
 using Talabat.APIs.DTO;
@@ -35,24 +34,51 @@ namespace Talabat.APIs.Controllers
             _repositoryPost = genericRepository;
             _repositoryComment = genericRepository2;
         }
-        //Get Post by UserId
-        //Get Posts
-        [Authorize]
-        [HttpGet("")]
-        public async Task<ActionResult<PostDto>> GetPosts()
-        {
-            var spec = new BaseSpecifications<Post>();
-            var Posts = await _repositoryPost.GetAllWithSpecAsync(spec);
-            if(Posts == null)
-            {
-                return BadRequest("No posts");
-            }
-            else
-                return Ok(Posts);
-        }
-        //Get Post by id
-        [Authorize]
-        [HttpGet("{id}")]
+
+
+		//Get Post by UserId
+		//Get Posts
+
+		[Authorize]
+		[HttpGet("")]
+		public async Task<ActionResult<PostDto>> GetPosts()
+		{
+			var spec = new BaseSpecifications<Post>();
+			var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+			if (posts == null || !posts.Any())
+			{
+				return NotFound("No posts found");
+			}
+
+			var postDtos = new List<PostDto>();
+			foreach (var post in posts)
+			{
+				var user = await _manager.GetUserByIdAsync(post.AuthorId);
+				if (user == null)
+				{
+					return NotFound($"User not found for post with ID: {post.Id}");
+				}
+
+				var postDto = new PostDto
+				{
+					Id = post.Id,
+					content = post.content,
+					DatePosted = post.DatePosted,
+					AuthorId = user.Id,
+					AuthorName = user.DisplayName
+				};
+
+				postDtos.Add(postDto);
+			}
+
+			return Ok(postDtos);
+		}
+
+
+
+		//Get Post by id
+		[Authorize]
+		[HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
             //get by id in specs
@@ -62,9 +88,25 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
-            else
-                return Ok(post);
+
+			var author = await _manager.GetUserByIdAsync(post.AuthorId);
+			if (author == null)
+			{
+				return NotFound("User not found");
+			}
+
+			var postDto = new PostDto
+			{
+				Id = post.Id,
+				content = post.content,
+				DatePosted = post.DatePosted,
+				AuthorId = author.Id,
+				AuthorName = author.DisplayName
+			};
+
+			return Ok(postDto);
         }
+
         //Post Request
         [Authorize]
         [HttpPost("")]
@@ -77,6 +119,10 @@ namespace Talabat.APIs.Controllers
             var post = _mapper.Map<PostDto, Post>(newPost);
             post.AuthorId = user.Id;
             post.Comments = null;
+			if (post is null)
+			{
+				return BadRequest(new ApiResponse(400));
+			}
             var result = _repositoryPost.Add(post);
             _repositoryPost.SaveChanges();
             if (!result.IsCompletedSuccessfully)
@@ -85,6 +131,7 @@ namespace Talabat.APIs.Controllers
             return Ok(post);
 
         }
+        
         //Put Request 
         [Authorize]
 		[HttpPut("{id}")]
@@ -98,38 +145,45 @@ namespace Talabat.APIs.Controllers
 			if (oldPost is null)
 				return BadRequest(new ApiResponse(404));
 
-			var post = _mapper.Map<PostDto, Post>(newPost);
-            post = oldPost;
-			_repositoryPost.Update(post);
+			
+			if (oldPost.AuthorId != user.Id)
+				return Unauthorized(new ApiResponse(401));
+
+			oldPost.content= newPost.content;
+			_repositoryPost.Update(oldPost);
 			_repositoryPost.SaveChanges();
 
-            return Ok(post);
+            return Ok(oldPost);
 		}
-        //Delete Post
-        [Authorize]
+
+		//Delete Post
+		[Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<PostDto>> DeletePost(int id)
         {
             //get by id in specs
             var spec = new BaseSpecifications<Post>(P => P.Id == id);
             var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
-            if (post == null)
-            {
-                return BadRequest("No posts");
-            }
-            else
-            {
-                if (post.Comments != null)
+			var user = await _manager.GetUserAddressAsync(User);
+
+			if (user is null)
+				return Unauthorized(new ApiResponse(401));
+
+			if (post == null)
+                return BadRequest($"No post found with that id : {id}");
+
+			if (post.AuthorId != user.Id)
+				return Unauthorized(new ApiResponse(401));
+
+			if (post.Comments != null) { 
+                foreach(Comment comment in post.Comments)
                 {
-                    //for loop on comments to remove
-                    foreach (Comment comment in post.Comments)
-                    {
-                        _repositoryComment.Delete(comment);
-                    }
+                    _repositoryComment.Delete(comment);
                 }
-                _repositoryPost.Delete(post);
-                _repositoryPost.SaveChanges();
             }
+            _repositoryPost.Delete(post);
+            _repositoryPost.SaveChanges();
+
             return Ok("Post deleted");
         }
     }

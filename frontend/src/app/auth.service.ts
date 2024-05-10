@@ -10,6 +10,10 @@ export class AuthService {
 
   constructor(private _HttpClient:HttpClient) { }
 
+  getToken(): string | null {
+    return localStorage.getItem('userToken');
+  }
+
   register(data:FormGroup):Observable<any>{
     console.log(data);
     return this._HttpClient.post('https://localhost:7095/api/Accounts/Register',data);
