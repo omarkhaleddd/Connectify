@@ -22,7 +22,7 @@ namespace Connectify.Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Connectify.Core.Entities.Core.Comment", b =>
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,7 +77,7 @@ namespace Connectify.Repository.Migrations
                     b.ToTable("Comment");
                 });
 
-            modelBuilder.Entity("Connectify.Core.Entities.Core.Post", b =>
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,17 +119,59 @@ namespace Connectify.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("likeCount")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Post");
                 });
 
-            modelBuilder.Entity("Connectify.Core.Entities.Core.Comment", b =>
+            modelBuilder.Entity("Talabat.Core.Entities.Core.PostLikes", b =>
                 {
-                    b.HasOne("Connectify.Core.Entities.Core.Post", "Post")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("DeleteBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsertBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("InsertDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdateBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostLikes");
+                });
+
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Comment", b =>
+                {
+                    b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -138,9 +180,22 @@ namespace Connectify.Repository.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Connectify.Core.Entities.Core.Post", b =>
+            modelBuilder.Entity("Talabat.Core.Entities.Core.PostLikes", b =>
+                {
+                    b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 #pragma warning restore 612, 618
         }

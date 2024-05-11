@@ -30,10 +30,15 @@ namespace Talabat.Repository.Data
 				.WithOne(C => C.Post)
 				.HasForeignKey(C => C.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>()
+				.HasMany(P => P.Likes)
+				.WithOne(L => L.Post)
+				.HasForeignKey(L => L.PostId)
+				.OnDelete(DeleteBehavior.Cascade);
 
-			//base.OnModelCreating(modelBuilder);
-		}
+            //base.OnModelCreating(modelBuilder);
+        }
 
 
-	}
+    }
 }
