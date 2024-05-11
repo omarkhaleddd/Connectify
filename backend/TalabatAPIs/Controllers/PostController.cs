@@ -59,12 +59,15 @@ namespace Talabat.APIs.Controllers
 					return NotFound($"User not found for post with ID: {post.Id}");
 				}
 
+				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+
 				var postDto = new PostDto
 				{
 					Id = post.Id,
 					content = post.content,
+					likeCount = post.likeCount,
 					DatePosted = post.DatePosted,
-					likeCount= post.likeCount,
+					Comments = comments,
 					AuthorId = user.Id,
 					AuthorName = user.DisplayName
 				};

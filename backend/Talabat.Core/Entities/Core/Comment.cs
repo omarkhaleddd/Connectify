@@ -18,6 +18,7 @@ namespace Talabat.Core.Entities.Core
             InsertDate = DateTime.Now;
             UpdateDate = DateTime.Now;
             DeleteDate = null;
+            likeCount = 0;
         }
         public string content { get; set; }
         public int likeCount { get; set; }
