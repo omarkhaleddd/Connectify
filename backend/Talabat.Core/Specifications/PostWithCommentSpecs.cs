@@ -18,5 +18,9 @@ namespace Talabat.Core.Specifications
         {
 			Includes.Add(P => P.Comments);
 		}
-	}
+        public PostWithCommentSpecs(string authorId) : base(P => P.AuthorId == authorId)
+        {
+            Includes.Add(P => P.Comments);
+        }
+    }
 }

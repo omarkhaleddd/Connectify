@@ -36,10 +36,43 @@ namespace Talabat.APIs.Controllers
         }
 
 
-		//Get Post by UserId
-		//Get Posts
+        //Get Post by UserId
+        [Authorize]
+        [HttpGet("GetPostByAuthorId/{authorId}")]
+        public async Task<ActionResult<PostDto>> GetPostByAuthorId(string authorId)
+        {
+            //get by id in specs
+            var spec = new PostWithCommentSpecs(authorId);
+            var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
+            if (post == null)
+            {
+                return BadRequest("No posts");
+            }
 
-		[Authorize]
+            var author = await _manager.GetUserByIdAsync(post.AuthorId);
+            if (author == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+
+            var postDto = new PostDto
+            {
+                Id = post.Id,
+                content = post.content,
+                likeCount = post.likeCount,
+                DatePosted = post.DatePosted,
+                Comments = comments,
+                AuthorId = author.Id,
+                AuthorName = author.DisplayName
+            };
+
+            return Ok(postDto);
+        }
+
+        //Get Posts
+        [Authorize]
 		[HttpGet("")]
 		public async Task<ActionResult<PostDto>> GetPosts()
 		{
