@@ -43,7 +43,7 @@ namespace Talabat.APIs.Controllers
 		[HttpGet("")]
 		public async Task<ActionResult<PostDto>> GetPosts()
 		{
-			var spec = new BaseSpecifications<Post>();
+			var spec = new PostWithCommentSpecs();
 			var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
 			if (posts == null || !posts.Any())
 			{
@@ -64,6 +64,7 @@ namespace Talabat.APIs.Controllers
 					Id = post.Id,
 					content = post.content,
 					DatePosted = post.DatePosted,
+					likeCount= post.likeCount,
 					AuthorId = user.Id,
 					AuthorName = user.DisplayName
 				};
@@ -82,7 +83,7 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
             //get by id in specs
-            var spec = new BaseSpecifications<Post>(P=>P.Id == id);
+            var spec = new PostWithCommentSpecs(id);
             var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
             if (post == null)
             {
@@ -95,11 +96,15 @@ namespace Talabat.APIs.Controllers
 				return NotFound("User not found");
 			}
 
+			var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+			
 			var postDto = new PostDto
 			{
 				Id = post.Id,
 				content = post.content,
+				likeCount= post.likeCount,
 				DatePosted = post.DatePosted,
+				Comments = comments,
 				AuthorId = author.Id,
 				AuthorName = author.DisplayName
 			};

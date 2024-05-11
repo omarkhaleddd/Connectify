@@ -6,7 +6,7 @@
             <span class="post-date">{{ post?.datePosted }}</span>
         </div>
     </div>
-    <div class="post-content">
+    <div class="post-content"  (click)="onPostClick(post)">
         <p>{{ post?.content }}</p>
         <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
     </div>

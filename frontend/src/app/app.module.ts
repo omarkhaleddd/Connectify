@@ -14,6 +14,10 @@ import { ProfileComponent } from './profile/profile.component';
 import { PostsDisplayComponent } from './components/post/posts-display/posts-display.component';
 import { PostGetComponent } from './components/post/post-get/post-get.component';
 import { PostCreateComponent } from './components/post/post-create/post-create.component';
+import { CommentsDisplayComponent } from './components/comment/comments-display/comments-display.component';
+import { CommentsCreateComponent } from './components/comment/comments-create/comments-create.component';
+import { CommentGetComponent } from './components/comment/comment-get/comment-get.component';
+import { PostComponent } from './post/post.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +30,11 @@ import { PostCreateComponent } from './components/post/post-create/post-create.c
     ProfileComponent,
     PostsDisplayComponent,
     PostGetComponent,
-    PostCreateComponent
+    PostCreateComponent,
+    CommentsDisplayComponent,
+    CommentsCreateComponent,
+    CommentGetComponent,
+    PostComponent
   ],
   imports: [
     BrowserModule,
