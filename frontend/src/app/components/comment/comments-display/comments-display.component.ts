@@ -7,5 +7,5 @@ import { Comment } from 'src/app/models/comment.model';
   styleUrls: ['./comments-display.component.css']
 })
 export class CommentsDisplayComponent {
-  @Input() comments: Comment[] = []; // Declare comments as an input property
+  @Input() comments: Comment[] | undefined; // Declare comments as an input property
 }

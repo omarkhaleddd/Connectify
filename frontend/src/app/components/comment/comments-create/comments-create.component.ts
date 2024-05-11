@@ -1,9 +1,8 @@
-import { SharedDataService } from './../../../services/sharedData/shared-data.service';
 import { HttpHeaders } from '@angular/common/http';
 import { CommentService } from './../../../services/comment/comment.service';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AuthService } from 'src/app/auth.service';
-import { Subscription } from 'rxjs';
+import { Post } from 'src/app/models/post.model';
 
 @Component({
   selector: 'app-comments-create',
@@ -12,21 +11,9 @@ import { Subscription } from 'rxjs';
 })
 export class CommentsCreateComponent {
   commentContent: string = '';
-  postData: any;
-  private subscription: Subscription = new Subscription(); 
+  @Input() post: Post | undefined;
 
-  constructor(private _AuthService:AuthService ,private commentService: CommentService, private dataService:SharedDataService) { }
-
-  ngOnInit() {
-    this.subscription = this.dataService.postData$.subscribe(data => {
-      this.postData = data;
-      console.log('Received data:', this.postData);
-    });
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe(); // Unsubscribe to avoid memory leaks
-  }
+  constructor(private _AuthService:AuthService ,private commentService: CommentService) { }
 
   token:any = this._AuthService.getToken();
 
@@ -35,7 +22,7 @@ export class CommentsCreateComponent {
   });
 
   createComment() {
-    const commentData = { content: this.commentContent ,postId : this.postData.id }; 
+    const commentData = { content: this.commentContent ,postId : this.post?.id }; 
     console.log(commentData);
     this.commentService.createComment(commentData,this.headers).subscribe(response => {
       console.log('Comment created successfully:', response);

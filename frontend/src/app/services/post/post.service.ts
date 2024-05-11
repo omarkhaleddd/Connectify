@@ -15,7 +15,12 @@ export class PostService {
     return this.http.post<any>(this.apiUrl, postData,{headers : headers});
   }
 
-  getAllPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(this.apiUrl);
+  getAllPosts(headers: any): Observable<Post[]> {
+    return this.http.get<Post[]>(this.apiUrl,{headers: headers});
+  }
+
+  getPost(id: number,headers: any): Observable<Post> {
+    console.log(this.apiUrl + `${id}`);
+    return this.http.get<Post>(this.apiUrl + `${id}`,{headers: headers});
   }
 }

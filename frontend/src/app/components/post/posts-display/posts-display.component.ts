@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/auth.service';
 import { Post } from 'src/app/models/post.model';
+import { PostService } from 'src/app/services/post/post.service';
 
 @Component({
   selector: 'app-posts-display',
@@ -11,7 +12,7 @@ import { Post } from 'src/app/models/post.model';
 export class PostsDisplayComponent implements OnInit {
   posts: Post[] = [];
 
-  constructor(private _AuthService:AuthService ,private http: HttpClient) { }
+  constructor(private _AuthService:AuthService ,private postService:PostService) { }
 
   ngOnInit(): void {
     this.fetchPosts();
@@ -23,7 +24,7 @@ export class PostsDisplayComponent implements OnInit {
   });
 
   fetchPosts() {
-    this.http.get<Post[]>('https://localhost:7095/api/Post/', { headers: this.headers }).subscribe(posts => {
+    this.postService.getAllPosts(this.headers).subscribe(posts => {
       this.posts = posts;
       console.log(this.posts)
     }, error => {

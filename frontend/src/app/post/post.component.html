@@ -1,4 +1,4 @@
 <p>post works!</p>
-<app-post-get [post]="postData"></app-post-get>
-<app-comments-create></app-comments-create>
-<app-comments-display [comments]="postData.comments"></app-comments-display>
+<app-post-get [post]="post"></app-post-get>
+<app-comments-create [post]="post"></app-comments-create>
+<app-comments-display [comments]="post?.comments"></app-comments-display>
