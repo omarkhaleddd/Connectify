@@ -63,8 +63,8 @@ namespace Talabat.APIs.Controllers
             if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 DisplayName = user.DisplayName,
-                Email = user.Email,
                 Token = await _tokenService.CreateTokenAsync(user, _manager)
             });
 
@@ -78,8 +78,8 @@ namespace Talabat.APIs.Controllers
             var user = await _manager.FindByEmailAsync(Email);
             var ReturnedUser = new UserDto()
             {
+                Id = user.Id,
                 DisplayName = user.DisplayName,
-                Email = user.Email,
                 Token = await _tokenService.CreateTokenAsync(user, _manager)
             };
             return Ok(ReturnedUser);
