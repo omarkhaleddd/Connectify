@@ -46,8 +46,8 @@ namespace Talabat.APIs.Controllers
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             var returnedUser = new UserDto()
             {
+                Id = user.Id,
                 DisplayName = user.DisplayName,
-                Email = user.Email,
                 Token = await _tokenService.CreateTokenAsync(user, _manager)
 
             };
@@ -145,7 +145,7 @@ namespace Talabat.APIs.Controllers
                 return Unauthorized(new ApiResponse(401, $" ggg {user}"));
             var appuser = _mapper.Map<UserDto, AppUser>(updateUser);
             user.DisplayName = updateUser.DisplayName;
-            user.Email = updateUser.Email;
+            user.Id = updateUser.Id;
 			var result = await _manager.UpdateAsync(user);
 			if (!result.Succeeded) return BadRequest(new ApiResponse(400));
 			return Ok(updateUser);
