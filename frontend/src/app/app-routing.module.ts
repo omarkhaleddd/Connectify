@@ -8,6 +8,7 @@ import {RegisterComponent } from './register/register.component';
 import { NotfoundComponent } from './notfound/notfound.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
+import { SearchComponent } from './components/search/search.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   {path: 'profile' , component: ProfileComponent},
   {path: 'post/:id' , component: PostComponent},
+  {path: 'search/:query' , component: SearchComponent},
   {path:'**',component:NotfoundComponent}
 ];
 

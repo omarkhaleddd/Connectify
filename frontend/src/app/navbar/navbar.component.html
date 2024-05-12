@@ -18,8 +18,8 @@
         </li>
       </ul>
       
-      <form class="form-inline my-2 my-lg-0 px-3 d-flex">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <form (submit)="search()" class="form-inline my-2 my-lg-0 px-3 d-flex">
+        <input class="form-control mr-sm-2" type="search" [(ngModel)]="query" placeholder="Search" name="search" aria-label="Search">
         <button class="btn my-2 my-sm-0 ms-2" type="submit" > <i class="fas fa-search"></i> </button>
         
       </form>

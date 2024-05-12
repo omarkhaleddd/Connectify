@@ -19,6 +19,8 @@ import { CommentsCreateComponent } from './components/comment/comments-create/co
 import { CommentGetComponent } from './components/comment/comment-get/comment-get.component';
 import { PostComponent } from './post/post.component';
 import { PostsProfileDisplayComponent } from './components/post/posts-profile-display/posts-profile-display.component';
+import { SearchComponent } from './components/search/search.component';
+import { SearchUserComponent } from './components/search-user/search-user.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,9 @@ import { PostsProfileDisplayComponent } from './components/post/posts-profile-di
     CommentsCreateComponent,
     CommentGetComponent,
     PostComponent,
-    PostsProfileDisplayComponent
+    PostsProfileDisplayComponent,
+    SearchComponent,
+    SearchUserComponent
   ],
   imports: [
     BrowserModule,
