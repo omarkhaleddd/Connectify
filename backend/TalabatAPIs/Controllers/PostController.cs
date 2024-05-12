@@ -69,6 +69,7 @@ namespace Talabat.APIs.Controllers
                     Id = post.Id,
                     content = post.content,
                     Likes = PostLikes,
+                    LikeCount = post.Likes.Count,
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
@@ -110,6 +111,7 @@ namespace Talabat.APIs.Controllers
                     Id = post.Id,
                     content = post.content,
                     Likes = PostLikes,
+                    LikeCount = post.Likes.Count,
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
@@ -150,6 +152,7 @@ namespace Talabat.APIs.Controllers
             {
                 Id = post.Id,
                 content = post.content,
+                LikeCount = post.Likes.Count,
                 Likes = PostLikes,
                 DatePosted = post.DatePosted,
                 Comments = comments,
@@ -266,9 +269,14 @@ namespace Talabat.APIs.Controllers
                 var mappedPostLikes = _mapper.Map<PostLikesDto, PostLikes > (newPostLikes);
                 await _repositoryPostLikes.Add(mappedPostLikes);
                 _repositoryPostLikes.SaveChanges();
-                return Ok(true);
+                return Ok("Like");
             }
-            return Ok(false);
+            else
+            {
+                _repositoryPostLikes.Delete(isLiked);
+                _repositoryPostLikes.SaveChanges();
+            }
+            return Ok("Dislike");
         }
     }
 }
