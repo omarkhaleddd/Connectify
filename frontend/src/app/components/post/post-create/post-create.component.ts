@@ -23,6 +23,8 @@ export class PostCreateComponent {
     console.log(this.postContent);
     const postData = { content: this.postContent }; 
     this.postService.createPost(postData,this.headers).subscribe(response => {
+      console.log(this.headers);
+      
       console.log('Post created successfully:', response);
     }, error => {
       console.error('Error creating post:', error);

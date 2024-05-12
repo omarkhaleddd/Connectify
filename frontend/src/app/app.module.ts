@@ -18,6 +18,7 @@ import { CommentsDisplayComponent } from './components/comment/comments-display/
 import { CommentsCreateComponent } from './components/comment/comments-create/comments-create.component';
 import { CommentGetComponent } from './components/comment/comment-get/comment-get.component';
 import { PostComponent } from './post/post.component';
+import { PostsProfileDisplayComponent } from './components/post/posts-profile-display/posts-profile-display.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { PostComponent } from './post/post.component';
     CommentsDisplayComponent,
     CommentsCreateComponent,
     CommentGetComponent,
-    PostComponent
+    PostComponent,
+    PostsProfileDisplayComponent
   ],
   imports: [
     BrowserModule,

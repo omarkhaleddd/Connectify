@@ -26,6 +26,7 @@ export class LoginComponent {
         if(res.token){
           localStorage.setItem('userToken',res.token);
           localStorage.setItem('displayName',res.displayName);
+          localStorage.setItem('userId',res.id);
           this._Router.navigate(['/home']);
         }
       },

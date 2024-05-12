@@ -6,12 +6,15 @@
             <span class="post-date">{{ post?.datePosted }}</span>
         </div>
     </div>
-    <div class="post-content"  (click)="onPostClick(post)">
+    <div class="post-content" (click)="onPostClick(post)">
         <p>{{ post?.content }}</p>
         <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
     </div>
     <div class="post-footer">
-        <button (click)="likePost()">Like</button>
+        <button (click)="likePost()">
+            {{ isLiked }}
+        </button>
+
         <span>{{ post?.likeCount }} Likes</span>
         <button (click)="commentPost()">Comment</button>
     </div>

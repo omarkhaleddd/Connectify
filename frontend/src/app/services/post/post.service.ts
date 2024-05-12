@@ -11,7 +11,9 @@ export class PostService {
 
   constructor(private http: HttpClient) { }
 
-  createPost(postData: any,headers: any): Observable<any> {
+  createPost(postData: any,headers: any): Observable<any> 
+  {
+    console.log(headers.get('Authorization'));
     return this.http.post<any>(this.apiUrl, postData,{headers : headers});
   }
 
@@ -23,4 +25,16 @@ export class PostService {
     console.log(this.apiUrl + `${id}`);
     return this.http.get<Post>(this.apiUrl + `${id}`,{headers: headers});
   }
+
+  getPostsByAuthorId(authorId: string, headers: any): Observable<Post[]> {
+    console.log(this.apiUrl + `GetPostByAuthorId/${authorId}`);
+    return this.http.get<Post[]>(this.apiUrl + `GetPostByAuthorId/${authorId}`, { headers: headers });
+  }
+
+  likePost(postId: number,headers: any): Observable<any> 
+  {
+    console.log(headers);
+    console.log(this.apiUrl + `LikePost/${postId}`);
+    return this.http.put<string>(this.apiUrl + `LikePost/${postId}`,{headers : headers});
+  } 
 }
