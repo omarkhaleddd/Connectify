@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
+using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Repositories;
 using Talabat.Core.Services;
+using Talabat.Core.Specifications;
 
 namespace Talabat.APIs.Controllers
 {
@@ -20,13 +24,15 @@ namespace Talabat.APIs.Controllers
         private readonly UserManager<AppUser> _manager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly IGenericRepository<Post> _repositoryPost;
 
-        public AccountsController(IMapper mapper, UserManager<AppUser> manager, SignInManager<AppUser> signInManager, ITokenService tokenService)
+        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, SignInManager<AppUser> signInManager, ITokenService tokenService)
         {
             _mapper = mapper;
             _manager = manager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _repositoryPost = genericRepository;
         }
         [HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
@@ -150,8 +156,6 @@ namespace Talabat.APIs.Controllers
 			if (!result.Succeeded) return BadRequest(new ApiResponse(400));
 			return Ok(updateUser);
 		}
-
-
 		[HttpGet("EmailExist")]
         public async Task<ActionResult<bool>> checkDuplicateEmail(string email)
         {
@@ -159,5 +163,62 @@ namespace Talabat.APIs.Controllers
             if (user is null) return false;
             else return true;
         }
+
+        [HttpGet("Search/{DisplayName}")]
+        public async Task<ActionResult<ICollection<UserDto>>> GetUsersWithNames(string DisplayName)
+        {
+            var UserStartingWithPrefix = await _manager.Users
+                .Where(N => N.DisplayName.StartsWith(DisplayName))
+                .ToListAsync();
+            if(UserStartingWithPrefix.Count == 0)
+            {
+                return NotFound("User not found");
+            }
+            var mappedUsers = _mapper.Map<List<AppUser>, List<AppUserDto>>(UserStartingWithPrefix);
+            return Ok(mappedUsers);
+        }
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<UserDto>> GetCurrentUser(string id)
+        {
+            var user = await _manager.GetUserByIdAsync(id);
+            if (user is null) 
+                return NotFound(new ApiResponse(404));
+            var spec = new PostWithCommentSpecs(id);
+            var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+
+            if (posts == null)
+            {
+                return BadRequest("No posts");
+            }
+
+            var postDtos = new List<PostDto>();
+            foreach (var post in posts)
+            {
+                var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+                var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+
+                var postDto = new PostDto
+                {
+                    Id = post.Id,
+                    content = post.content,
+                    Likes = PostLikes,
+                    DatePosted = post.DatePosted,
+                    Comments = comments,
+                    AuthorId = user.Id,
+                    AuthorName = user.DisplayName
+                };
+
+                postDtos.Add(postDto);
+            }
+            var ReturnedUser = new
+            {
+                Id = user.Id,
+                DisplayName = user.DisplayName,
+                posts = postDtos
+            };
+            return Ok(ReturnedUser);
+        }
+
+
     }
 }

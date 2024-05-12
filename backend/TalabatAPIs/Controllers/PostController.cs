@@ -241,7 +241,7 @@ namespace Talabat.APIs.Controllers
             return Ok("Post deleted");
         }
         
-        //Like Post
+        //Like or Dislike Post
         [Authorize]
         [HttpPut("LikePost/{PostId}")]
         public async Task<ActionResult<PostDto>> LikePost(int PostId)
