@@ -14,8 +14,12 @@ export class AuthService {
     return localStorage.getItem('userToken');
   }
 
+  getUserId(): string | null {
+    return localStorage.getItem('userId');
+  }
+
+
   register(data:FormGroup):Observable<any>{
-    console.log(data);
     return this._HttpClient.post('https://localhost:7095/api/Accounts/Register',data);
   } 
   login(data:FormGroup):Observable<any>{

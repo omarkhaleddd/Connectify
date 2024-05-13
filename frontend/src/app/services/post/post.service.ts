@@ -33,8 +33,7 @@ export class PostService {
 
   likePost(postId: number,headers: any): Observable<any> 
   {
-    console.log(headers);
     console.log(this.apiUrl + `LikePost/${postId}`);
-    return this.http.put<string>(this.apiUrl + `LikePost/${postId}`,{headers : headers});
+    return this.http.put<any>(this.apiUrl + `LikePost/${postId}`,null,{headers : headers});
   } 
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
+using System.Text.Json;
 using Talabat.APIs.Controllers;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
@@ -245,7 +246,7 @@ namespace Talabat.APIs.Controllers
         }
         
         //Like or Dislike Post
-        [Authorize]
+//        [Authorize]
         [HttpPut("LikePost/{PostId}")]
         public async Task<ActionResult<PostDto>> LikePost(int PostId)
         {
@@ -269,14 +270,28 @@ namespace Talabat.APIs.Controllers
                 var mappedPostLikes = _mapper.Map<PostLikesDto, PostLikes > (newPostLikes);
                 await _repositoryPostLikes.Add(mappedPostLikes);
                 _repositoryPostLikes.SaveChanges();
-                return Ok("Like");
+                // hena ba3ml retreive ll post b3d el update
+                var specLikes = new PostWithCommentSpecs(PostId);
+                var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
+                var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                var response = new { message = "Dislike", likeCount = retPostLikes.Count };
+                
+                return Ok(JsonSerializer.Serialize(response));
             }
             else
             {
                 _repositoryPostLikes.Delete(isLiked);
                 _repositoryPostLikes.SaveChanges();
+                // hena ba3ml retreive ll post b3d el update w 3ayz avalidate hena la2no ka by3ml remove fa momken yrg3lo zero 
+                var specLikes = new PostWithCommentSpecs(PostId);
+                var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
+                var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post?.Likes);
+
+                var response = new { message = "Like", likeCount = retPostLikes.Count };
+               
+                return Ok(JsonSerializer.Serialize(response));
             }
-            return Ok("Dislike");
+
         }
     }
 }

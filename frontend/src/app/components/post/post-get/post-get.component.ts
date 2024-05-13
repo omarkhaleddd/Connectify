@@ -2,6 +2,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
+import { Likes } from 'src/app/models/like';
 import { Post } from 'src/app/models/post.model';
 import { PostService } from 'src/app/services/post/post.service';
 
@@ -10,11 +11,29 @@ import { PostService } from 'src/app/services/post/post.service';
   templateUrl: './post-get.component.html',
   styleUrls: ['./post-get.component.css']
 })
-export class PostGetComponent {
+export class PostGetComponent implements OnInit{
   @Input() post: Post | undefined;
-  isLiked : string = "Like";
+  isLiked : string | undefined;
+  likeCount : number | undefined;
+  isLikedBtn : any ;
+  constructor(private _AuthService:AuthService ,private postService:PostService,private router:Router) 
+  { 
 
-  constructor(private _AuthService:AuthService ,private postService:PostService,private router:Router) { }
+  }
+
+  ngOnInit(): void {
+    var userId =this._AuthService.getUserId()
+    this.isLikedBtn = this.post?.likes.some(like => like.userId === userId);
+    console.log(this.post?.likeCount);
+    this.likeCount = this.post?.likeCount
+    
+    if(this.isLikedBtn){
+      this.isLiked = "Dislike";
+    }
+    else{
+      this.isLiked = "Like";
+    }
+  }
 
   token:any = this._AuthService.getToken();
 
@@ -22,25 +41,20 @@ export class PostGetComponent {
     Authorization: `Bearer ${this.token}`
   });
 
-
   likePost() {
     if (this.post) {
-      console.log(this.post.id);
-      console.log(this.headers);
-      if (this.headers.has('Authorization')) {
-        console.log('Token was sent successfully:', this.headers);
-      } else {
-        console.log('Token was not sent in the headers.');
-      }
-      
+      console.log(this.post.likes);
       this.postService.likePost(this.post.id,this.headers).subscribe(res => {
-        console.log(res)
-        this.isLiked = res;
-        console.log(this.isLiked);  
+        this.isLiked = res.message; 
+        console.log(this.likeCount);
+        
+        this.likeCount = res.likeCount;
+        console.log(res);
+        
       }, error => {
-        console.log(error);
         console.error('Error liking post:', error);
-      });
+      }
+    );
     }
   }
 
