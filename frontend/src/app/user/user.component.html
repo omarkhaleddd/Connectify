@@ -1,0 +1,30 @@
+<div class="row vh-100 p-2">
+    <div class="col-md-2">
+
+    </div>
+    <div class="col-md-8 d-grid gap-2 bg-info">
+        <app-posts-profile-display [userPosts]="userPosts"></app-posts-profile-display>
+    </div>
+    <div class="col-md-2">
+        <div class="w-100  border-4 border rounded-4 overflow-hidden sticky-top">
+            <div class="row">
+                <div class="bg-primary-subtle row">
+                    <div class="col-lg-5 col-sm-3">
+                        <i class="fa-circle fa-solid fa-6x text-center"></i>
+                    </div>
+                    <div class="col-lg-7 col-sm-5">
+                        <p class="mt-4 ms-2"> {{displayName}} </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row p-2 ">
+                <div class="col-md-12 p-1 text-center">
+                    <button class="w-50 m-auto btn btn-success" (onclick)="editProfile()">Add Friend</button>
+                </div>
+                <div class="col-md-12 p-1 text-center">
+                    <button class="w-50 m-auto btn btn-success" (onclick)="logout()">Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

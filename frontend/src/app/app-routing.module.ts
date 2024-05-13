@@ -9,6 +9,7 @@ import { NotfoundComponent } from './notfound/notfound.component';
 import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
 import { SearchComponent } from './components/search/search.component';
+import { UserComponent } from './user/user.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -18,6 +19,7 @@ const routes: Routes = [
   {path: 'profile' , component: ProfileComponent},
   {path: 'post/:id' , component: PostComponent},
   {path: 'search/:query' , component: SearchComponent},
+  {path: 'user/:id' , component: UserComponent},
   {path:'**',component:NotfoundComponent}
 ];
 

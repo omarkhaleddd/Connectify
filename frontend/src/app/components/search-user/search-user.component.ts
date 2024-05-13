@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component, Input } from '@angular/core';
-import { User } from 'src/app/models/user';
+import { User } from 'src/app/models/user.model';
 
 @Component({
   selector: 'app-search-user',
@@ -9,7 +9,7 @@ import { User } from 'src/app/models/user';
 })
 export class SearchUserComponent {
   @Input() user: User | undefined;
-  adlyPage: string = "";
+  adlyPage: string = "user/";
   constructor(private router: Router){}
 
   getUserById(){

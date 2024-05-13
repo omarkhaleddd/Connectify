@@ -2,7 +2,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
-import { User } from 'src/app/models/user';
+import { User } from 'src/app/models/user.model';
 import { SearchService } from 'src/app/services/search/search.service';
 
 @Component({
