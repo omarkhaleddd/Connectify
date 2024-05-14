@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Connetify.APIs.DTO;
 using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
@@ -30,6 +31,9 @@ namespace Talabat.APIs.Helpers
 
             CreateMap<FriendDto, AppUserFriend>();
             CreateMap<AppUserFriend, FriendDto>();
-        }
+
+			CreateMap<FriendRequestDto, FriendRequest>();
+			CreateMap<FriendRequest, FriendRequestDto>();
+		}
     }
 }

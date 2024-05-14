@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Connetify.APIs.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -27,18 +28,20 @@ namespace Talabat.APIs.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IGenericRepository<Post> _repositoryPost;
+        private readonly IGenericRepository<FriendRequest> _repositoryFriendRequest;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
 
-        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository,IGenericRepository<AppUserFriend> genericRepository1, SignInManager<AppUser> signInManager, ITokenService tokenService)
-        {
-            _mapper = mapper;
-            _manager = manager;
-            _signInManager = signInManager;
-            _tokenService = tokenService;
-            _repositoryPost = genericRepository;
-            _repositoryFriend = genericRepository1;
-        }
-        [HttpPost("Register")]
+		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<FriendRequest> genericRepository1, SignInManager<AppUser> signInManager, ITokenService tokenService, IGenericRepository<AppUserFriend> repositoryFriend)
+		{
+			_mapper = mapper;
+			_manager = manager;
+			_signInManager = signInManager;
+			_tokenService = tokenService;
+			_repositoryPost = genericRepository;
+			_repositoryFriendRequest = genericRepository1;
+			_repositoryFriend = repositoryFriend;
+		}
+		[HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
         {
 
@@ -239,35 +242,67 @@ namespace Talabat.APIs.Controllers
         }
         //AddFriend
         [Authorize]
-        [HttpPost("AddFriend/{id}")]
-        public async Task<ActionResult<AppUserFriend>> AddFriend(string id)
+        [HttpPost("SendFriendRequest/{id}")]
+        public async Task<ActionResult<AppUserFriend>> SendFriendRequest(string id)
         {
             var user = await _manager.GetUserAddressAsync(User);
             if(id == user.Id)
             {
                 return BadRequest();
             }
-            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id);
+
+            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id );
             var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-            var isFriend = friends.Where(f => f.FriendId == id).FirstOrDefault();
-            if(isFriend is null)
+            var isFriend = friends.Where(f => f.FriendId == id || f.UserId == id).FirstOrDefault();
+
+			var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
+			var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
+
+			var sentFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id && u.Recieverid == id);
+			var sentFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(sentFriendReqSpec);
+
+            
+
+			if (sentFriendRequest is not null)
             {
-                var newFriend = new FriendDto { UserId = user.Id , FriendId = id };
-                var mappedNewFriend = _mapper.Map<FriendDto,AppUserFriend>(newFriend);
-                await _repositoryFriend.Add(mappedNewFriend);
-                _repositoryFriend.SaveChanges();
-                var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-                var result = new { message = "Friend Added" , Friends = updatedFriends };
-                return Ok(JsonSerializer.Serialize(result));
-            }
-            else
+				_repositoryFriendRequest.Delete(sentFriendRequest);
+				_repositoryFriendRequest.SaveChanges();
+				 var updatedFriendRequests = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
+				 var result = new { message = "Removed", FriendRequests = updatedFriendRequests };
+				return Ok(JsonSerializer.Serialize(result));
+			}
+
+			if (receivedFriendRequest is not null)
+			{
+				return BadRequest("Received");
+			}
+
+            if (isFriend is not null)
             {
-                _repositoryFriend.Delete(isFriend);
-                _repositoryFriend.SaveChanges();
-                var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-                var result = new { message = "Friend Deleted", Friends = updatedFriends };
-                return Ok(JsonSerializer.Serialize(result));
-            }
-        }
+				return BadRequest("Friend");
+			}
+
+
+            var newFriendRequest = new FriendRequestDto { SenderId = user.Id, Recieverid = id };
+            var mappedNewFriendRequest = _mapper.Map<FriendRequestDto, FriendRequest>(newFriendRequest);
+            await _repositoryFriendRequest.Add(mappedNewFriendRequest);
+			_repositoryFriendRequest.SaveChanges();
+            var updatedFriendRequestsAdd = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
+            var sentResult = new { message = "Sent", FriendRequests = updatedFriendRequestsAdd };
+            return Ok(JsonSerializer.Serialize(sentResult));
+        
+        //else
+        //{
+        //    _repositoryFriend.Delete(isFriend);
+        //    _repositoryFriend.SaveChanges();
+        //    var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+        //    var result = new { message = "Friend Deleted", Friends = updatedFriends };
+        //    return Ok(JsonSerializer.Serialize(result));
+        //}
     }
+
+
+
+
+	}
 }
