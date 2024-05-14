@@ -97,20 +97,28 @@ namespace Talabat.APIs.Controllers
             //kda m3ana el id el el user bta3na mwgood feha f kol mkan 3ayzen n3ml concat 
             var AllFriends = friendsByFriendId.Concat(friendsByUserId);
             //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
-            var spec = new PostWithCommentSpecs();
-            var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
-            if (posts == null || !posts.Any())
+            var postList = new List<Post>();
+            foreach (var friendByUserId in friendsByUserId)
+            {
+                var spec = new PostWithCommentSpecs(friendByUserId.FriendId);
+                var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+                postList.AddRange(posts);
+            }
+            foreach (var friendByFriendId in friendsByFriendId)
+            {
+                var spec = new PostWithCommentSpecs(friendByFriendId.UserId);
+                var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+                postList.AddRange(posts);
+
+            }
+            if (postList == null || !postList.Any())
             {
                 return NotFound("No posts found");
             }
+
             var postDtos = new List<PostDto>();
 
-            foreach (var friend in AllFriends)
-            {
-                posts.Where(p => p.AuthorId == friend.UserId).ToList();
-            }
-
-            foreach (var post in posts)
+            foreach (var post in postList)
             {
                 var user = await _manager.GetUserByIdAsync(post.AuthorId);
                 if (user == null)

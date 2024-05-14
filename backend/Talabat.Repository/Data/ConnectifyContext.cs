@@ -38,6 +38,11 @@ namespace Talabat.Repository.Data
 				.HasForeignKey(L => L.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Comment>()
+				.HasMany(C => C.Likes)
+				.WithOne(CL => CL.Comment)
+				.HasForeignKey(CL => CL.CommentId)
+				.OnDelete(DeleteBehavior.Cascade);
             //base.OnModelCreating(modelBuilder);
         }
 

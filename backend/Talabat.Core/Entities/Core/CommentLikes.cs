@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities;
 
-namespace Connectify.Core.Entities.Core
+namespace Talabat.Core.Entities.Core
 {
 	public class CommentLikes : BaseEntity
 	{
@@ -21,7 +21,7 @@ namespace Connectify.Core.Entities.Core
 		public string userName { get; set; }
 		[ForeignKey("Comment")]
 		public int CommentId { get; set; }
-		public Comment Post { get; set; }
+		public Comment Comment { get; set; }
 
 	}
 }
