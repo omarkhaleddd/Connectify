@@ -4,6 +4,7 @@ import { PostService } from '../services/post/post.service';
 import { HttpHeaders } from '@angular/common/http';
 import { Post } from '../models/post.model';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../services/user/user.service';
 
 @Component({
   selector: 'app-user',
@@ -15,23 +16,26 @@ export class UserComponent implements OnInit {
   displayName : string | undefined;
   userPosts: Post[] = [];
   isLogged:boolean=true;
+  friendReq: string | undefined;
+  hasRequested: boolean | undefined;
 
-  constructor(private _AuthService:AuthService,private route: ActivatedRoute,private postService:PostService) { }
+  constructor(private _AuthService:AuthService,private route: ActivatedRoute,private postService:PostService,private userService:UserService) { }
 
   ngOnInit(): void {
     
     this.getUserPosts()
     console.log(this.userPosts);
-    console.log(this.displayName);
-    
-    
-  }
+    this.checkFriendRequestFromUser();
+    console.log(this.friendReq);
 
-  logout(){
-    //removes token from the local storage and redirect to login page
-  }
-  editProfile(){
-    //redirects to edit profile page with inputs to edit the profile
+    if (!this.friendReq && this.hasRequested) {
+      this.friendReq = "Send Friend Request";
+    }else{
+      this.friendReq = "Accept or Decline";
+    }
+    console.log(this.friendReq);
+    // this.sendFriendRequest();
+    
   }
 
   token:any = this._AuthService.getToken();
@@ -39,6 +43,43 @@ export class UserComponent implements OnInit {
   headers: any = new HttpHeaders({
     Authorization: `Bearer ${this.token}`
   });
+
+  logout(){
+
+    console.log("erger");
+    
+    //removes token GrmPo{9n18|( from the local storage and redirect to login page
+  }
+
+  checkFriendRequestFromUser(){
+    if (this.userId) {
+      this.route.params.subscribe(params => {
+        const userId = params['id'];
+        console.log(userId);
+        this.userService.checkFriendRequestFromUser(userId,this.headers).subscribe(res => {
+          console.log(res)
+          this.hasRequested = res.message;
+        },error => {
+          console.log(error);
+        } );
+      });
+    }
+  }
+
+  sendFriendRequest() {
+    if (this.userId) {
+      this.route.params.subscribe(params => {
+        const userId = params['id'];
+        console.log(userId);
+        this.userService.sendFriendRequest(userId,this.headers).subscribe(res => {
+          console.log(res)
+          this.friendReq = res.message;
+        },error => {
+          console.log(error);
+        } );
+      });
+    }
+  }
 
 
   getUserPosts() {

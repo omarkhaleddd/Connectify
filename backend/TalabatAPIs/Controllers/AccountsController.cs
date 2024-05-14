@@ -240,8 +240,8 @@ namespace Talabat.APIs.Controllers
             var mappedFriends = _mapper.Map<List<AppUserFriend>, List<FriendDto>>(friends.ToList());
             return Ok(mappedFriends);
         }
-        //AddFriend
-        [Authorize]
+		//SendFriendRequest
+		[Authorize]
         [HttpPost("SendFriendRequest/{id}")]
         public async Task<ActionResult<AppUserFriend>> SendFriendRequest(string id)
         {
@@ -274,12 +274,14 @@ namespace Talabat.APIs.Controllers
 
 			if (receivedFriendRequest is not null)
 			{
-				return BadRequest("Received");
+				var result = new { message = "Received" };
+				return Ok(JsonSerializer.Serialize(result));
 			}
 
             if (isFriend is not null)
             {
-				return BadRequest("Friend");
+				var result = new { message = "Friend" };
+				return Ok(JsonSerializer.Serialize(result));
 			}
 
 
@@ -291,17 +293,33 @@ namespace Talabat.APIs.Controllers
             var sentResult = new { message = "Sent", FriendRequests = updatedFriendRequestsAdd };
             return Ok(JsonSerializer.Serialize(sentResult));
         
-        //else
-        //{
-        //    _repositoryFriend.Delete(isFriend);
-        //    _repositoryFriend.SaveChanges();
-        //    var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-        //    var result = new { message = "Friend Deleted", Friends = updatedFriends };
-        //    return Ok(JsonSerializer.Serialize(result));
-        //}
+       
     }
 
+		[Authorize]
+		[HttpGet("CheckFriendRequestFromUser/{id}")]
+		public async Task<ActionResult<AppUserFriend>> CheckFriendRequestFromUser(string id)
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+			if (id == user.Id)
+			{
+				return BadRequest();
+			}
 
+			var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
+			var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
+
+			if (receivedFriendRequest is not null)
+			{
+				var result = new { message = true };
+				return Ok(JsonSerializer.Serialize(result));
+			}
+
+			var sentResult = new { message = false };
+			return Ok(JsonSerializer.Serialize(sentResult));
+
+
+		}
 
 
 	}
