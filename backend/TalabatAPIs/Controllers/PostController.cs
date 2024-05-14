@@ -28,15 +28,16 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<Post> _repositoryPost;
         private readonly IGenericRepository<Comment> _repositoryComment;
         private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
+        private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
 
-        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2 , IGenericRepository<PostLikes> genericRepository3)
+        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2 , IGenericRepository<PostLikes> genericRepository3 , IGenericRepository<AppUserFriend> genericRepository4)
         {
             _mapper = mapper;
             _manager = manager;
             _repositoryPost = genericRepository;
             _repositoryComment = genericRepository2;
             _repositoryPostLikes = genericRepository3;
-
+            _repositoryFriend = genericRepository4;
         }
 
 
@@ -88,14 +89,27 @@ namespace Talabat.APIs.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PostDto>> GetPosts()
         {
+            var currUser = await _manager.GetUserAddressAsync(User);
+            var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == currUser.Id);
+            var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == currUser.Id);
+            var friendsByUserId = await _repositoryFriend.GetAllWithSpecAsync(specFriendUserId);
+            var friendsByFriendId = await _repositoryFriend.GetAllWithSpecAsync(specFriendFriendId);
+            //kda m3ana el id el el user bta3na mwgood feha f kol mkan 3ayzen n3ml concat 
+            var AllFriends = friendsByFriendId.Concat(friendsByUserId);
+            //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var spec = new PostWithCommentSpecs();
             var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
             if (posts == null || !posts.Any())
             {
                 return NotFound("No posts found");
             }
-
             var postDtos = new List<PostDto>();
+
+            foreach (var friend in AllFriends)
+            {
+                posts.Where(p => p.AuthorId == friend.UserId).ToList();
+            }
+
             foreach (var post in posts)
             {
                 var user = await _manager.GetUserByIdAsync(post.AuthorId);

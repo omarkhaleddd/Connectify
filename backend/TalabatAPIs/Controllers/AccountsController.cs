@@ -31,17 +31,18 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<FriendRequest> _repositoryFriendRequest;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
 
-		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<FriendRequest> genericRepository1, SignInManager<AppUser> signInManager, ITokenService tokenService, IGenericRepository<AppUserFriend> repositoryFriend)
-		{
-			_mapper = mapper;
-			_manager = manager;
-			_signInManager = signInManager;
-			_tokenService = tokenService;
-			_repositoryPost = genericRepository;
-			_repositoryFriendRequest = genericRepository1;
-			_repositoryFriend = repositoryFriend;
-		}
-		[HttpPost("Register")]
+
+        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, SignInManager<AppUser> signInManager, ITokenService tokenService)
+        {
+            _mapper = mapper;
+            _manager = manager;
+            _signInManager = signInManager;
+            _tokenService = tokenService;
+            _repositoryPost = genericRepository;
+            _repositoryFriend = genericRepository1;
+            _repositoryFriendRequest = genericRepository2;
+        }
+        [HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
         {
 
@@ -83,7 +84,7 @@ namespace Talabat.APIs.Controllers
 
         }
         [Authorize]
-		[HttpGet("GetCurrentUser")]
+        [HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
             var Email = User.FindFirstValue(ClaimTypes.Email);
@@ -109,63 +110,63 @@ namespace Talabat.APIs.Controllers
 
         }
 
-		[Authorize]
-		[HttpPost("Address")]
-		public async Task<ActionResult<AddressDto>> CreateAddress(AddressDto newAddress)
-		{
-			var user = await _manager.GetUserAddressAsync(User); 
-			if (user is null)
-				return Unauthorized(new ApiResponse(401));
-
-			var address = _mapper.Map<AddressDto, Address>(newAddress);
-			user.Address = address;
-
-			var result = await _manager.UpdateAsync(user); 
-
-			if (!result.Succeeded)
-				return BadRequest(new ApiResponse(400));
-
-			//var createdAddressDto = _mapper.Map<Address, AddressDto>(user.Address);
-			return Ok(newAddress);
-		}
-
-		[Authorize]
-        [HttpPut("Address")]
-        public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto updatedAddress)
+        [Authorize]
+        [HttpPost("Address")]
+        public async Task<ActionResult<AddressDto>> CreateAddress(AddressDto newAddress)
         {
-           
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-            var address =_mapper.Map<AddressDto, Address>(updatedAddress);
+
+            var address = _mapper.Map<AddressDto, Address>(newAddress);
+            user.Address = address;
+
+            var result = await _manager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                return BadRequest(new ApiResponse(400));
+
+            //var createdAddressDto = _mapper.Map<Address, AddressDto>(user.Address);
+            return Ok(newAddress);
+        }
+
+        [Authorize]
+        [HttpPut("Address")]
+        public async Task<ActionResult<AddressDto>> UpdateAddress(AddressDto updatedAddress)
+        {
+
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401));
+            var address = _mapper.Map<AddressDto, Address>(updatedAddress);
             address.Id = user.Address.Id;
             user.Address = address;
-            var result =await _manager.UpdateAsync(user);
+            var result = await _manager.UpdateAsync(user);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             return Ok(updatedAddress);
         }
 
-		[Authorize]
-		[HttpPut("UpdateProfile")]
-		public async Task<ActionResult<UserDto>> UpdateProfile(UserDto updateUser)
-		{
+        [Authorize]
+        [HttpPut("UpdateProfile")]
+        public async Task<ActionResult<UserDto>> UpdateProfile(UserDto updateUser)
+        {
             //example of how to use get user main async
             var userId = await _manager.GetUserAddressAsync(User);
-            
-			var user = await _manager.GetUserAddressAsync(User);
+
+            var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401, $" ggg {user}"));
             var appuser = _mapper.Map<UserDto, AppUser>(updateUser);
             user.DisplayName = updateUser.DisplayName;
             user.Id = updateUser.Id;
-			var result = await _manager.UpdateAsync(user);
-			if (!result.Succeeded) return BadRequest(new ApiResponse(400));
-			return Ok(updateUser);
-		}
-		[HttpGet("EmailExist")]
+            var result = await _manager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            return Ok(updateUser);
+        }
+        [HttpGet("EmailExist")]
         public async Task<ActionResult<bool>> checkDuplicateEmail(string email)
         {
-            var user =await _manager.FindByEmailAsync(email);
+            var user = await _manager.FindByEmailAsync(email);
             if (user is null) return false;
             else return true;
         }
@@ -176,7 +177,7 @@ namespace Talabat.APIs.Controllers
             var UserStartingWithPrefix = await _manager.Users
                 .Where(N => N.DisplayName.StartsWith(DisplayName))
                 .ToListAsync();
-            if(UserStartingWithPrefix.Count == 0)
+            if (UserStartingWithPrefix.Count == 0)
             {
                 return NotFound("User not found");
             }
@@ -187,7 +188,7 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<UserDto>> GetCurrentUser(string id)
         {
             var user = await _manager.GetUserByIdAsync(id);
-            if (user is null) 
+            if (user is null)
                 return NotFound(new ApiResponse(404));
             var spec = new PostWithCommentSpecs(id);
             var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
@@ -231,7 +232,7 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<FriendDto>> GetFriends()
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id );
+            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
             var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
             if (friends == null || !friends.Any())
             {
@@ -240,69 +241,133 @@ namespace Talabat.APIs.Controllers
             var mappedFriends = _mapper.Map<List<AppUserFriend>, List<FriendDto>>(friends.ToList());
             return Ok(mappedFriends);
         }
-        //AddFriend
+        //Send/Delete-Friend-Request
         [Authorize]
         [HttpPost("SendFriendRequest/{id}")]
         public async Task<ActionResult<AppUserFriend>> SendFriendRequest(string id)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            if(id == user.Id)
+            if (id == user.Id)
             {
                 return BadRequest();
             }
 
-            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id );
+            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
             var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
             var isFriend = friends.Where(f => f.FriendId == id || f.UserId == id).FirstOrDefault();
 
-			var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
-			var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
+            var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
+            var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
 
-			var sentFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id && u.Recieverid == id);
-			var sentFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(sentFriendReqSpec);
+            var sentFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id && u.Recieverid == id);
+            var sentFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(sentFriendReqSpec);
 
-            
 
-			if (sentFriendRequest is not null)
+
+            if (sentFriendRequest is not null)
             {
-				_repositoryFriendRequest.Delete(sentFriendRequest);
-				_repositoryFriendRequest.SaveChanges();
-				 var updatedFriendRequests = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
-				 var result = new { message = "Removed", FriendRequests = updatedFriendRequests };
-				return Ok(JsonSerializer.Serialize(result));
-			}
+                _repositoryFriendRequest.Delete(sentFriendRequest);
+                _repositoryFriendRequest.SaveChanges();
+                var updatedFriendRequests = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
+                var result = new { message = "Removed", FriendRequests = updatedFriendRequests };
+                return Ok(JsonSerializer.Serialize(result));
+            }
 
-			if (receivedFriendRequest is not null)
-			{
-				return BadRequest("Received");
-			}
+            if (receivedFriendRequest is not null)
+            {
+                return BadRequest("Received");
+            }
 
             if (isFriend is not null)
             {
-				return BadRequest("Friend");
-			}
+                return BadRequest("Friend");
+            }
 
 
             var newFriendRequest = new FriendRequestDto { SenderId = user.Id, Recieverid = id };
             var mappedNewFriendRequest = _mapper.Map<FriendRequestDto, FriendRequest>(newFriendRequest);
             await _repositoryFriendRequest.Add(mappedNewFriendRequest);
-			_repositoryFriendRequest.SaveChanges();
+            _repositoryFriendRequest.SaveChanges();
             var updatedFriendRequestsAdd = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
             var sentResult = new { message = "Sent", FriendRequests = updatedFriendRequestsAdd };
             return Ok(JsonSerializer.Serialize(sentResult));
-        
-        //else
-        //{
-        //    _repositoryFriend.Delete(isFriend);
-        //    _repositoryFriend.SaveChanges();
-        //    var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-        //    var result = new { message = "Friend Deleted", Friends = updatedFriends };
-        //    return Ok(JsonSerializer.Serialize(result));
-        //}
+
+            //else
+            //{
+            //    _repositoryFriend.Delete(isFriend);
+            //    _repositoryFriend.SaveChanges();
+            //    var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            //    var result = new { message = "Friend Deleted", Friends = updatedFriends };
+            //    return Ok(JsonSerializer.Serialize(result));
+            //}
+        }
+        //Accept/Reject-Friend-Req
+        [Authorize]
+        [HttpPost("FriendState/{id}")]
+        public async Task<ActionResult<FriendDto>> FriendState(string id, [FromBody] StateDto stateDto )
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
+            var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+            var requestById = requests.Where(u => u.SenderId == id).FirstOrDefault();
+            if (requestById is null)
+            {
+                return NotFound(404);
+            }
+                if (stateDto.State == 0) // reject
+            {
+                _repositoryFriendRequest.Delete(requestById);
+                _repositoryFriendRequest.SaveChanges();
+                var result = new { message = "Rejected" };
+                return Ok(JsonSerializer.Serialize(result));
+            }
+            else if(stateDto.State == 1)
+            {// accept
+                _repositoryFriendRequest.Delete(requestById);
+                _repositoryFriendRequest.SaveChanges();
+                var friend = new AppUserFriend { UserId = requestById.SenderId, FriendId = requestById.Recieverid };
+                await _repositoryFriend.Add(friend);
+                _repositoryFriend.SaveChanges();
+                var result = new { message = "Accepted" };
+                return Ok(JsonSerializer.Serialize(result));
+            }
+            else { 
+                return BadRequest(); 
+            }
+        }
+        [Authorize]
+        [HttpGet("FriendRequestsRecieved")]
+        public async Task<ActionResult<IEnumerable<FriendRequest>>> FriendRequestsRecieved()
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
+            var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+
+            if (requests.Any())
+            {
+                return Ok(requests);
+            }
+            else
+            {
+                return NotFound("No Requests Received found");
+            }
+        }[Authorize]
+[HttpGet("FriendRequestsSent")]
+public async Task<ActionResult<IEnumerable<FriendRequest>>> FriendRequestsSent()
+{
+    var user = await _manager.GetUserAddressAsync(User);
+    var spec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id);
+    var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+
+    if (requests.Any())
+    {
+        return Ok(requests);
     }
+    else
+    {
+        return NotFound("No Requests Sent found");
+    }
+}
 
-
-
-
-	}
+    }
 }
