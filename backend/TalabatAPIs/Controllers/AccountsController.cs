@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System.Security.Claims;
+using System.Text.Json;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
@@ -25,14 +27,16 @@ namespace Talabat.APIs.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IGenericRepository<Post> _repositoryPost;
+        private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
 
-        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, SignInManager<AppUser> signInManager, ITokenService tokenService)
+        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository,IGenericRepository<AppUserFriend> genericRepository1, SignInManager<AppUser> signInManager, ITokenService tokenService)
         {
             _mapper = mapper;
             _manager = manager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _repositoryPost = genericRepository;
+            _repositoryFriend = genericRepository1;
         }
         [HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
@@ -75,8 +79,7 @@ namespace Talabat.APIs.Controllers
             });
 
         }
-
-		[Authorize]
+        [Authorize]
 		[HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
@@ -219,6 +222,52 @@ namespace Talabat.APIs.Controllers
             return Ok(ReturnedUser);
         }
 
-
+        //GetFriends
+        [Authorize]
+        [HttpGet("Friends")]
+        public async Task<ActionResult<FriendDto>> GetFriends()
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id );
+            var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            if (friends == null || !friends.Any())
+            {
+                return NotFound("No Friends found");
+            }
+            var mappedFriends = _mapper.Map<List<AppUserFriend>, List<FriendDto>>(friends.ToList());
+            return Ok(mappedFriends);
+        }
+        //AddFriend
+        [Authorize]
+        [HttpPost("AddFriend/{id}")]
+        public async Task<ActionResult<AppUserFriend>> AddFriend(string id)
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            if(id == user.Id)
+            {
+                return BadRequest();
+            }
+            var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id);
+            var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            var isFriend = friends.Where(f => f.FriendId == id).FirstOrDefault();
+            if(isFriend is null)
+            {
+                var newFriend = new FriendDto { UserId = user.Id , FriendId = id };
+                var mappedNewFriend = _mapper.Map<FriendDto,AppUserFriend>(newFriend);
+                await _repositoryFriend.Add(mappedNewFriend);
+                _repositoryFriend.SaveChanges();
+                var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+                var result = new { message = "Friend Added" , Friends = updatedFriends };
+                return Ok(JsonSerializer.Serialize(result));
+            }
+            else
+            {
+                _repositoryFriend.Delete(isFriend);
+                _repositoryFriend.SaveChanges();
+                var updatedFriends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+                var result = new { message = "Friend Deleted", Friends = updatedFriends };
+                return Ok(JsonSerializer.Serialize(result));
+            }
+        }
     }
 }

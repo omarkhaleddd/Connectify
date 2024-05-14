@@ -27,6 +27,9 @@ namespace Talabat.APIs.Helpers
 
             CreateMap<PostLikesDto, PostLikes>();
             CreateMap<PostLikes, PostLikesDto>();
+
+            CreateMap<FriendDto, AppUserFriend>();
+            CreateMap<AppUserFriend, FriendDto>();
         }
     }
 }

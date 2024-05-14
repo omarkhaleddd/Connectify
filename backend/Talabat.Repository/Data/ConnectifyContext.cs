@@ -16,6 +16,7 @@ namespace Talabat.Repository.Data
 		public DbSet<Post> Post { get; set; }
 
 		public DbSet<Comment> Comment { get; set; }
+		public DbSet<AppUserFriend> friends { get; set; }
 
 		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{

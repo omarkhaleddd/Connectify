@@ -18,14 +18,15 @@ namespace Talabat.Core.Entities.Core
             InsertDate = DateTime.Now;
             UpdateDate = DateTime.Now;
             DeleteDate = null;
-            likeCount = 0;
+            Likes = null;
         }
         public string content { get; set; }
-        public int likeCount { get; set; }
         public DateTime DatePosted { get; set; } 
 		public string AuthorId { get; set; }
 		[ForeignKey("Post")]
         public int PostId { get; set; }
         public Post Post { get; set; }
+        public ICollection<CommentLikes>? Likes { get; set; } = new HashSet<CommentLikes>();
+
     }
 }
