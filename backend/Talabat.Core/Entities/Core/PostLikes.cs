@@ -16,7 +16,8 @@ namespace Talabat.Core.Entities.Core
             DeleteDate = null;
         }
         public string userId { get; set; }
-        [ForeignKey("Post")]
+		public string userName { get; set; }
+		[ForeignKey("Post")]
         public int PostId { get; set; }
         public Post Post { get; set; }
 

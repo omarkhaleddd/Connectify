@@ -5,4 +5,5 @@ export interface Comment {
     likeCount: number
     datePosted: Date;
     authorId: string;
+    authorName:string;
 }

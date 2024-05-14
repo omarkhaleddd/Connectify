@@ -266,7 +266,7 @@ namespace Talabat.APIs.Controllers
 
             if (isLiked is null)
             {
-                var newPostLikes = new PostLikesDto { userId= user.Id, PostId=  PostId };
+                var newPostLikes = new PostLikesDto { userId= user.Id, PostId=  PostId, userName= user.DisplayName };
                 var mappedPostLikes = _mapper.Map<PostLikesDto, PostLikes > (newPostLikes);
                 await _repositoryPostLikes.Add(mappedPostLikes);
                 _repositoryPostLikes.SaveChanges();
@@ -274,7 +274,7 @@ namespace Talabat.APIs.Controllers
                 var specLikes = new PostWithCommentSpecs(PostId);
                 var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-                var response = new { message = "Dislike", likeCount = retPostLikes.Count };
+                var response = new { message = "Dislike", likeCount = retPostLikes.Count, likes = retPostLikes };
                 
                 return Ok(JsonSerializer.Serialize(response));
             }
@@ -287,9 +287,9 @@ namespace Talabat.APIs.Controllers
                 var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post?.Likes);
 
-                var response = new { message = "Like", likeCount = retPostLikes.Count };
-               
-                return Ok(JsonSerializer.Serialize(response));
+                var response = new { message = "Like", likeCount = retPostLikes.Count, likes = retPostLikes };
+
+				return Ok(JsonSerializer.Serialize(response));
             }
 
         }

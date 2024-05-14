@@ -24,7 +24,8 @@ namespace Talabat.Core.Entities.Core
         public string content { get; set; }
         public DateTime DatePosted { get; set; } 
         public string AuthorId { get; set; }
-        public ICollection<PostLikes>? Likes { get; set; } = new HashSet<PostLikes>();
+		public string AuthorName { get; set; }
+		public ICollection<PostLikes>? Likes { get; set; } = new HashSet<PostLikes>();
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
     }
 }

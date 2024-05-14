@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Connectify.Core.Entities.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace Talabat.Core.Entities.Core
         public string content { get; set; }
         public DateTime DatePosted { get; set; } 
 		public string AuthorId { get; set; }
+		public string AuthorName { get; set; }
 		[ForeignKey("Post")]
         public int PostId { get; set; }
         public Post Post { get; set; }

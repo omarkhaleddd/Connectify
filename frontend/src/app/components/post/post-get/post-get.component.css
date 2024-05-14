@@ -87,3 +87,12 @@
     color: #555;
     margin-right: 10px;
 }
+
+.post-footer * {
+    margin-right: 1em;
+}
+
+.post-footer span:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
