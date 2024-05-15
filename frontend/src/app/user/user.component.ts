@@ -18,6 +18,8 @@ export class UserComponent implements OnInit {
   isLogged:boolean=true;
   friendReq: string | undefined;
   hasRequested: boolean | undefined;
+  
+  friendState: string | undefined;
 
   constructor(private _AuthService:AuthService,private route: ActivatedRoute,private postService:PostService,private userService:UserService) { }
 
@@ -27,12 +29,15 @@ export class UserComponent implements OnInit {
     console.log(this.userPosts);
     this.checkFriendRequestFromUser();
     console.log(this.friendReq);
+    console.log(this.hasRequested);
 
-    if (!this.friendReq && this.hasRequested) {
+    
+
+    if (!this.friendReq) {
       this.friendReq = "Send Friend Request";
-    }else{
-      this.friendReq = "Accept or Decline";
     }
+    
+    
     console.log(this.friendReq);
     // this.sendFriendRequest();
     
@@ -57,8 +62,35 @@ export class UserComponent implements OnInit {
         const userId = params['id'];
         console.log(userId);
         this.userService.checkFriendRequestFromUser(userId,this.headers).subscribe(res => {
-          console.log(res)
+          console.log(res.message)
           this.hasRequested = res.message;
+          console.log(this.hasRequested);
+          if (this.hasRequested){
+            this.friendReq = undefined;
+          }
+          console.log(this.friendReq);
+          
+        },error => {
+          console.log(error);
+        } );
+      });
+    }
+  }
+
+  blockUser(){
+    if (this.userId) {
+      this.route.params.subscribe(params => {
+        const userId = params['id'];
+        console.log(userId);
+        this.userService.checkFriendRequestFromUser(userId,this.headers).subscribe(res => {
+          console.log(res.message)
+          this.hasRequested = res.message;
+          console.log(this.hasRequested);
+          if (this.hasRequested){
+            this.friendReq = undefined;
+          }
+          console.log(this.friendReq);
+          
         },error => {
           console.log(error);
         } );
@@ -81,6 +113,29 @@ export class UserComponent implements OnInit {
     }
   }
 
+  answerRequest(state:number){
+    if (this.userId) {
+      this.route.params.subscribe(params => {
+        const userId = params['id'];
+        console.log(userId);
+        this.userService.answerRequest(userId,state,this.headers).subscribe(res => {
+          console.log(res)
+          this.friendState = res.message
+          if (this.friendState == "Rejected") {
+            console.log("You Declined this request");
+          } else if (this.friendState == "Accepted"){
+            console.log("You accepted this request");
+          }else{
+            console.log(res);
+            
+          }
+
+        },error => {
+          console.log(error);
+        } );
+      });
+    }
+  }
 
   getUserPosts() {
     this.route.params.subscribe(params => {

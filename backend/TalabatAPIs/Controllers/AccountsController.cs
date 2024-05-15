@@ -433,6 +433,75 @@ namespace Talabat.APIs.Controllers
 
 		}
 
+		//Accept/Reject-Friend-Req
+		[Authorize]
+		[HttpPost("FriendState/{id}")]
+		public async Task<ActionResult<FriendDto>> FriendState(string id, [FromBody] StateDto stateDto)
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+			var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
+			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+			var requestById = requests.Where(u => u.SenderId == id).FirstOrDefault();
+			if (requestById is null)
+			{
+				return NotFound(404);
+			}
+			if (stateDto.State == 0) // reject
+			{
+				_repositoryFriendRequest.Delete(requestById);
+				_repositoryFriendRequest.SaveChanges();
+				var result = new { message = "Rejected" };
+				return Ok(JsonSerializer.Serialize(result));
+			}
+			else if (stateDto.State == 1)
+			{// accept
+				_repositoryFriendRequest.Delete(requestById);
+				_repositoryFriendRequest.SaveChanges();
+				var friend = new AppUserFriend { UserId = requestById.SenderId, FriendId = requestById.Recieverid };
+				await _repositoryFriend.Add(friend);
+				_repositoryFriend.SaveChanges();
+				var result = new { message = "Accepted" };
+				return Ok(JsonSerializer.Serialize(result));
+			}
+			else
+			{
+				return BadRequest();
+			}
+		}
+		[Authorize]
+		[HttpGet("FriendRequestsRecieved")]
+		public async Task<ActionResult<IEnumerable<FriendRequest>>> FriendRequestsRecieved()
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+			var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
+			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
 
-    }
+			if (requests.Any())
+			{
+				return Ok(requests);
+			}
+			else
+			{
+				return NotFound("No Requests Received found");
+			}
+		}
+		[Authorize]
+		[HttpGet("FriendRequestsSent")]
+		public async Task<ActionResult<IEnumerable<FriendRequest>>> FriendRequestsSent()
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+			var spec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id);
+			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+
+			if (requests.Any())
+			{
+				return Ok(requests);
+			}
+			else
+			{
+				return NotFound("No Requests Sent found");
+			}
+		}
+
+	}
 }

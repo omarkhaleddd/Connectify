@@ -12,7 +12,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   sendFriendRequest(userId: any,headers: any): Observable<any> {
-    console.log(this.apiUrl + `/SendFriendRequest/${userId}`);
+    console.log(this.apiUrl + `SendFriendRequest/${userId}`);
     
     return this.http.post<any>(this.apiUrl + `SendFriendRequest/${userId}`,null,{headers : headers});
   }
@@ -21,5 +21,11 @@ export class UserService {
     console.log(this.apiUrl + `CheckFriendRequestFromUser/${userId}`);
     
     return this.http.get<any>(this.apiUrl + `CheckFriendRequestFromUser/${userId}`,{headers : headers});
+  }
+
+  answerRequest(userId: any,friendState:number,headers: any): Observable<any> {
+    console.log(this.apiUrl + `FriendState/${userId}`);
+    
+    return this.http.post<any>(this.apiUrl + `FriendState/${userId}`,{state : friendState},{headers : headers});
   }
 }

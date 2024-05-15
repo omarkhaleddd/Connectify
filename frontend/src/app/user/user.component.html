@@ -18,12 +18,24 @@
                 </div>
             </div>
             <div class="row p-2 ">
-                <div class="col-md-12 p-1 text-center">
+                <ng-container *ngIf="friendReq; else requestActions">
                     <button class="m-auto btn btn-success" (click)="sendFriendRequest()">{{ friendReq }}</button>
-                </div>
+                </ng-container>
+                <ng-template #requestActions>
+                    <div class="flex">
+                        <button class="me-3 btn btn-success" (click)="answerRequest(1)">Accept</button>
+                        <button class="m-auto btn btn-danger" (click)="answerRequest(0)">Decline</button>
+                    </div>
+                </ng-template>
                 <div class="col-md-12 p-1 text-center">
                     <button class="w-50 m-auto btn btn-success" (click)="logout()">Message</button>
                 </div>
+                <ng-container *ngIf="friendReq; else requestActions">
+                    <button class="m-auto btn btn-danger" (click)="blockUser()">{{ friendReq }}</button>
+                </ng-container>
+                <ng-template #requestActions>
+                    <button class="m-auto btn btn-success" (click)="blockUser()">{{ friendReq }}</button>
+                </ng-template>
             </div>
         </div>
     </div>
