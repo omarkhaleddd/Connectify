@@ -16,10 +16,13 @@ export class UserComponent implements OnInit {
   displayName : string | undefined;
   userPosts: Post[] = [];
   isLogged:boolean=true;
+
   friendReq: string | undefined;
   hasRequested: boolean | undefined;
-  
   friendState: string | undefined;
+
+  blockReq: string | undefined;
+  hasBlocked: boolean | undefined;
 
   constructor(private _AuthService:AuthService,private route: ActivatedRoute,private postService:PostService,private userService:UserService) { }
 
@@ -28,6 +31,7 @@ export class UserComponent implements OnInit {
     this.getUserPosts()
     console.log(this.userPosts);
     this.checkFriendRequestFromUser();
+    this.checkBlockedUser();
     console.log(this.friendReq);
     console.log(this.hasRequested);
 
@@ -35,6 +39,10 @@ export class UserComponent implements OnInit {
 
     if (!this.friendReq) {
       this.friendReq = "Send Friend Request";
+    }
+
+    if (!this.blockReq) {
+      this.blockReq = "Block";
     }
     
     
@@ -77,19 +85,44 @@ export class UserComponent implements OnInit {
     }
   }
 
+  checkBlockedUser(){
+    if (this.userId) {
+      this.route.params.subscribe(params => {
+        const userId = params['id'];
+        console.log(userId);
+        this.userService.checkBlockedUser(userId,this.headers).subscribe(res => {
+          console.log(res.message)
+          this.hasBlocked = res.message;
+          console.log(this.hasBlocked);
+          if (this.hasBlocked){
+            this.blockReq = "unBlock";
+          }
+          console.log(this.blockReq);
+          
+        },error => {
+          console.log(error);
+        } );
+      });
+    }
+  }
+
   blockUser(){
     if (this.userId) {
       this.route.params.subscribe(params => {
         const userId = params['id'];
         console.log(userId);
-        this.userService.checkFriendRequestFromUser(userId,this.headers).subscribe(res => {
+        this.userService.blockUser(userId,this.headers).subscribe(res => {
           console.log(res.message)
-          this.hasRequested = res.message;
-          console.log(this.hasRequested);
-          if (this.hasRequested){
-            this.friendReq = undefined;
+          console.log(this.hasBlocked);
+          this.blockReq = res.message;
+          if (this.blockReq == "block") {
+            console.log("You unblocked this user");
+          } else if (this.blockReq == "unBlock"){
+            console.log("You blocked this user");
+          }else{
+            console.log(res);
+            
           }
-          console.log(this.friendReq);
           
         },error => {
           console.log(error);

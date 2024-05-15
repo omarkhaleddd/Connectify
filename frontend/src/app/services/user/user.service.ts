@@ -23,9 +23,21 @@ export class UserService {
     return this.http.get<any>(this.apiUrl + `CheckFriendRequestFromUser/${userId}`,{headers : headers});
   }
 
+  checkBlockedUser(userId: any,headers: any): Observable<any> {
+    console.log(this.apiUrl + `CheckBlocked/${userId}`);
+    
+    return this.http.get<any>(this.apiUrl + `CheckBlocked/${userId}`,{headers : headers});
+  }
+
   answerRequest(userId: any,friendState:number,headers: any): Observable<any> {
     console.log(this.apiUrl + `FriendState/${userId}`);
     
     return this.http.post<any>(this.apiUrl + `FriendState/${userId}`,{state : friendState},{headers : headers});
+  }
+
+  blockUser(userId: any,headers: any): Observable<any> {
+    console.log(this.apiUrl + `Block/${userId}`);
+    
+    return this.http.post<any>(this.apiUrl + `Block/${userId}`,null,{headers : headers});
   }
 }
