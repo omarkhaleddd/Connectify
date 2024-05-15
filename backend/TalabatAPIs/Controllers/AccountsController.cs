@@ -178,16 +178,29 @@ namespace Talabat.APIs.Controllers
         [HttpGet("Search/{DisplayName}")]
         public async Task<ActionResult<ICollection<UserDto>>> Search(string DisplayName)
         {
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
             //check if the this user added me in the blockList
-
+            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id);
+            var blockedMe = await _repositoryBlock.GetAllWithSpecAsync(blockSpec);
             var UserStartingWithPrefix = await _manager.Users
                 .Where(N => N.DisplayName.StartsWith(DisplayName))
                 .ToListAsync();
             if (UserStartingWithPrefix.Count == 0)
             {
                 return NotFound("User not found");
-         }
-         
+            }
+            foreach (var oneBlockedMe in blockedMe)
+            {
+                var isBlocked = UserStartingWithPrefix.Find(u => u.Id == oneBlockedMe.UserId);
+                if (isBlocked is not null)
+                {
+                    UserStartingWithPrefix.Remove(isBlocked);
+                }
+            }
             var mappedUsers = _mapper.Map<List<AppUser>, List<AppUserDto>>(UserStartingWithPrefix);
             return Ok(mappedUsers);
         }
