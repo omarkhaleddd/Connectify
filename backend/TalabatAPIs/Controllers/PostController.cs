@@ -55,7 +55,7 @@ namespace Talabat.APIs.Controllers
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == authorId);
-            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");

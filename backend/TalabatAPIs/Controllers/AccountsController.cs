@@ -200,7 +200,7 @@ namespace Talabat.APIs.Controllers
                 return NotFound(new ApiResponse(404));
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
-            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
             if(isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
@@ -337,6 +337,33 @@ namespace Talabat.APIs.Controllers
             }
 
         }
+        //CheckFriendRequest
+        [Authorize]
+        [HttpGet("CheckBlocked/{id}")]
+        public async Task<ActionResult<AppUserFriend>> CheckBlocked(string id)
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            if (id == user.Id)
+            {
+                return BadRequest();
+            }
+
+            var blockedUserReqSpec = new BaseSpecifications<BlockList>(u => u.UserId == user.Id && u.BlockedId == id);
+            var blockedUserRequest = await _repositoryBlock.GetEntityWithSpecAsync(blockedUserReqSpec);
+
+            if (blockedUserRequest is not null)
+            {
+                var result = new { message = true };
+                return Ok(JsonSerializer.Serialize(result));
+            }
+
+            var sentResult = new { message = false };
+            return Ok(JsonSerializer.Serialize(sentResult));
+        }
         //SendFriendRequest
         [Authorize]
         [HttpPost("SendFriendRequest/{id}")]
@@ -353,7 +380,7 @@ namespace Talabat.APIs.Controllers
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
-            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
@@ -429,8 +456,6 @@ namespace Talabat.APIs.Controllers
 
 			var sentResult = new { message = false };
 			return Ok(JsonSerializer.Serialize(sentResult));
-
-
 		}
 
 		//Accept/Reject-Friend-Req
