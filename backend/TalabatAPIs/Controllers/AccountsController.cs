@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.DTO;
@@ -29,10 +30,11 @@ namespace Talabat.APIs.Controllers
         private readonly ITokenService _tokenService;
         private readonly IGenericRepository<Post> _repositoryPost;
         private readonly IGenericRepository<FriendRequest> _repositoryFriendRequest;
+        private readonly IGenericRepository<BlockList> _repositoryBlock;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
 
 
-        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, SignInManager<AppUser> signInManager, ITokenService tokenService)
+        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2,IGenericRepository<BlockList> genericRepository3, SignInManager<AppUser> signInManager, ITokenService tokenService)
         {
             _mapper = mapper;
             _manager = manager;
@@ -41,7 +43,9 @@ namespace Talabat.APIs.Controllers
             _repositoryPost = genericRepository;
             _repositoryFriend = genericRepository1;
             _repositoryFriendRequest = genericRepository2;
+            _repositoryBlock = genericRepository3;
         }
+
         [HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
         {
@@ -172,24 +176,35 @@ namespace Talabat.APIs.Controllers
         }
 
         [HttpGet("Search/{DisplayName}")]
-        public async Task<ActionResult<ICollection<UserDto>>> GetUsersWithNames(string DisplayName)
+        public async Task<ActionResult<ICollection<UserDto>>> Search(string DisplayName)
         {
+            //check if the this user added me in the blockList
+
             var UserStartingWithPrefix = await _manager.Users
                 .Where(N => N.DisplayName.StartsWith(DisplayName))
                 .ToListAsync();
             if (UserStartingWithPrefix.Count == 0)
             {
                 return NotFound("User not found");
-            }
+         }
+         
             var mappedUsers = _mapper.Map<List<AppUser>, List<AppUserDto>>(UserStartingWithPrefix);
             return Ok(mappedUsers);
         }
+
         [HttpGet("User/{id}")]
         public async Task<ActionResult<UserDto>> GetCurrentUser(string id)
         {
             var user = await _manager.GetUserByIdAsync(id);
             if (user is null)
                 return NotFound(new ApiResponse(404));
+            //check if the this user added me in the blockList
+            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
+            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            if(isBlocked is not null)
+            {
+                return BadRequest("You are Blocked");
+            }
             var spec = new PostWithCommentSpecs(id);
             var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
 
@@ -232,6 +247,10 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<FriendDto>> GetFriends()
         {
             var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
             var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
             var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
             if (friends == null || !friends.Any())
@@ -241,17 +260,103 @@ namespace Talabat.APIs.Controllers
             var mappedFriends = _mapper.Map<List<AppUserFriend>, List<FriendDto>>(friends.ToList());
             return Ok(mappedFriends);
         }
-        //Send/Delete-Friend-Request
+        //Show BlockList 
         [Authorize]
-		//SendFriendRequest
-		[Authorize]
+        [HttpGet("BlockList")]
+        public async Task<ActionResult<AppUserFriend>> GetBlockList()
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            var spec = new BaseSpecifications<BlockList>(u => u.UserId == user.Id);
+            var blocks = await _repositoryBlock.GetAllWithSpecAsync(spec);
+            if(blocks is null)
+            {
+                return NotFound();
+            }
+            var blockList = _mapper.Map< List < BlockList> ,List<BlockListDto>>(blocks.ToList());
+            return Ok(blockList);
+        }
+        //Block / UnBlock User
+        [Authorize]
+        [HttpPost("Block/{id}")]
+        public async Task<ActionResult<AppUserFriend>> Block(string id)
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            if (id == user.Id)
+            {
+                return BadRequest();
+            }
+
+            var baseSpec = new BaseSpecifications<BlockList>();
+            var spec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
+            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(spec);
+            if (isBlocked is not null)
+            {
+                return BadRequest("This user already blocked you");
+            }
+            var specBlock = new BaseSpecifications<BlockList>(u => u.BlockedId == id && u.UserId == user.Id);
+            var alreadyBlocked = await _repositoryBlock.GetEntityWithSpecAsync(specBlock);
+            if(alreadyBlocked is null)
+            {
+                var blockedUser = new BlockListDto { UserId = user.Id, BlockedId = id };
+                var mappedUser = _mapper.Map<BlockListDto, BlockList>(blockedUser);
+                await _repositoryBlock.Add(mappedUser);
+                _repositoryBlock.SaveChanges();
+                var friendSpec = new BaseSpecifications<AppUserFriend>(u => (u.FriendId == user.Id && u.UserId == id) ||(u.UserId == user.Id && u.FriendId == id));
+                var isFriend = await _repositoryFriend.GetEntityWithSpecAsync(friendSpec);
+                if (isFriend is not null)
+                {
+                    _repositoryFriend.Delete(isFriend);
+                    _repositoryFriend.SaveChanges();
+                }
+                var friendReqSpec = new BaseSpecifications<FriendRequest>(u => (u.SenderId == user.Id && u.Recieverid == id) || (u.Recieverid == user.Id && u.SenderId == id));
+                var isFriendReq = await _repositoryFriendRequest.GetEntityWithSpecAsync(friendReqSpec);
+                if (isFriendReq is not null)
+                {
+                    _repositoryFriendRequest.Delete(isFriendReq);
+                    _repositoryFriendRequest.SaveChanges();
+                }
+                var updatedBlockList = await _repositoryBlock.GetAllWithSpecAsync(baseSpec);
+                var sentResult = new { message = "unBlock", BlockList = updatedBlockList };
+                return Ok(JsonSerializer.Serialize(sentResult));
+            }
+            else
+            {
+                _repositoryBlock.Delete(alreadyBlocked);
+                _repositoryBlock.SaveChanges();
+                var updatedBlockList = await _repositoryBlock.GetAllWithSpecAsync(baseSpec);
+                var sentResult = new { message = "block", BlockList = updatedBlockList };
+                return Ok(JsonSerializer.Serialize(sentResult));
+            }
+
+        }
+        //SendFriendRequest
+        [Authorize]
         [HttpPost("SendFriendRequest/{id}")]
         public async Task<ActionResult<AppUserFriend>> SendFriendRequest(string id)
         {
             var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
             if (id == user.Id)
             {
                 return BadRequest();
+            }
+            //check if the this user added me in the blockList
+            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
+            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            if (isBlocked is not null)
+            {
+                return BadRequest("You are Blocked");
             }
 
             var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
@@ -298,13 +403,17 @@ namespace Talabat.APIs.Controllers
         
        
     }
-
+        //CheckFriendRequest
 		[Authorize]
 		[HttpGet("CheckFriendRequestFromUser/{id}")]
 		public async Task<ActionResult<AppUserFriend>> CheckFriendRequestFromUser(string id)
 		{
 			var user = await _manager.GetUserAddressAsync(User);
-			if (id == user.Id)
+            if (user is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            if (id == user.Id)
 			{
 				return BadRequest();
 			}

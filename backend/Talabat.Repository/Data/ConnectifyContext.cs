@@ -18,8 +18,8 @@ namespace Talabat.Repository.Data
 		public DbSet<Comment> Comment { get; set; }
 		public DbSet<AppUserFriend> friends { get; set; }
 		public DbSet<FriendRequest> friendRequests { get; set; }
-
-		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
+        public DbSet<BlockList> blockList { get; set; }
+        public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
 
 		}

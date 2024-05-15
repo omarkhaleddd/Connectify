@@ -29,8 +29,9 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<Comment> _repositoryComment;
         private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
+        private readonly IGenericRepository<BlockList> _repositoryBlock;
 
-        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2 , IGenericRepository<PostLikes> genericRepository3 , IGenericRepository<AppUserFriend> genericRepository4)
+        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2 , IGenericRepository<PostLikes> genericRepository3 , IGenericRepository<AppUserFriend> genericRepository4 ,IGenericRepository<BlockList> genericRepository5)
         {
             _mapper = mapper;
             _manager = manager;
@@ -38,6 +39,7 @@ namespace Talabat.APIs.Controllers
             _repositoryComment = genericRepository2;
             _repositoryPostLikes = genericRepository3;
             _repositoryFriend = genericRepository4;
+            _repositoryBlock = genericRepository5;
         }
 
 
@@ -51,6 +53,13 @@ namespace Talabat.APIs.Controllers
             {
                 return NotFound($"User not found");
             }
+            //check if the this user added me in the blockList
+            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == authorId);
+            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            if (isBlocked is not null)
+            {
+                return BadRequest("You are Blocked");
+            }
             //get by id in specs
             var spec = new PostWithCommentSpecs(authorId);
             var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
@@ -59,7 +68,6 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
-
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
@@ -84,18 +92,21 @@ namespace Talabat.APIs.Controllers
             return Ok(postDtos);
         }
 
-        //Get Posts
+        //Get Posts of my Friends
         [Authorize]
         [HttpGet("")]
         public async Task<ActionResult<PostDto>> GetPosts()
         {
+            var myUser = await _manager.GetUserAddressAsync(User);
+            if (myUser is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
             var currUser = await _manager.GetUserAddressAsync(User);
             var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == currUser.Id);
             var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == currUser.Id);
             var friendsByUserId = await _repositoryFriend.GetAllWithSpecAsync(specFriendUserId);
             var friendsByFriendId = await _repositoryFriend.GetAllWithSpecAsync(specFriendFriendId);
-            //kda m3ana el id el el user bta3na mwgood feha f kol mkan 3ayzen n3ml concat 
-            var AllFriends = friendsByFriendId.Concat(friendsByUserId);
             //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var postList = new List<Post>();
             foreach (var friendByUserId in friendsByUserId)
@@ -154,9 +165,20 @@ namespace Talabat.APIs.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
+            var myUser = await _manager.GetUserAddressAsync(User);
+            if (myUser is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
             //get by id in specs
             var spec = new PostWithCommentSpecs(id);
             var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
+            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == myUser.Id && u.UserId == post.AuthorId);
+            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            if (isBlocked is not null)
+            {
+                return BadRequest("You are Blocked");
+            }
             if (post == null)
             {
                 return BadRequest("No posts");
@@ -268,7 +290,7 @@ namespace Talabat.APIs.Controllers
         }
         
         //Like or Dislike Post
-//        [Authorize]
+        [Authorize]
         [HttpPut("LikePost/{PostId}")]
         public async Task<ActionResult<PostDto>> LikePost(int PostId)
         {
