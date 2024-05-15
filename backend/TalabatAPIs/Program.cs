@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.APIs.Helpers;
+using Talabat.APIs.Hubs;
 using Talabat.APIs.MiddleWares;
 using Talabat.Core.Repositories;
 using Talabat.Repository;
@@ -27,7 +28,8 @@ public class Program
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
-
+        builder.Services.AddSignalR();
+        
         builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
         {
             Options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
@@ -93,7 +95,10 @@ public class Program
         }
         app.UseStaticFiles();
         app.UseStatusCodePagesWithRedirects("/errors/{0}");
-
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapHub<ChatHub>("/chat");
+        });
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

@@ -3,6 +3,7 @@ using Connetify.APIs.DTO;
 using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
+using Talabbat.APIs.DTO;
 
 namespace Talabat.APIs.Helpers
 {
@@ -35,7 +36,10 @@ namespace Talabat.APIs.Helpers
             CreateMap<FriendDto, AppUserFriend>();
             CreateMap<AppUserFriend, FriendDto>();
 
-			CreateMap<FriendRequestDto, FriendRequest>();
+            CreateMap<MessageDto, Message>();
+            CreateMap<Message, MessageDto>();
+
+            CreateMap<FriendRequestDto, FriendRequest>();
 			CreateMap<FriendRequest, FriendRequestDto>();
 		}
     }

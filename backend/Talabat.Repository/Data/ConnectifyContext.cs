@@ -19,6 +19,7 @@ namespace Talabat.Repository.Data
 		public DbSet<AppUserFriend> friends { get; set; }
 		public DbSet<FriendRequest> friendRequests { get; set; }
         public DbSet<BlockList> blockList { get; set; }
+		public DbSet<Message> messages { get; set; }
         public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
 
