@@ -201,6 +201,11 @@ namespace Talabat.APIs.Controllers
                     UserStartingWithPrefix.Remove(isBlocked);
                 }
             }
+            var isMe = UserStartingWithPrefix.Find(u => u.Id == user.Id);
+            if (isMe is not null)
+            {
+                UserStartingWithPrefix.Remove(isMe);
+            }
             var mappedUsers = _mapper.Map<List<AppUser>, List<AppUserDto>>(UserStartingWithPrefix);
             return Ok(mappedUsers);
         }
