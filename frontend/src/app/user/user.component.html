@@ -30,12 +30,9 @@
                 <div class="col-md-12 p-1 text-center">
                     <button class="w-50 m-auto btn btn-success" (click)="logout()">Message</button>
                 </div>
-                <ng-container *ngIf="friendReq; else requestActions">
-                    <button class="m-auto btn btn-danger" (click)="blockUser()">{{ friendReq }}</button>
-                </ng-container>
-                <ng-template #requestActions>
-                    <button class="m-auto btn btn-success" (click)="blockUser()">{{ friendReq }}</button>
-                </ng-template>
+                
+                    <button class="m-auto btn btn-success" (click)="blockUser()">{{ blockReq }}</button>
+                
             </div>
         </div>
     </div>
