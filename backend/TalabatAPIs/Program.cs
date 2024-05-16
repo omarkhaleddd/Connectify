@@ -86,7 +86,6 @@ public class Program
 
         #endregion
         app.UseRouting();
-
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -97,11 +96,17 @@ public class Program
         }
         app.UseStaticFiles();
         app.UseStatusCodePagesWithRedirects("/errors/{0}");
+       
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapHub<ChatHub>("/chatHub");
 
+        app.UseEndpoints(endpoints =>
+		{
+			//endpoints.MapHub<ChatHub>("/chat");
+			endpoints.MapHub<AccountNotificationHub>("/notification");
+		});
 
         app.MapControllers();
 

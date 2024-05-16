@@ -26,6 +26,9 @@ import { MessageGeneralComponent } from './components/message/message-general/me
 import { MessageChatComponent } from './components/message/message-chat/message-chat.component';
 import { MessageFriendListSidebarComponent } from './components/message/message-friend-list-sidebar/message-friend-list-sidebar.component';
 import { MessageFriendComponent } from './components/message/message-friend/message-friend.component';
+import { ModalComponent } from './components/global/modal/modal.component';
+import { NotificationsComponent } from './notifications/notifications.component';
+import { NotificationComponent } from './components/notifications/notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +50,9 @@ import { MessageFriendComponent } from './components/message/message-friend/mess
     SearchComponent,
     SearchUserComponent,
     UserComponent,
+    ModalComponent,
+    NotificationsComponent,
+    NotificationComponent,
     MessageGeneralComponent,
     MessageChatComponent,
     MessageFriendListSidebarComponent,

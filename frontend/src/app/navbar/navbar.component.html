@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light px-3 ">
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-3 sticky-top">
     <a class="navbar-brand" routerLink="/home">Home</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -7,7 +7,7 @@
     <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="home"> <i class="fa-solid fa-bell px-2"></i> Notifications</a>
+          <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="notifications"> <i class="fa-solid fa-bell px-2"></i> Notifications</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" aria-current="page" routerLinkActive="active" routerLink="message"> <i class="fa-solid fa-envelope px-2"></i> Messages</a>
@@ -18,11 +18,14 @@
         </li>
       </ul>
       
-      <form (submit)="search()" class="form-inline my-2 my-lg-0 px-3 d-flex">
-        <input class="form-control mr-sm-2" type="search" [(ngModel)]="query" placeholder="Search" name="search" aria-label="Search">
-        <button class="btn my-2 my-sm-0 ms-2" type="submit" > <i class="fas fa-search"></i> </button>
-        
-      </form>
+      <div class="position-relative">
+        <form (submit)="search()" class="form-inline my-2 my-lg-0 px-3 d-flex">
+          <input class="form-control mr-sm-2" (focus)="showModal = true"   type="text" placeholder="Search..." [(ngModel)]="query" (input)="onInputChange($event)">
+          <button class="btn my-2 my-sm-0 ms-2" type="submit" > <i class="fas fa-search"></i> </button>
+          
+        </form>
+        <app-modal class="position-absolute w-75 z-9999" [users]="searchResults" [modalBody]="modalBody" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showModal" ></app-modal>
+      </div>
     </div>
   </nav>
   

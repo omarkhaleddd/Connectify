@@ -20,7 +20,9 @@ namespace Talabat.Repository.Data
 		public DbSet<FriendRequest> friendRequests { get; set; }
         public DbSet<BlockList> blockList { get; set; }
 		public DbSet<Message> messages { get; set; }
-        public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
+		public DbSet<Notification> Notifications { get; set; }
+
+		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
 
 		}

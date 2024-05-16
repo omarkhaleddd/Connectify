@@ -16,6 +16,11 @@ export class PostGetComponent implements OnInit{
   isLiked : string | undefined;
   likeCount : number | undefined;
   isLikedBtn : any ;
+  likes: any;
+  emptyMsg: string = "No likes" ;
+  showModal = false;
+  
+
   constructor(private _AuthService:AuthService ,private postService:PostService,private router:Router) 
   { 
 
@@ -24,8 +29,9 @@ export class PostGetComponent implements OnInit{
   ngOnInit(): void {
     var userId =this._AuthService.getUserId()
     this.isLikedBtn = this.post?.likes.some(like => like.userId === userId);
-    console.log(this.post?.likeCount);
+    console.log(this.post);
     this.likeCount = this.post?.likeCount
+    this.likes = this.post?.likes.map(obj => obj.userName)
     
     if(this.isLikedBtn){
       this.isLiked = "Dislike";

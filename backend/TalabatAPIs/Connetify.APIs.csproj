@@ -22,8 +22,4 @@
     <ProjectReference Include="..\Talabat.Service\Connectify.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Hubs\" />
-  </ItemGroup>
-
 </Project>

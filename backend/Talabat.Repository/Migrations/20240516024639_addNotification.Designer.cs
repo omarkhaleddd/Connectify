@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talabat.Repository.Data;
 
@@ -11,9 +12,10 @@ using Talabat.Repository.Data;
 namespace Connectify.Repository.Migrations
 {
     [DbContext(typeof(ConnectifyContext))]
-    partial class ConnectifyContextModelSnapshot : ModelSnapshot
+    [Migration("20240516024639_addNotification")]
+    partial class addNotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,10 +42,6 @@ namespace Connectify.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FriendName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("InsertBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -62,10 +60,6 @@ namespace Connectify.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

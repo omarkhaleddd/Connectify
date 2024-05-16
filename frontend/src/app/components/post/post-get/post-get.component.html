@@ -11,11 +11,13 @@
         <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
     </div>
     <div class="post-footer">
-        <button (click)="likePost()">
+        <button class="me-1" (click)="likePost()">
             {{ isLiked }}
         </button>
 
-        <span>{{ likeCount}} Likes</span>
-        <button (click)="commentPost()">Comment</button>
+        <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}} Likes</span>
+        <!-- <button (click)="openModal()">Open Modal</button> -->
+        <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showModal" ></app-modal>
+        <button class="ms-1" (click)="commentPost()">Comment</button>
     </div>
 </div>

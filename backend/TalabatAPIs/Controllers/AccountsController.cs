@@ -4,16 +4,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Stripe;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
+using Talabat.APIs.Hubs;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Hubs.Interfaces;
 using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Core.Specifications;
@@ -27,26 +31,30 @@ namespace Talabat.APIs.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IHubContext<AccountNotificationHub, INotificationHub> _accountNotification;
         private readonly ITokenService _tokenService;
         private readonly IGenericRepository<Post> _repositoryPost;
         private readonly IGenericRepository<FriendRequest> _repositoryFriendRequest;
         private readonly IGenericRepository<BlockList> _repositoryBlock;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
+        private readonly IGenericRepository<Notification> _repositoryNotification;
 
 
-        public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2,IGenericRepository<BlockList> genericRepository3, SignInManager<AppUser> signInManager, ITokenService tokenService)
-        {
-            _mapper = mapper;
-            _manager = manager;
-            _signInManager = signInManager;
-            _tokenService = tokenService;
-            _repositoryPost = genericRepository;
-            _repositoryFriend = genericRepository1;
-            _repositoryFriendRequest = genericRepository2;
-            _repositoryBlock = genericRepository3;
-        }
+		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification)
+		{
+			_mapper = mapper;
+			_manager = manager;
+			_signInManager = signInManager;
+			_tokenService = tokenService;
+			_repositoryPost = genericRepository;
+			_repositoryFriend = genericRepository1;
+			_repositoryFriendRequest = genericRepository2;
+			_repositoryBlock = genericRepository3;
+			_accountNotification = accountNotification;
+            _repositoryNotification = genericRepository4;
+		}
 
-        [HttpPost("Register")]
+		[HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
         {
 
@@ -109,7 +117,7 @@ namespace Talabat.APIs.Controllers
 
             var user = await _manager.GetUserAddressAsync(User);
             if (user == null) return NotFound("user null");
-            var mappedUser = _mapper.Map<Address, AddressDto>(user.Address);
+            var mappedUser = _mapper.Map<Core.Entities.Identity.Address, AddressDto>(user.Address);
             return Ok(mappedUser);
 
         }
@@ -122,7 +130,7 @@ namespace Talabat.APIs.Controllers
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
-            var address = _mapper.Map<AddressDto, Address>(newAddress);
+            var address = _mapper.Map<AddressDto, Core.Entities.Identity.Address>(newAddress);
             user.Address = address;
 
             var result = await _manager.UpdateAsync(user);
@@ -142,7 +150,7 @@ namespace Talabat.APIs.Controllers
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-            var address = _mapper.Map<AddressDto, Address>(updatedAddress);
+            var address = _mapper.Map<AddressDto, Core.Entities.Identity.Address>(updatedAddress);
             address.Id = user.Address.Id;
             user.Address = address;
             var result = await _manager.UpdateAsync(user);
@@ -444,7 +452,33 @@ namespace Talabat.APIs.Controllers
             _repositoryFriendRequest.SaveChanges();
             var updatedFriendRequestsAdd = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
             var sentResult = new { message = "Sent", FriendRequests = updatedFriendRequestsAdd };
-            return Ok(JsonSerializer.Serialize(sentResult));
+
+			var newNotification = new NotificationDto
+            {
+				content = $"The User {user.UserName} sent you a friend request.",
+				userId = id,
+				type = "Friend Request",
+			};
+
+            var mappedNotification = _mapper.Map<NotificationDto, Notification>(newNotification);
+
+            // Check if _accountNotification is not null before sending the notification
+            if (_accountNotification != null)
+			{
+				// send notification to the user 
+				await _accountNotification.Clients.All.SendNotification(mappedNotification);
+			}
+
+			// Check if _repositoryNotification is not null before adding the notification
+			if (_repositoryNotification != null)
+			{
+				// save notification in db
+				await _repositoryNotification.Add(mappedNotification);
+				_repositoryNotification.SaveChanges();
+			}
+
+
+			return Ok(JsonSerializer.Serialize(sentResult));
         
        
     }

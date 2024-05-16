@@ -10,6 +10,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './user/user.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 import { MessageGeneralComponent } from './components/message/message-general/message-general.component';
 
 const routes: Routes = [
@@ -22,6 +23,7 @@ const routes: Routes = [
   {path: 'post/:id' , component: PostComponent},
   {path: 'search/:query' , component: SearchComponent},
   {path: 'user/:id' , component: UserComponent},
+  {path: 'notifications' , component: NotificationsComponent},
   {path:'**',component:NotfoundComponent}
 ];
 

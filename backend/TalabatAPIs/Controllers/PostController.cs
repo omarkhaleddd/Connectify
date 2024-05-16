@@ -174,7 +174,7 @@ namespace Talabat.APIs.Controllers
             var spec = new PostWithCommentSpecs(id);
             var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == myUser.Id && u.UserId == post.AuthorId);
-            var isBlocked = _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
