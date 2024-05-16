@@ -10,6 +10,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
 import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './user/user.component';
+import { MessageGeneralComponent } from './components/message/message-general/message-general.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   {path: 'profile' , component: ProfileComponent},
+  {path: 'message' , component: MessageGeneralComponent},
   {path: 'post/:id' , component: PostComponent},
   {path: 'search/:query' , component: SearchComponent},
   {path: 'user/:id' , component: UserComponent},

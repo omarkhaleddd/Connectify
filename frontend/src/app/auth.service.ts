@@ -17,7 +17,9 @@ export class AuthService {
   getUserId(): string | null {
     return localStorage.getItem('userId');
   }
-
+  getDisplayName(): string | null {
+    return localStorage.getItem('displayName')
+  }
 
   register(data:FormGroup):Observable<any>{
     return this._HttpClient.post('https://localhost:7095/api/Accounts/Register',data);

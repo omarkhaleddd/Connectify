@@ -500,7 +500,9 @@ namespace Talabat.APIs.Controllers
 			{// accept
 				_repositoryFriendRequest.Delete(requestById);
 				_repositoryFriendRequest.SaveChanges();
-				var friend = new AppUserFriend { UserId = requestById.SenderId, FriendId = requestById.Recieverid };
+                var Friend = await _manager.GetUserByIdAsync(id);
+                var friend = new AppUserFriend { UserId = requestById.SenderId,UserName = user.DisplayName , FriendId = requestById.Recieverid, FriendName = Friend.DisplayName };
+
 				await _repositoryFriend.Add(friend);
 				_repositoryFriend.SaveChanges();
 				var result = new { message = "Accepted" };

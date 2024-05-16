@@ -22,6 +22,10 @@ import { PostsProfileDisplayComponent } from './components/post/posts-profile-di
 import { SearchComponent } from './components/search/search.component';
 import { SearchUserComponent } from './components/search-user/search-user.component';
 import { UserComponent } from './user/user.component';
+import { MessageGeneralComponent } from './components/message/message-general/message-general.component';
+import { MessageChatComponent } from './components/message/message-chat/message-chat.component';
+import { MessageFriendListSidebarComponent } from './components/message/message-friend-list-sidebar/message-friend-list-sidebar.component';
+import { MessageFriendComponent } from './components/message/message-friend/message-friend.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +46,11 @@ import { UserComponent } from './user/user.component';
     PostsProfileDisplayComponent,
     SearchComponent,
     SearchUserComponent,
-    UserComponent
+    UserComponent,
+    MessageGeneralComponent,
+    MessageChatComponent,
+    MessageFriendListSidebarComponent,
+    MessageFriendComponent,
   ],
   imports: [
     BrowserModule,
