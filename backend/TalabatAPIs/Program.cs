@@ -1,3 +1,4 @@
+using Connectify.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +42,9 @@ public class Program
             return ConnectionMultiplexer.Connect(ConnectionSting);
         });
 
-        builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
+		builder.Services.AddSingleton<RedisCacheService>();
+
+		builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
         builder.Services.AddApplicationService();
         builder.Services.AddIdentityServices(builder.Configuration);
 

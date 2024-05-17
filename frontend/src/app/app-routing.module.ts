@@ -12,6 +12,7 @@ import { SearchComponent } from './components/search/search.component';
 import { UserComponent } from './user/user.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { MessageGeneralComponent } from './components/message/message-general/message-general.component';
+import { RepostComponent } from './repost/repost.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -24,6 +25,7 @@ const routes: Routes = [
   {path: 'search/:query' , component: SearchComponent},
   {path: 'user/:id' , component: UserComponent},
   {path: 'notifications' , component: NotificationsComponent},
+  {path: 'repost' , component: RepostComponent},
   {path:'**',component:NotfoundComponent}
 ];
 

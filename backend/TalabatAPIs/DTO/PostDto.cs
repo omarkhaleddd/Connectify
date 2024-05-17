@@ -13,6 +13,6 @@ namespace Talabat.APIs.DTO
         public int LikeCount { get; set; }
         public ICollection<PostLikesDto>? Likes { get; set; } = new HashSet<PostLikesDto>();
         public ICollection<CommentDto>? Comments { get; set; } = new HashSet<CommentDto>();
-
-    }
+        public ICollection<string> mentions { get; set; } = new HashSet<string>();
+	}   
 }

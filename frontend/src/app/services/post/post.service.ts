@@ -36,4 +36,15 @@ export class PostService {
     console.log(this.apiUrl + `LikePost/${postId}`);
     return this.http.put<any>(this.apiUrl + `LikePost/${postId}`,null,{headers : headers});
   } 
+
+  createRepost(repostData: any,headers: any): Observable<any> 
+  {
+    console.log(headers.get('Authorization'));
+    return this.http.post<any>(this.apiUrl + `Repost`, repostData,{headers : headers});
+  }
+
+  getAllReposts(headers: any): Observable<any[]> {
+    
+    return this.http.get<any[]>(this.apiUrl,{headers: headers});
+  }
 }

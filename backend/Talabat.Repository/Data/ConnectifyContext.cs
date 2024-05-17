@@ -16,6 +16,7 @@ namespace Talabat.Repository.Data
 		public DbSet<Post> Post { get; set; }
 
 		public DbSet<Comment> Comment { get; set; }
+		public DbSet<Repost> Repost { get; set; }
 		public DbSet<AppUserFriend> friends { get; set; }
 		public DbSet<FriendRequest> friendRequests { get; set; }
         public DbSet<BlockList> blockList { get; set; }
@@ -41,7 +42,13 @@ namespace Talabat.Repository.Data
 				.HasForeignKey(L => L.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Comment>()
+			modelBuilder.Entity<Post>()
+				.HasMany(P => P.Reposts)
+				.WithOne(R => R.Post)
+				.HasForeignKey(R => R.PostId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<Comment>()
 				.HasMany(C => C.Likes)
 				.WithOne(CL => CL.Comment)
 				.HasForeignKey(CL => CL.CommentId)

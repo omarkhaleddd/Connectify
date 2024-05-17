@@ -1,17 +1,23 @@
 ﻿using AutoMapper;
+using Connectify.Core.Services;
+using Connetify.APIs.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.Controllers;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
+using Talabat.APIs.Hubs;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Hubs.Interfaces;
 using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Core.Specifications;
@@ -30,21 +36,30 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
         private readonly IGenericRepository<BlockList> _repositoryBlock;
-
-        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2 , IGenericRepository<PostLikes> genericRepository3 , IGenericRepository<AppUserFriend> genericRepository4 ,IGenericRepository<BlockList> genericRepository5)
-        {
-            _mapper = mapper;
-            _manager = manager;
-            _repositoryPost = genericRepository;
-            _repositoryComment = genericRepository2;
-            _repositoryPostLikes = genericRepository3;
-            _repositoryFriend = genericRepository4;
-            _repositoryBlock = genericRepository5;
-        }
+        private readonly IGenericRepository<Repost> _repositoryRepost;
+        private readonly IGenericRepository<Notification> _repositoryNotification;
+		private readonly IHubContext<MentionNotification, INotificationHub> _mentionNotification;
+		private readonly RedisCacheService _cacheService;
 
 
-        //Get Posts by UserId
-        [Authorize]
+
+		public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2, IGenericRepository<PostLikes> genericRepository3, IGenericRepository<AppUserFriend> genericRepository4, IGenericRepository<BlockList> genericRepository5, IGenericRepository<Repost> repositoryRepost, IGenericRepository<Notification> repositoryNotification, RedisCacheService cacheService)
+		{
+			_mapper = mapper;
+			_manager = manager;
+			_repositoryPost = genericRepository;
+			_repositoryComment = genericRepository2;
+			_repositoryPostLikes = genericRepository3;
+			_repositoryFriend = genericRepository4;
+			_repositoryBlock = genericRepository5;
+			_repositoryRepost = repositoryRepost;
+			_repositoryNotification = repositoryNotification;
+			_cacheService = cacheService;
+		}
+
+
+		//Get Posts by UserId
+		[Authorize]
         [HttpGet("GetPostByAuthorId/{authorId}")]
         public async Task<ActionResult<PostDto>> GetPostByAuthorId(string authorId)
         {
@@ -97,7 +112,18 @@ namespace Talabat.APIs.Controllers
         [HttpGet("")]
         public async Task<ActionResult<PostDto>> GetPosts()
         {
-            var myUser = await _manager.GetUserAddressAsync(User);
+
+			var cacheKey = "posts";
+
+			// Try to get the posts from the cache
+			var cachedPosts = await _cacheService.GetStringAsync(cacheKey);
+			if (cachedPosts != null)
+			{
+				var cachedResultDtos = JsonConvert.DeserializeObject<List<object>>(cachedPosts);
+				return Ok(cachedResultDtos);
+			}
+
+			var myUser = await _manager.GetUserAddressAsync(User);
             if (myUser is null)
             {
                 return Unauthorized(new ApiResponse(401));
@@ -109,59 +135,103 @@ namespace Talabat.APIs.Controllers
             var friendsByFriendId = await _repositoryFriend.GetAllWithSpecAsync(specFriendFriendId);
             //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var postList = new List<Post>();
-            foreach (var friendByUserId in friendsByUserId)
-            {
-                var spec = new PostWithCommentSpecs(friendByUserId.FriendId);
-                var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
-                postList.AddRange(posts);
-            }
-            foreach (var friendByFriendId in friendsByFriendId)
-            {
-                var spec = new PostWithCommentSpecs(friendByFriendId.UserId);
-                var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
-                postList.AddRange(posts);
+			var repostList = new List<Repost>();
 
-            }
-            if (postList == null || !postList.Any())
-            {
-                return NotFound("No posts found");
-            }
+			foreach (var friendByUserId in friendsByUserId)
+			{
+				var postSpec = new PostWithCommentSpecs(friendByUserId.FriendId);
+				var posts = await _repositoryPost.GetAllWithSpecAsync(postSpec);
+				postList.AddRange(posts);
 
-            var postDtos = new List<PostDto>();
+				var repostSpec = new RepostWithCommentSpecs(friendByUserId.FriendId);
+				var reposts = await _repositoryRepost.GetAllWithSpecAsync(repostSpec);
+				repostList.AddRange(reposts);
+			}
 
-            foreach (var post in postList)
-            {
-                var user = await _manager.GetUserByIdAsync(post.AuthorId);
-                if (user == null)
+			foreach (var friendByFriendId in friendsByFriendId)
+			{
+				var postSpec = new PostWithCommentSpecs(friendByFriendId.UserId);
+				var posts = await _repositoryPost.GetAllWithSpecAsync(postSpec);
+				postList.AddRange(posts);
+
+				var repostSpec = new RepostWithCommentSpecs(friendByFriendId.UserId);
+				var reposts = await _repositoryRepost.GetAllWithSpecAsync(repostSpec);
+				repostList.AddRange(reposts);
+			}
+			if (!postList.Any() && !repostList.Any())
+			{
+				return NotFound("No posts or reposts found");
+			}
+
+			var postDtos = new List<PostDto>();
+			var resultDtos = new List<object>();
+
+			foreach (var post in postList)
+			{
+				var user = await _manager.GetUserByIdAsync(post.AuthorId);
+				if (user == null)
+				{
+					return NotFound($"User not found for post with ID: {post.Id}");
+				}
+
+				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+
+
+				var postDto = new PostDto
+				{
+					Id = post.Id,
+					content = post.content,
+					Likes = postLikes,
+					LikeCount = post.Likes.Count,
+					DatePosted = post.DatePosted,
+					Comments = comments,
+					AuthorId = user.Id,
+					AuthorName = user.DisplayName
+				};
+
+				resultDtos.Add(postDto);
+			}
+			foreach (var repost in repostList)
+			{
+				var user = await _manager.GetUserByIdAsync(repost.AuthorId);
+				if (user == null)
+				{
+					return NotFound($"User not found for repost with ID: {repost.Id}");
+				}
+
+				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(repost.Comments);
+				var repostLikes = _mapper.Map<ICollection<RepostLikes>, ICollection<RepostLikesDto>>(repost.Likes);
+                var postsOfReposts = _mapper.Map<Post, PostDto>(repost.Post);
+                var repostDto = new RepostDto
                 {
-                    return NotFound($"User not found for post with ID: {post.Id}");
-                }
-
-                var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
-                var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-
-                var postDto = new PostDto
-                {
-                    Id = post.Id,
-                    content = post.content,
-                    Likes = PostLikes,
-                    LikeCount = post.Likes.Count,
-                    DatePosted = post.DatePosted,
+                    Id = repost.Id,
+                    content = repost.content,
+                    Likes = repostLikes,
+                    LikeCount = repost.Likes.Count,
+                    DatePosted = repost.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
-                    AuthorName = user.DisplayName
-                };
+                    AuthorName = user.DisplayName,
+                    PostId = repost.PostId,
+                    Post = postsOfReposts
+				};
 
-                postDtos.Add(postDto);
-            }
+				resultDtos.Add(repostDto);
+			}
 
-            return Ok(postDtos);
-        }
+			// Cache the result
+			await _cacheService.SetStringAsync(cacheKey, JsonConvert.SerializeObject(resultDtos));
+
+
+			return Ok(resultDtos);
+		}
 
 
 
-        //Get Post by id
-        [Authorize]
+
+		//Get Post by id
+		[Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
         {
@@ -217,19 +287,56 @@ namespace Talabat.APIs.Controllers
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
-            var post = _mapper.Map<PostDto, Post>(newPost);
+			
+			var post = _mapper.Map<PostDto, Post>(newPost);
             post.AuthorId = user.Id;
             post.Comments = null;
             if (post is null)
             {
                 return BadRequest(new ApiResponse(400));
             }
-            var result = _repositoryPost.Add(post);
+
+
+			var result = _repositoryPost.Add(post);
             _repositoryPost.SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
 
-            return Ok(post);
+			if (newPost.mentions is not null)
+			{
+				foreach (var mention in newPost.mentions)
+				{
+					var mentionedUser = _manager.Users.Where(u => u.UserName == mention).FirstOrDefault();
+
+
+					var newNotification = new NotificationDto
+					{
+						content = $"The User {user.UserName} mentioned you in a post ",
+						userId = mentionedUser.Id,
+						type = "Friend Mention",
+					};
+
+					var mappedNotification = _mapper.Map<NotificationDto, Notification>(newNotification);
+
+					// Check if _mentionNotification is not null before sending the notification
+					if (_mentionNotification != null)
+					{
+						// send notification to the user 
+						await _mentionNotification.Clients.All.SendNotification(mappedNotification);
+					}
+
+					// Check if _repositoryNotification is not null before adding the notification
+					if (_repositoryNotification != null)
+					{
+						// save notification in db
+						await _repositoryNotification.Add(mappedNotification);
+						_repositoryNotification.SaveChanges();
+					}
+				}
+			}
+
+
+			return Ok(post);
 
         }
 
@@ -320,7 +427,7 @@ namespace Talabat.APIs.Controllers
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
                 var response = new { message = "Dislike", likeCount = retPostLikes.Count, likes = retPostLikes };
                 
-                return Ok(JsonSerializer.Serialize(response));
+                return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
             else
             {
@@ -333,9 +440,40 @@ namespace Talabat.APIs.Controllers
 
                 var response = new { message = "Like", likeCount = retPostLikes.Count, likes = retPostLikes };
 
-				return Ok(JsonSerializer.Serialize(response));
+				return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
 
         }
-    }
+
+		//Post Request
+		[Authorize]
+		[HttpPost("Repost")]
+		public async Task<ActionResult<RepostDto>> CreateRepost(RepostDto newRepost)
+		{
+			var user = await _manager.GetUserAddressAsync(User);
+			if (user is null)
+				return Unauthorized(new ApiResponse(401));
+
+
+			var repost = _mapper.Map<RepostDto, Repost>(newRepost);
+			repost.AuthorId = user.Id;
+            repost.AuthorName = user.DisplayName;
+			repost.Comments = null;
+			repost.DatePosted = DateTime.Now;
+            repost.Post = null;
+
+			if (repost is null)
+			{
+				return BadRequest(new ApiResponse(400));
+			}
+			var result = _repositoryRepost.Add(repost);
+			_repositoryRepost.SaveChanges();
+			if (!result.IsCompletedSuccessfully)
+				return BadRequest(new ApiResponse(400));
+
+			var repostDto = _mapper.Map<RepostDto>(repost);
+			return Ok(repost);
+
+		}
+	}
 }

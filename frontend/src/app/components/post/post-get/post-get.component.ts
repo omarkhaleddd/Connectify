@@ -19,6 +19,7 @@ export class PostGetComponent implements OnInit{
   likes: any;
   emptyMsg: string = "No likes" ;
   showModal = false;
+  rePost : any;
   
 
   constructor(private _AuthService:AuthService ,private postService:PostService,private router:Router) 
@@ -39,6 +40,8 @@ export class PostGetComponent implements OnInit{
     else{
       this.isLiked = "Like";
     }
+
+    this.rePost = this.post?.post
   }
 
   token:any = this._AuthService.getToken();
@@ -72,5 +75,10 @@ export class PostGetComponent implements OnInit{
     if (this.post) {
       console.log('Commenting on post:', this.post.authorId);
     }
+  }
+
+  repost(clickedPost: any){
+    //repost post
+    this.router.navigate(['/repost/'+clickedPost.id]);
   }
 }

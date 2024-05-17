@@ -11,4 +11,6 @@ export interface Post {
     authorId: string;
     authorName:string;
     comments?: Comment[];
+    post:Post;
+    mentions: string[];
 }

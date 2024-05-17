@@ -8,6 +8,9 @@
     </div>
     <div class="post-content" (click)="onPostClick(post)">
         <p>{{ post?.content }}</p>
+        <div *ngIf="post?.post">
+            <app-post-get  [post]="post?.post"></app-post-get>
+        </div>
         <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
     </div>
     <div class="post-footer">
@@ -16,8 +19,8 @@
         </button>
 
         <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}} Likes</span>
-        <!-- <button (click)="openModal()">Open Modal</button> -->
         <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showModal" ></app-modal>
         <button class="ms-1" (click)="commentPost()">Comment</button>
+        <button class="ms-1" (click)="repost(post)">Share</button>
     </div>
 </div>

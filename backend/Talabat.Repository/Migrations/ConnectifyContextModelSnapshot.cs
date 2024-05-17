@@ -156,6 +156,9 @@ namespace Connectify.Repository.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RepostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UpdateBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -170,6 +173,8 @@ namespace Connectify.Repository.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("RepostId");
 
                     b.ToTable("Comment");
                 });
@@ -477,6 +482,111 @@ namespace Connectify.Repository.Migrations
                     b.ToTable("PostLikes");
                 });
 
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Repost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DatePosted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeleteBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsertBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("InsertDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdateBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("Repost");
+                });
+
+            modelBuilder.Entity("Talabat.Core.Entities.Core.RepostLikes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("DeleteBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsertBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("InsertDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RepostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdateBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("userName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RepostId");
+
+                    b.ToTable("RepostLikes");
+                });
+
             modelBuilder.Entity("Talabat.Core.Entities.Core.Comment", b =>
                 {
                     b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
@@ -484,6 +594,10 @@ namespace Connectify.Repository.Migrations
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Talabat.Core.Entities.Core.Repost", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("RepostId");
 
                     b.Navigation("Post");
                 });
@@ -510,12 +624,43 @@ namespace Connectify.Repository.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Repost", b =>
+                {
+                    b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
+                        .WithMany("Reposts")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Talabat.Core.Entities.Core.RepostLikes", b =>
+                {
+                    b.HasOne("Talabat.Core.Entities.Core.Repost", "Repost")
+                        .WithMany("Likes")
+                        .HasForeignKey("RepostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Repost");
+                });
+
             modelBuilder.Entity("Talabat.Core.Entities.Core.Comment", b =>
                 {
                     b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("Talabat.Core.Entities.Core.Post", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+
+                    b.Navigation("Reposts");
+                });
+
+            modelBuilder.Entity("Talabat.Core.Entities.Core.Repost", b =>
                 {
                     b.Navigation("Comments");
 
