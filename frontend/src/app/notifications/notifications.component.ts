@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { NotificationService } from '../services/notification/notification.service';
 import { Notification } from '../models/notification.model';
+import { HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-notifications',
@@ -17,8 +19,9 @@ export class NotificationsComponent {
   // ];
 
   notifications: Notification[] = [];
+  notificationsHistory: Notification[] = [];
 
-    constructor(private notificationService: NotificationService) { }
+    constructor(private notificationService: NotificationService , private _AuthService : AuthService) { }
 
     ngOnInit(): void {
       console.log(this.notifications);
@@ -36,5 +39,21 @@ export class NotificationsComponent {
           }, error => {
         console.log('Error connecting to SignalR Hub:', error);
       });
+      this.getMessages()
     }
+    token:any = this._AuthService.getToken();
+
+    headers: any = new HttpHeaders({
+      Authorization: `Bearer ${this.token}`
+    });
+    
+    getMessages(){
+      this.notificationService.getNotificationHistory(this.headers).subscribe(notications => {
+        // this.messages.push({ messages.recieverId, recieverName, message, sentAt })
+        this.notificationsHistory =notications
+        console.log(notications)  
+      }, error => {
+        console.error('Error fetching notifications:', error);
+      });
+}
 }

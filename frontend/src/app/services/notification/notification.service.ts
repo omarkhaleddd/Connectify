@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { Observable, Subject } from 'rxjs';
@@ -10,8 +11,9 @@ export class NotificationService {
     private hubConnection: HubConnection;
     private notificationSubject: Subject<Notification> = new Subject<Notification>();
     private apiUrl = 'https://localhost:7095/notification';
+    private recieveNotificationsUrl : string = "https://localhost:7095/api/Notification/Notifications"
 
-    constructor() {
+    constructor(private http : HttpClient) {
         this.hubConnection = new HubConnectionBuilder()
             .withUrl(this.apiUrl,{
               skipNegotiation: true,
@@ -49,7 +51,10 @@ export class NotificationService {
     getNotifications() {
         return this.notificationSubject.asObservable();
     }
-
+    getNotificationHistory(headers:any):Observable<Notification[]>{
+      console.log(headers);
+      return this.http.get<Notification[]>(this.recieveNotificationsUrl, {headers: headers});
+    }
     // public startConnection = () => {
     //   this.hubConnection = new signalR.HubConnectionBuilder()
     //                           .withUrl('https://localhost:7132/Notify',{ skipNegotiation: true,

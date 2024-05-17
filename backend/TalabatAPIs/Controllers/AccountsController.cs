@@ -278,13 +278,32 @@ namespace Talabat.APIs.Controllers
                 return Unauthorized(new ApiResponse(401));
             }
             var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
-            var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
-            if (friends == null || !friends.Any())
+            var friendsRaw = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            if (friendsRaw == null || !friendsRaw.Any())
             {
                 return NotFound("No Friends found");
             }
-            var mappedFriends = _mapper.Map<List<AppUserFriend>, List<FriendDto>>(friends.ToList());
-            return Ok(mappedFriends);
+            var friends = new List<FriendDto>();
+            foreach(var friend in friendsRaw)
+            {
+                var currFriend = new FriendDto
+                {
+                    FriendId = "",
+                    FriendName = ""
+                };
+                if (user.Id == friend.UserId)
+                {
+                    currFriend.FriendId = friend.FriendId;
+                    currFriend.FriendName = friend.FriendName;
+                }
+                else
+                {
+                    currFriend.FriendId = friend.UserId;
+                    currFriend.FriendName = friend.UserName;
+                }
+                friends.Add(currFriend);
+            }
+            return Ok(friends);
         }
         //Show BlockList 
         [Authorize]

@@ -13,4 +13,5 @@ export class FriendService {
   getFriends(headers:any):Observable<friend[]>{
     return this.http.get<friend[]>(this.apiUrl + "Friends", {headers: headers});
   }
+  
 }

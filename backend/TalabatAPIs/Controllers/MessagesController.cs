@@ -20,7 +20,7 @@ namespace Talabat.APIs.Controllers
         private readonly IMapper _mapper;
         private readonly IGenericRepository<Message> _repositoryMessage;
         private readonly UserManager<AppUser> _manager;
-        public MessagesController(IMapper mapper, UserManager<AppUser> manager , IGenericRepository<Message> genericRepository)
+        public MessagesController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Message> genericRepository)
         {
             _manager = manager;
             _mapper = mapper;
@@ -30,24 +30,20 @@ namespace Talabat.APIs.Controllers
         [HttpGet("getMessages/{id}")]
         public async Task<ActionResult<MessageDto>> GetMessages(string id)
         {
-            //var myUser = await _manager.GetUserAddressAsync(User);
-            //if (myUser is null)
-            //{
-            //    return Unauthorized(new ApiResponse(401));
-            //}
-            //var spec = new BaseSpecifications<Message>(m => m.userId == id );
-            //var messages = await _repositoryMessage.GetAllWithSpecAsync(spec);
-            //if (messages == null)
-            //{
-            //    return BadRequest("No Messages");
-            //}
-            //var displayName = await _manager.GetUserByIdAsync(messages.userId);
-            //if (displayName == null)
-            //{
-            //    return NotFound("User not found");
-            //}
-            //var mappedMessage = 
-        }
+            var myUser = await _manager.GetUserAddressAsync(User);
+            if (myUser is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            var spec = new BaseSpecifications<Message>(m => (m.senderId == id && m.recieverId == myUser.Id) || (m.senderId == myUser.Id && m.recieverId == id));
+            var messages = await _repositoryMessage.GetAllWithSpecAsync(spec);
+            if (messages == null)
+            {
+                return BadRequest("No Messages");
+            }
 
+            var mappedMessage = _mapper.Map<List<Message>, List<MessageDto>>(messages.ToList());
+            return Ok(mappedMessage);
+        }
     }
-}
+    }

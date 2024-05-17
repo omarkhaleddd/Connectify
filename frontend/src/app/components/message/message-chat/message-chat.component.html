@@ -6,6 +6,17 @@
     </div>
 
     <div class="row flex-grow-1 overflow-auto">
+        <div *ngFor="let item of sharedMessages" class="col-12">
+            <div class="d-flex justify-content-between">
+                <div class="message-content d-flex justify-content-center">
+                    <h4 class="me-3">{{item.displayName}} : </h4>
+                    <p class="mt-1">{{item.messageText}}</p>
+                </div>
+                <div class="message-details">
+                    <p>Date : {{item.messageDate}}</p>
+                </div>
+            </div>
+          </div>
         <div *ngFor="let item of messages" class="col-12">
             <div class="d-flex justify-content-between">
                 <div class="message-content d-flex justify-content-center">
