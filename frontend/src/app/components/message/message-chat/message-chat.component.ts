@@ -18,9 +18,13 @@ export class MessageChatComponent implements OnInit {
   messages: any[] = [];
   sharedDataValue: any;
   sharedMessages:any;
+  isUserId: string;
+  isConnected:boolean = true;
+  GroupData:any ;
+  
   @Input() selectedFriendId: string | undefined;
 
-  
+
   constructor(private _AuthService: AuthService,private _messageService:MessageService ,private dataService: DataService, private chatService: SignalrService) {
     this.dataService.sharedData$.subscribe(data => {
       this.sharedDataValue = data;
@@ -30,12 +34,24 @@ export class MessageChatComponent implements OnInit {
     this.dataService.sharedMessages$.subscribe(messages => {
       this.sharedMessages = messages;
       console.log(this.sharedMessages);
+
+
     })
+    this.dataService.sharedGroup$.subscribe(group => {
+      this.GroupData = group;
+      console.log(this.GroupData);
+    })
+    this.isUserId = this._AuthService.getUserId() || "";
+    console.log(this.isUserId);
+    
   }
 
   ngOnInit() {
+    // this.chatService.addReceiveMessageListener(this.receiveMessage.bind(this));
+
     console.log(this.selectedFriendId);
     if(this._AuthService.getUserId()==this.sharedDataValue.friendId){
+      
       this.userId = this.sharedDataValue.userId;
       this.recieverName =this.sharedDataValue.userName;
     }
@@ -43,26 +59,30 @@ export class MessageChatComponent implements OnInit {
       this.userId = this.sharedDataValue.friendId;
       this.recieverName =this.sharedDataValue.friendName;
     }    
-    console.log(this.userId);
-    console.log(this.recieverName);
+    
     this.chatService.connect().subscribe(() => {
       console.log('Connected to SignalR Hub');
-      this.chatService.onReceiveMessage((recieverId, recieverName, message, sentAt) => {
 
-        this.messages.push({ recieverId, recieverName, message, sentAt });
-        console.log(this.messages);
-        
-      });
+    
+    this.chatService.onReceiveMessage((recieverId, recieverName, message, sentAt) => {
+
+      this.messages.push({ recieverId, recieverName, message, sentAt });
+      console.log(this.messages);
+      
+    });
+    // this.joinGroup();
+    // this.chatService.addReceiveMessageListener((userId: string, displayName: string, message: string) => {
+    //   this.grpMessages.push({ userId, displayName, message });
+    //   console.log(this.grpMessages);
+    // });
         }, error => {
       console.log('Error connecting to SignalR Hub:', error);
     });
+
   }
 
   sendMessage() {
-    console.log("here");
-
     if (this.message) {
-      console.log("ana");
       var id ;
       var recieverName;
       console.log(this._AuthService.getUserId());
@@ -98,4 +118,24 @@ export class MessageChatComponent implements OnInit {
   }
   }}
 
+  public joinGroup() {
+    if (this.GroupData.groupName) {
+      console.log(this.GroupData.groupName);
+      
+      this.chatService.joinGroup(this.GroupData.groupName, this.isUserId);
+      this.isConnected = true;
+    }
+  }
+
+  public sendMessageToGroup() {        
+    if (this.isConnected) {
+      this.chatService.sendMessageToGroup(this.GroupData.groupName, this.isUserId, this.message);      
+      this.message = '';
+    }
+  }
+
+  private receiveMessage(senderId: string, senderName: string, message: string) {
+    console.log(this.messages);
+    this.messages.push({ senderId, senderName, messageText: message, messageDate: new Date() });
+  }
 }

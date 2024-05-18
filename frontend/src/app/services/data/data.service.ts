@@ -9,10 +9,15 @@ export class DataService {
   sharedData$ = this.sharedDataSubject.asObservable();
   private sharedDataSubject2 = new BehaviorSubject<any>(null);
   sharedMessages$ = this.sharedDataSubject2.asObservable();
+  private sharedDataSubject3 = new BehaviorSubject<any>(null);
+  sharedGroup$ = this.sharedDataSubject3.asObservable();
+  
   constructor() {
     // Initialize shared data if needed
     this.sharedDataSubject.next({});
     this.sharedDataSubject2.next({});
+    this.sharedDataSubject3.next({});
+
 
   }
 
@@ -23,6 +28,9 @@ export class DataService {
   updateSharedMessages(newData: any) {
     // Update shared data
     this.sharedDataSubject2.next(newData);    
-
+  }
+  updateGroup(newData: any) {
+    // Update shared data
+    this.sharedDataSubject3.next(newData);    
   }
 }

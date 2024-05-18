@@ -1,6 +1,20 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-12">
+            <h3 class="text-center">Group List</h3>
+            <div class="chat-container">
+                <div *ngIf="!isConnectedToGroup">
+                  <h3>Join a Group</h3>
+                  <form (ngSubmit)="joinGroup()">
+                    <div class="form-group">
+                      <label for="groupName">Group Name</label>
+                      <input type="text" id="groupName" [(ngModel)]="groupName" name="groupName" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Join Group</button>
+                  </form>
+                </div>
+        </div>
+        <div class="col-12">
             <h3 class="text-center">Friend List</h3>
         </div>
         <div class="col-12" *ngIf="friends.length > 0">

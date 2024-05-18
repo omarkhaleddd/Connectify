@@ -1,3 +1,5 @@
+import { DataService } from 'src/app/services/data/data.service';
+import { SignalrService } from './../../../services/signalr/signalr.service';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/auth.service';
@@ -12,9 +14,16 @@ import { FriendService } from 'src/app/services/friends/friend.service';
 export class MessageFriendListSidebarComponent implements OnInit {
   selectedFriendId: any | undefined;
   friends : friend[] = [];
-  constructor(private _AuthService : AuthService , private friendService : FriendService) { }
+  public groupName: string|undefined; 
+  myUserId:string;
+  public isConnectedToGroup: boolean = false;
+
+  constructor(private _AuthService : AuthService,private sharedData:DataService , private friendService : FriendService) {
+    this.myUserId = _AuthService.getUserId()|| "";
+   }
   ngOnInit(): void {
     this.fetchFriends();
+
   }
   token:any = this._AuthService.getToken();
   headers : any = new HttpHeaders({
@@ -35,5 +44,11 @@ export class MessageFriendListSidebarComponent implements OnInit {
   onFriendSelected(friend: friend) {
     console.log("Selected friend:", friend); // Access friend properties directly
   }
-  
+  public joinGroup() {
+    if (this.groupName) {
+      this.isConnectedToGroup = true;
+      this.sharedData.updateGroup({isConnected:this.isConnectedToGroup , groupName : this.groupName} )
+    }
+  }
+
 }

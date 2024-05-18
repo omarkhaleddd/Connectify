@@ -50,4 +50,17 @@ export class SignalrService {
   public onReceiveMessage(callback: (userId: string, displayName: string, message: string, sentAt: Date) => void) {
     this.connection.on('RecieveMessage', callback);
   }
+  public joinGroup(groupName: string, userId: string) {
+    this.connection.invoke('JoinGroup', groupName, userId)
+      .catch(err => console.log(err));
+  }
+
+  public sendMessageToGroup(groupName: string, senderId: string, message: string) {
+    this.connection.invoke('SendMessageToGroup', groupName, senderId, message)
+      .catch(err => console.log(err));
+  }
+
+  public addReceiveMessageListener(callback: (senderId: string, senderName: string, message: string) => void) {
+    this.connection.on('recieveMessageGrp', callback);
+  }
 }
