@@ -39,6 +39,9 @@ namespace Talabat.APIs.Helpers
             CreateMap<MessageDto, Message>();
             CreateMap<Message, MessageDto>();
 
+			CreateMap<RepostDto, Repost>();
+			CreateMap<Repost, RepostDto>();
+
 			CreateMap<NotificationDto, Notification>();
 			CreateMap<Notification, NotificationDto>();
 

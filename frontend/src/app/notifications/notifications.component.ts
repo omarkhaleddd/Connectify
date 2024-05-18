@@ -26,6 +26,7 @@ export class NotificationsComponent {
     ngOnInit(): void {
       console.log(this.notifications);
       console.log(this.notifications);
+      this.getMessages()
 
       this.notificationService.connect().subscribe(() => {
         console.log('Connected to SignalR Hub');
@@ -39,7 +40,6 @@ export class NotificationsComponent {
           }, error => {
         console.log('Error connecting to SignalR Hub:', error);
       });
-      this.getMessages()
     }
     token:any = this._AuthService.getToken();
 

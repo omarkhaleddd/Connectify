@@ -1,0 +1,26 @@
+<div class="post-container">
+    <div class="post-header">
+        <!-- <img [src]="post.authorProfilePicture" alt="Profile Picture"> -->
+        <div class="author-info">
+            <span>{{ repost?.authorName }}</span>
+            <span class="post-date">{{ repost?.datePosted }}</span>
+        </div>
+    </div>
+    <div class="post-content" (click)="onRepostClick(repost)">
+        <p>{{ repost?.content }}</p>
+        <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
+        <div class="post-content">
+            <!-- <app-post-get [post]="post"></app-post-get> -->
+
+        </div>
+    </div>
+    <div class="post-footer">
+        <!-- <button class="me-1" (click)="likePost()">
+            {{ isLiked }}
+        </button> -->
+
+        <!-- <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}} Likes</span> -->
+        <!-- <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showModal" ></app-modal> -->
+        <!-- <button class="ms-1" (click)="commentPost()">Comment</button> -->
+    </div>
+</div>

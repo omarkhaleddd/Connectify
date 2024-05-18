@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talabat.Repository.Data;
 
@@ -11,9 +12,10 @@ using Talabat.Repository.Data;
 namespace Connectify.Repository.Migrations
 {
     [DbContext(typeof(ConnectifyContext))]
-    partial class ConnectifyContextModelSnapshot : ModelSnapshot
+    [Migration("20240516215756_addRepostWithLikes")]
+    partial class addRepostWithLikes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -303,7 +305,8 @@ namespace Connectify.Repository.Migrations
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("groupName")
+                    b.Property<string>("displayName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("messageDate")
@@ -313,17 +316,7 @@ namespace Connectify.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("recieverId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("recieverName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("senderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("senderName")
+                    b.Property<string>("userId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

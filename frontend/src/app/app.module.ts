@@ -29,6 +29,9 @@ import { MessageFriendComponent } from './components/message/message-friend/mess
 import { ModalComponent } from './components/global/modal/modal.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { NotificationComponent } from './components/notifications/notification/notification.component';
+import { RepostComponent } from './repost/repost.component';
+import { RepostCreateComponent } from './components/repost/repost-create/repost-create.component';
+import { RepostGetComponent } from './components/repost/repost-get/repost-get.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +60,9 @@ import { NotificationComponent } from './components/notifications/notification/n
     MessageChatComponent,
     MessageFriendListSidebarComponent,
     MessageFriendComponent,
+    RepostComponent,
+    RepostCreateComponent,
+    RepostGetComponent,
   ],
   imports: [
     BrowserModule,

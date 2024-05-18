@@ -1,7 +1,8 @@
 <div>
     <h2>Create a New Post</h2>
     <form (submit)="createPost()">
-        <textarea [(ngModel)]="postContent" name="postContent" placeholder="Write your post here..." rows="5"></textarea>
+        <textarea (input)="onPostContentChange($event)" [(ngModel)]="postContent" name="postContent" placeholder="Write your post here..." rows="5"></textarea>
+        <app-modal class="position-absolute w-75 z-9999" [users]="searchResults" [modalBody]="modalBody" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showSearchComponent" ></app-modal>
         <button type="submit">Create Post</button>
     </form>
 </div>

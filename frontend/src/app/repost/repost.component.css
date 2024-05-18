@@ -1,0 +1,39 @@
+.repost-container {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.repost-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.author {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.repost-content {
+    margin: 10px 0;
+}
+
+.original-post {
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.original-author {
+    font-size: 0.8em;
+    color: #777;
+}
+
+.repost-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
