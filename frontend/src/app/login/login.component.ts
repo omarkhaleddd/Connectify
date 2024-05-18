@@ -26,6 +26,9 @@ export class LoginComponent {
       next: (res) => {  
         console.log(res);
         if(res.token){
+          sessionStorage.setItem('userSessionId',res.id);
+          sessionStorage.setItem('userSessionToken',res.token);
+          sessionStorage.setItem('userSessionDisplayName',res.displayName);
           localStorage.setItem('userToken',res.token);
           localStorage.setItem('displayName',res.displayName);
           localStorage.setItem('userId',res.id);

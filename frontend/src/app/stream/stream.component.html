@@ -1,0 +1,8 @@
+<div class="video-call-page">
+    <div class="friend-list-container">
+        <app-friend-list (friendSelected)="onFriendSelected($event)"></app-friend-list>
+    </div>
+    <div class="video-call-container">
+        <app-video-call [selectedFriend]="selectedFriendData"></app-video-call>
+    </div>
+</div>

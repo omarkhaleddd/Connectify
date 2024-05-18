@@ -32,6 +32,9 @@ import { NotificationComponent } from './components/notifications/notification/n
 import { RepostComponent } from './repost/repost.component';
 import { RepostCreateComponent } from './components/repost/repost-create/repost-create.component';
 import { RepostGetComponent } from './components/repost/repost-get/repost-get.component';
+import { VideoCallComponent } from './components/video-call/video-call.component';
+import { StreamComponent } from './stream/stream.component';
+import { FriendListComponent } from './components/global/friend-list/friend-list.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +66,9 @@ import { RepostGetComponent } from './components/repost/repost-get/repost-get.co
     RepostComponent,
     RepostCreateComponent,
     RepostGetComponent,
+    VideoCallComponent,
+    StreamComponent,
+    FriendListComponent
   ],
   imports: [
     BrowserModule,

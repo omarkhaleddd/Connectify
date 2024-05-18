@@ -13,6 +13,7 @@ import { UserComponent } from './user/user.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { MessageGeneralComponent } from './components/message/message-general/message-general.component';
 import { RepostComponent } from './repost/repost.component';
+import { StreamComponent } from './stream/stream.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -26,6 +27,7 @@ const routes: Routes = [
   {path: 'user/:id' , component: UserComponent},
   {path: 'notifications' , component: NotificationsComponent},
   {path: 'repost' , component: RepostComponent},
+  {path: 'stream' , component: StreamComponent},
   {path:'**',component:NotfoundComponent}
 ];
 

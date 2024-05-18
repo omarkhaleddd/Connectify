@@ -1,0 +1,19 @@
+<div>
+    <ng-container *ngIf="showConn; else disConn">
+        <b class="text-success">you are connected</b>
+    </ng-container>
+    <ng-template #disConn>
+        <b class="text-danger">you are disconnected</b>
+    </ng-template>
+</div>
+
+<h2>Your Online Friends</h2>
+<!-- i will fix this later  -->
+<ng-container *ngIf="friends; else noFriends">  
+    <div *ngFor="let friend of friends" (click)="selectFriend(friend)">
+        <h4> {{ friend }}</h4>
+    </div>
+</ng-container>
+<ng-template #noFriends>
+    <h4 class="text-info">No Online Friends</h4>
+</ng-template>

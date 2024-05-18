@@ -42,12 +42,15 @@ export class SignalrService {
   public async sendMessage(userId: string, displayName: string, message: string): Promise<void> {
     if (this.isConnected()) {
       await this.connection.invoke('Send', userId, displayName, message);
+      console.log(message);
+      
     } else {
       throw new Error('Not connected to SignalR Hub');
     }
   }
 
   public onReceiveMessage(callback: (userId: string, displayName: string, message: string, sentAt: Date) => void) {
+    console.log(callback);
     this.connection.on('RecieveMessage', callback);
   }
   public joinGroup(groupName: string, userId: string) {

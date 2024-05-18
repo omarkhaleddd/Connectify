@@ -15,6 +15,7 @@ using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.APIs.Hubs;
+using Talabat.Core.Entities;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 using Talabat.Core.Hubs.Interfaces;
@@ -113,21 +114,36 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<PostDto>> GetPosts()
         {
 
-			var cacheKey = "posts";
-
-			// Try to get the posts from the cache
-			var cachedPosts = await _cacheService.GetStringAsync(cacheKey);
-			if (cachedPosts != null)
+			var myUser = await _manager.GetUserAddressAsync(User);
+			if (myUser is null)
 			{
-				var cachedResultDtos = JsonConvert.DeserializeObject<List<object>>(cachedPosts);
+				return Unauthorized(new ApiResponse(401));
+			}
+
+			var postDtos = new List<PostDto>();
+			var repostDtos = new List<RepostDto>();
+			var resultDtos = new List<object>();
+			var cachedResultDtos = new List<object>();
+
+			var cachedPostsKey = $"posts - {myUser.Id}";
+			var cachedRepostsKey = $"reposts - {myUser.Id}";
+
+			// Try to get the posts and reposts from the cache
+			var cachedPosts = await _cacheService.GetStringAsync(cachedPostsKey);
+			var cachedReposts = await _cacheService.GetStringAsync(cachedRepostsKey);
+
+			if (cachedPosts != null || cachedReposts != null)
+			{
+				var cachedPostDtos = JsonConvert.DeserializeObject<List<PostDto>>(cachedPosts);
+				var cachedRepostDtos = JsonConvert.DeserializeObject<List<RepostDto>>(cachedReposts);
+
+				cachedResultDtos.AddRange(cachedPostDtos);
+				cachedResultDtos.AddRange(cachedRepostDtos);
+
 				return Ok(cachedResultDtos);
 			}
 
-			var myUser = await _manager.GetUserAddressAsync(User);
-            if (myUser is null)
-            {
-                return Unauthorized(new ApiResponse(401));
-            }
+			
             var currUser = await _manager.GetUserAddressAsync(User);
             var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == currUser.Id);
             var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == currUser.Id);
@@ -136,6 +152,7 @@ namespace Talabat.APIs.Controllers
             //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var postList = new List<Post>();
 			var repostList = new List<Repost>();
+
 
 			foreach (var friendByUserId in friendsByUserId)
 			{
@@ -163,9 +180,6 @@ namespace Talabat.APIs.Controllers
 				return NotFound("No posts or reposts found");
 			}
 
-			var postDtos = new List<PostDto>();
-			var resultDtos = new List<object>();
-
 			foreach (var post in postList)
 			{
 				var user = await _manager.GetUserByIdAsync(post.AuthorId);
@@ -190,7 +204,7 @@ namespace Talabat.APIs.Controllers
 					AuthorName = user.DisplayName
 				};
 
-				resultDtos.Add(postDto);
+				postDtos.Add(postDto);
 			}
 			foreach (var repost in repostList)
 			{
@@ -217,12 +231,14 @@ namespace Talabat.APIs.Controllers
                     Post = postsOfReposts
 				};
 
-				resultDtos.Add(repostDto);
+				repostDtos.Add(repostDto);
 			}
 
-			// Cache the result
-			await _cacheService.SetStringAsync(cacheKey, JsonConvert.SerializeObject(resultDtos));
 
+
+			// Cache the result
+			await _cacheService.SetStringAsync(cachedPostsKey, JsonConvert.SerializeObject(postDtos));
+			await _cacheService.SetStringAsync(cachedRepostsKey, JsonConvert.SerializeObject(repostDtos));
 
 			return Ok(resultDtos);
 		}

@@ -29,7 +29,10 @@ public class Program
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors= true;
+        });
         
         builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
         {
@@ -109,6 +112,7 @@ public class Program
 		{
 			//endpoints.MapHub<ChatHub>("/chat");
 			endpoints.MapHub<AccountNotificationHub>("/notification");
+			endpoints.MapHub<VideoCallHub>("/videocallhub");
 		});
 
         app.MapControllers();
