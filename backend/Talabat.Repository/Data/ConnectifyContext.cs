@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Talabat.Core.Entities;
 using Talabat.Core.Entities.Core;
+using Talabat.Core.Entities.Core.Donation;
 using Talabat.Core.Entities.Identity;
 
 namespace Talabat.Repository.Data
@@ -22,6 +23,7 @@ namespace Talabat.Repository.Data
         public DbSet<BlockList> blockList { get; set; }
 		public DbSet<Message> messages { get; set; }
 		public DbSet<Notification> Notifications { get; set; }
+		public DbSet<Donation> Donations { get; set; }
 
 		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
@@ -53,8 +55,11 @@ namespace Talabat.Repository.Data
 				.WithOne(CL => CL.Comment)
 				.HasForeignKey(CL => CL.CommentId)
 				.OnDelete(DeleteBehavior.Cascade);
-            //base.OnModelCreating(modelBuilder);
-        }
+			modelBuilder.Entity<Donation>()
+				.Property(d => d.Amount)
+				.HasColumnType("decimal(18,2)");
+			//base.OnModelCreating(modelBuilder);
+		}
 
 
     }

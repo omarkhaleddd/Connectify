@@ -1,4 +1,21 @@
 <div class="post-container">
+    <div class="post-settings">
+        <button (click)="toggleDropdown()" class="three-dot-btn rounded-5 px-2 py-1">⋮</button>
+
+        <div *ngIf="showDropDown" class="dropdown-menu">
+            <a href="#" (click)="editPost(post)">Edit</a>
+            <a href="#" (click)="deletePost(post)">Delete</a>
+            <a href="#" (click)="reportPost(post)">Report</a>
+            <button href="#" (click)="openModal()">Donate</button>
+        </div>
+        <app-donate-modal [isVisible]="isModalVisible" [title]="'Donate to this post\'s author'" [showFooter]="true"
+            [buttons]="modalButtons">
+            <form (ngSubmit)="submitDonation()">
+                <label for="donationAmount">Donation Amount:</label>
+                <input type="number" id="donationAmount" [(ngModel)]="donationAmount" name="donationAmount" required />
+            </form>
+        </app-donate-modal>
+    </div>
     <div class="post-header">
         <!-- <img [src]="post.authorProfilePicture" alt="Profile Picture"> -->
         <div class="author-info">
@@ -9,7 +26,7 @@
     <div class="post-content" (click)="onPostClick(post)">
         <p>{{ post?.content }}</p>
         <div *ngIf="post?.post">
-            <app-post-get  [post]="post?.post"></app-post-get>
+            <app-post-get [post]="post?.post"></app-post-get>
         </div>
         <!-- <img *ngIf="post.imageURL" [src]="post.imageURL" alt="Post Image"> -->
     </div>
@@ -18,8 +35,10 @@
             {{ isLiked }}
         </button>
 
-        <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}} Likes</span>
-        <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showModal" ></app-modal>
+        <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}}
+            Likes</span>
+        <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true"
+            [showCloseButton]="false" *ngIf="showModal"></app-modal>
         <button class="ms-1" (click)="commentPost()">Comment</button>
         <button class="ms-1" (click)="repost(post)">Share</button>
     </div>

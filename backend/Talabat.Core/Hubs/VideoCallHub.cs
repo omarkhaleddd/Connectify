@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Talabat.Core.Entities.Hub;
 
 namespace Talabat.APIs.Hubs
 {

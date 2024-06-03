@@ -4,6 +4,7 @@ using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 using Talabat.APIs.DTO;
+using Talabat.Core.Entities.Core.Donation;
 
 namespace Talabat.APIs.Helpers
 {
@@ -47,6 +48,9 @@ namespace Talabat.APIs.Helpers
 
 			CreateMap<FriendRequestDto, FriendRequest>();
 			CreateMap<FriendRequest, FriendRequestDto>();
+
+			CreateMap<DonationDto, Donation>();
+			CreateMap<Donation, DonationDto>();
 		}
     }
 }

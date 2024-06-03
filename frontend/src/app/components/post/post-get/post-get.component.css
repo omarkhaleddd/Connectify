@@ -94,3 +94,54 @@
     cursor: pointer;
     text-decoration: underline;
 }
+
+/* dropdown-menu */
+
+.post-settings{
+    position: relative;
+    text-align: end;
+}
+
+.three-dot-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.three-dot-btn:hover{
+    background-color: #f1f1f1;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    display: block;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.dropdown-menu button{
+    width: 100%;
+    text-align: start;
+    background: 0;
+    border: 0;
+    padding: 8px 12px;
+}
+
+.dropdown-menu a:hover, .dropdown-menu button:hover {
+    background-color: #f1f1f1;
+}
+
+/* dropdown-menu */

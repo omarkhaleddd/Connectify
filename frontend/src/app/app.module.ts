@@ -35,6 +35,10 @@ import { RepostGetComponent } from './components/repost/repost-get/repost-get.co
 import { VideoCallComponent } from './components/video-call/video-call.component';
 import { StreamComponent } from './stream/stream.component';
 import { FriendListComponent } from './components/global/friend-list/friend-list.component';
+import { DonateModalComponent } from './components/global/donate-modal/donate-modal.component';
+import { DonationComponent } from './donation/donation.component';
+import { NgxStripeModule } from 'ngx-stripe';
+import { environment } from './enviroment';
 
 @NgModule({
   declarations: [
@@ -68,14 +72,17 @@ import { FriendListComponent } from './components/global/friend-list/friend-list
     RepostGetComponent,
     VideoCallComponent,
     StreamComponent,
-    FriendListComponent
+    FriendListComponent,
+    DonateModalComponent,
+    DonationComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    NgxStripeModule.forRoot(environment.stripePublicKey)
   ],
   providers: [],
   bootstrap: [AppComponent]

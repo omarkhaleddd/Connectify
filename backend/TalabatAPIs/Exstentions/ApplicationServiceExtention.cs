@@ -13,7 +13,7 @@ namespace Talabat.APIs.Exstentions
     {
         public static IServiceCollection AddApplicationService(this IServiceCollection Services)
         {
-          
+            Services.AddScoped( typeof(IPaymentService) ,typeof(PaymentService)); 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             Services.AddAutoMapper(typeof(MappingProfiles));
             Services.Configure<ApiBehaviorOptions>(options =>

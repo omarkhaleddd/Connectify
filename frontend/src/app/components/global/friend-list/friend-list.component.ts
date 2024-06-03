@@ -14,7 +14,6 @@ export class FriendListComponent {
   userId = sessionStorage.getItem('userSessionId');
   token = sessionStorage.getItem('userSessionToken');
   userName = sessionStorage.getItem('userSessionDisplayName');
-  userConn = sessionStorage.getItem('userConnectionId');
   friends: string[] = [];
   userList: any;
   showConn: boolean = false;
@@ -48,7 +47,6 @@ export class FriendListComponent {
   constructor(private streamService: StreamService) {}
 
   ngOnInit() {
-    if (this.userConn) {
       this.streamService.userList$.subscribe((users) => {
         this.userList = users;
         if (this.userName) {
@@ -59,7 +57,6 @@ export class FriendListComponent {
           this.showConn = false;
         }
       });
-    }
   }
 
   selectFriend(friend: string) {
