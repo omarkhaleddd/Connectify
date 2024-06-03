@@ -47,9 +47,15 @@ export class FriendListComponent {
   constructor(private streamService: StreamService) {}
 
   ngOnInit() {
+    console.log(this.showConn);
+    console.log(this.userConn);
+    
+    // if (this.userConn) {
       this.streamService.userList$.subscribe((users) => {
         this.userList = users;
-        if (this.userName) {
+        console.log(this.showConn);
+
+        if (this.userName) {          
           this.showConn = true;
           this.friends = Object.keys(users).filter((f) => f !== this.userName);
           console.log(this.friends);
@@ -57,10 +63,14 @@ export class FriendListComponent {
           this.showConn = false;
         }
       });
-  }
+    }
+
+  //}
 
   selectFriend(friend: string) {
     const selectedFriend = this.userList[friend];
+    console.log(this.userList);
+    
     this.friendSelected.emit(selectedFriend);
   }
 }
