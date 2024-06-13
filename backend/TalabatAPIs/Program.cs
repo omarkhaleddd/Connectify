@@ -1,4 +1,4 @@
-using Connectify.Core.Services;
+     using Connectify.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +9,7 @@ using Talabat.APIs.Helpers;
 using Talabat.APIs.Hubs;
 using Talabat.APIs.MiddleWares;
 using Talabat.Core.Repositories;
+using Talabat.Core.Services;
 using Talabat.Repository;
 using Talabat.Repository.Data;
 using Talabat.Repository.Identity;
@@ -46,6 +47,7 @@ public class Program
         });
 
 		builder.Services.AddSingleton<RedisCacheService>();
+		builder.Services.AddTransient<IEmailService, EmailService>();
 
 		builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
         builder.Services.AddApplicationService();

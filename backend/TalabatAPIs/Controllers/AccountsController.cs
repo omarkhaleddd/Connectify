@@ -38,9 +38,9 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<BlockList> _repositoryBlock;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
         private readonly IGenericRepository<Notification> _repositoryNotification;
+        private readonly IEmailService _emailService;
 
-
-		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification)
+		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
 		{
 			_mapper = mapper;
 			_manager = manager;
@@ -51,7 +51,8 @@ namespace Talabat.APIs.Controllers
 			_repositoryFriendRequest = genericRepository2;
 			_repositoryBlock = genericRepository3;
 			_accountNotification = accountNotification;
-            _repositoryNotification = genericRepository4;
+			_repositoryNotification = genericRepository4;
+			_emailService = emailService;
 		}
 
 		[HttpPost("Register")]
@@ -77,7 +78,8 @@ namespace Talabat.APIs.Controllers
                 Token = await _tokenService.CreateTokenAsync(user, _manager)
 
             };
-            return Ok(returnedUser);
+			_emailService.SendEmail(user.Email, "User Regitered");
+			return Ok(returnedUser);
         }
 
         [HttpPost("Login")]

@@ -40,7 +40,7 @@ namespace Talabat.APIs.Controllers
                     message.From = new MailAddress(fromEmail);
                     message.To.Add(new MailAddress(recipientEmail));
                     message.Subject = "Login";
-                    message.Body = "You just logged in your account on connectify , if itsnot you change the password ASAP!";
+                    message.Body = "You just logged in to your account on connectify , if it is not you change the password ASAP!";
                     message.IsBodyHtml = true; // Set to true for HTML content
 
                     using (var smtpClient = new SmtpClient(smtpServer, port))
