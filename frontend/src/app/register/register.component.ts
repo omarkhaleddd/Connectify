@@ -15,10 +15,10 @@ export class RegisterComponent {
   //form group -> form control
 
   registerForm = new FormGroup({
-    name : new FormControl(null,[Validators.required,Validators.minLength(3),Validators.maxLength(10)]), //validation as a array in the arguments
     email: new FormControl(null,[Validators.required,Validators.email]),
-    password: new FormControl(null,[Validators.required]),
-    rePassword: new FormControl(null,[Validators.required])
+    DisplayName : new FormControl(null,[Validators.required,Validators.minLength(3),Validators.maxLength(10)]), //validation as a array in the arguments
+    PhoneNumber: new FormControl(null,[Validators.required]),
+    password: new FormControl(null,[Validators.required])
   });
   constructor(private _AuthService:AuthService , private _Router:Router){}
 //functions here 
@@ -29,8 +29,13 @@ export class RegisterComponent {
       next: (res)=>{ 
         //navigate to login
         console.log(res);
-        if(res.message == "success"){
+        if(res.token){
+          sessionStorage.setItem('userSessionId',res.id);
+          sessionStorage.setItem('userSessionToken',res.token);
+          sessionStorage.setItem('userSessionDisplayName',res.displayName);
           localStorage.setItem('userToken',res.token);
+          localStorage.setItem('displayName',res.displayName);
+          localStorage.setItem('userId',res.id);
           this._Router.navigate(['/login']);
         }
       },

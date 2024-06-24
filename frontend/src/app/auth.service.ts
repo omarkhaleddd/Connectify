@@ -10,10 +10,21 @@ export class AuthService {
 
   constructor(private _HttpClient:HttpClient) { }
 
+  getToken(): string | null {
+    return localStorage.getItem('userToken');
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem('userId');
+  }
+  getDisplayName(): string | null {
+    return localStorage.getItem('displayName')
+  }
+
   register(data:FormGroup):Observable<any>{
-    return this._HttpClient.post('https://route-ecommerce.onrender.com/api/v1/auth/signup',data);
+    return this._HttpClient.post('https://localhost:7095/api/Accounts/Register',data);
   } 
   login(data:FormGroup):Observable<any>{
-    return this._HttpClient.post('https://route-ecommerce.onrender.com/api/v1/auth/signup',data);
+    return this._HttpClient.post('https://localhost:7095/api/Accounts/Login',data);
   }
 }

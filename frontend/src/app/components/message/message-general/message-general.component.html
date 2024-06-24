@@ -1,0 +1,15 @@
+<div class="container-fluid ">
+    <div class="row justify-content-center ">
+        <div class="col-12">
+            <h1 class="text-center">Messages</h1>
+        </div>
+        <div class = "row vh-100">
+            <div class="col-md-4 border-end border-3">
+                <app-message-friend-list-sidebar (friendSelected)="onFriendSelected($event)"></app-message-friend-list-sidebar>
+            </div>
+            <div class="col-md-8">
+                <app-message-chat [selectedFriendId]="selectedFriendId"></app-message-chat>
+            </div>
+        </div>
+    </div>
+</div>

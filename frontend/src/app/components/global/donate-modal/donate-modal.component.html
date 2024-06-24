@@ -1,0 +1,16 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2 *ngIf="title">{{ title }}</h2>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <ng-content></ng-content>
+        </div>
+        <div class="modal-footer" *ngIf="showFooter">
+            <button *ngFor="let button of buttons" (click)="button.action()">
+                {{ button.label }}
+            </button>
+        </div>
+    </div>
+</div>

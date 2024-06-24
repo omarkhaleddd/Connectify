@@ -1,0 +1,13 @@
+.video-call-page {
+    display: flex;
+}
+
+.friend-list-container {
+    width: 25%;
+    border-right: 1px solid #ccc;
+}
+
+.video-call-container {
+    width: 75%;
+    padding: 10px;
+}

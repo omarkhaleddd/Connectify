@@ -13,7 +13,6 @@ namespace Talabat.Repository.Identity
     {
         public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> Options) :base(Options)
         {
-
         }
     }
 }
