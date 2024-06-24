@@ -3,17 +3,17 @@
 
     </div>
     <div class="col-md-8 d-grid gap-2 bg-info">
-        //posts goes here
+        <app-posts-profile-display [userPosts]="userPosts"></app-posts-profile-display>
     </div>
     <div class="col-md-2">
-        <div class="w-100  border-4 border rounded-4 overflow-hidden sticky-top">
+        <div class="w-100  border-4 border rounded-4 overflow-hidden sticky">
             <div class="row">
                 <div class="bg-primary-subtle row">
                     <div class="col-lg-5 col-sm-3">
                         <i class="fa-circle fa-solid fa-6x text-center"></i>
                     </div>
                     <div class="col-lg-7 col-sm-5">
-                        <p class="mt-4 ms-2"> {{name}} </p>
+                        <p class="mt-4 ms-2"> {{displayName}} </p>
                     </div>
                 </div>
             </div>

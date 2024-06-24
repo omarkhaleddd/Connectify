@@ -1,0 +1,18 @@
+<div class="billing-container">
+    <h2>Billing Details</h2>
+    <form (ngSubmit)="pay()">
+        <!-- <label for="name">Name:</label>
+        <input type="text" id="name" [(ngModel)]="billingDetails.name" name="name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" [(ngModel)]="billingDetails.email" name="email" required /> -->
+
+        <label for="card">Credit or debit card:</label>
+        <div id="card-element">
+            <!-- Stripe card element will be inserted here -->
+        </div>
+        <div id="card-errors"></div>
+
+        <button type="submit">Pay ${{ donationAmount }}</button>
+    </form>
+</div>

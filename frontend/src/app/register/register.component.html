@@ -6,12 +6,12 @@
             </div>
 
             <div class="alert alert-danger"
-                *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)">
-                {{ getErrorMessage('name') }}
+                *ngIf="registerForm.get('DisplayName')?.invalid && (registerForm.get('DisplayName')?.dirty || registerForm.get('DisplayName')?.touched)">
+                {{ getErrorMessage('DisplayName') }}
             </div>
 
-            <label for="name" class="text-capitalize my-1">name</label>
-            <input formControlName="name" class="form-control" type="text" id="name">
+            <label for="DisplayName" class="text-capitalize my-1">name</label>
+            <input formControlName="DisplayName" class="form-control" type="text" id="DisplayName">
 
 
             <div class="alert alert-danger"
@@ -30,21 +30,13 @@
             <label for="password" class="text-capitalize my-1">password</label>
             <input formControlName="password" class="form-control" type="password" id="password">
 
-            <div class="invalid-feedback"
-                *ngIf="registerForm.get('rePassword')?.invalid && (registerForm.get('rePassword')?.dirty || registerForm.get('rePassword')?.touched)">
-                {{ getErrorMessage('rePassword') }}
-            </div>
-
-            <label for="rePassword" class="text-capitalize my-1">rePassword</label>
-            <input formControlName="rePassword" class="form-control" type="password" id="rePassword">
-
             <div class="alert alert-danger"
-                *ngIf="registerForm.get('phone')?.invalid && (registerForm.get('phone')?.dirty || registerForm.get('phone')?.touched)">
-                {{ getErrorMessage('phone') }}
+                *ngIf="registerForm.get('PhoneNumber')?.invalid && (registerForm.get('PhoneNumber')?.dirty || registerForm.get('PhoneNumber')?.touched)">
+                {{ getErrorMessage('PhoneNumber') }}
             </div>
 
-            <label for="phone" class="text-capitalize my-1">phone</label>
-            <input formControlName="phone" class="form-control" type="text" id="phone">
+            <label for="PhoneNumber" class="text-capitalize my-1">PhoneNumber</label>
+            <input formControlName="PhoneNumber" class="form-control" type="text" id="PhoneNumber">
             <div class="text-end text-center d-flex justify-content-end ">
                 <p class="my-3 px-2 ">Already have account?<a class="text-decoration-none" routerLink="/login"> Login </a></p>
             

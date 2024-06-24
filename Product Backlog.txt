@@ -1,0 +1,24 @@
+Connectify Backlog
+
+Comments API 
+Sign in / register integration with frontend
+Posts Component/ Comments (Frontend)
+Integration Posts/Comments
+Posts contain (image{s}/video{s})
+User Mentions
+
+Phase 2 Features
+
+
+Add user as friend
+Block user
+Search for user
+Notifications
+Save Collection
+Pin post on your profile
+User Profile more details ( profile pic / Education / HomeTown / Links )
+Groups
+Post filtering offensive words / images
+Online Chatting
+Sponsor Post
+Enhancing UI/UX

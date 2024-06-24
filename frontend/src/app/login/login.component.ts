@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { MailService } from '../services/mail/mail.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +17,7 @@ export class LoginComponent {
     email: new FormControl(null,[Validators.required,Validators.email]),
     password: new FormControl(null,[Validators.required])
   });
-  constructor(private _AuthService:AuthService,private _Router:Router){}
+  constructor(private _AuthService:AuthService,private _Router:Router,private _mailService:MailService){}
 
   loginUser(data:FormGroup){
     console.log(data.value);
@@ -23,8 +25,14 @@ export class LoginComponent {
     this._AuthService.login(data.value).subscribe({
       next: (res) => {  
         console.log(res);
-        if(res.message == "success"){
+        if(res.token){
+          sessionStorage.setItem('userSessionId',res.id);
+          sessionStorage.setItem('userSessionToken',res.token);
+          sessionStorage.setItem('userSessionDisplayName',res.displayName);
           localStorage.setItem('userToken',res.token);
+          localStorage.setItem('displayName',res.displayName);
+          localStorage.setItem('userId',res.id);
+          this.sendMail();
           this._Router.navigate(['/home']);
         }
       },
@@ -45,5 +53,22 @@ export class LoginComponent {
     } else {
       return '';
     }
+  }
+  //send mail service
+  sendMail(){
+    var token = this._AuthService.getToken();
+
+    var headers: any = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    var userMail=this.loginForm.value.email;
+
+    this._mailService.sendMail(userMail,headers).subscribe(
+      response =>{
+        console.log('Mail sent successfully:', response);
+      },
+      error => {
+        console.error('Error Sending Mail:', error);
+      });
   }
 }

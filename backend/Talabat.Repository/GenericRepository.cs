@@ -51,5 +51,10 @@ namespace Talabat.Repository
         {
             _dbcontext.Set<T>().Update(item);
         }
+
+        public void SaveChanges()
+        {
+            _dbcontext.SaveChanges();
+        }
     }
 }

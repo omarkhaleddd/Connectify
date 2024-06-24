@@ -1,0 +1,7 @@
+<div>
+    <video #localVideo autoplay muted playsinline></video>
+    <video #remoteVideo autoplay playsinline></video>
+    <h2>Video Call Component</h2>
+    <p>Selected Friend Data: {{ selectedFriend | json }}</p>
+    <button (click)="call()">Call</button>
+</div>
