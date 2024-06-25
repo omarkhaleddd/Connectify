@@ -1,2 +1,2 @@
 # Connectify
-connectify is social media website 
+Website Features: Chatting, Video Call, Notification system, Payment, Mail Server, Caching.
