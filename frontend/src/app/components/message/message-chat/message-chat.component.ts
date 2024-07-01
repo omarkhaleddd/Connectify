@@ -91,23 +91,20 @@ export class MessageChatComponent implements OnInit {
       if(this._AuthService.getUserId()==this.sharedDataValue.friendId){
         id = this.sharedDataValue.userId;
         recieverName =this.sharedDataValue.userName;
-      
       }
       else{
         id = this.sharedDataValue.friendId;
         recieverName =this.sharedDataValue.friendName;
         console.log("here");
-        
       }
+
       console.log(recieverName);
       console.log(id);      
       if (this.message && this.chatService.isConnected()) {  // Check connection before sending
-
       this.chatService.sendMessage(authId,id , this.message)
         .then(() => {
           this.message = '';
           console.log("sent");
-          
         })
         .catch(error => {
           console.log(error);
@@ -118,22 +115,7 @@ export class MessageChatComponent implements OnInit {
   }
   }}
 
-  public joinGroup() {
-    if (this.GroupData.groupName) {
-      console.log(this.GroupData.groupName);
-      
-      this.chatService.joinGroup(this.GroupData.groupName, this.isUserId);
-      this.isConnected = true;
-    }
-  }
-
-  public sendMessageToGroup() {        
-    if (this.isConnected) {
-      this.chatService.sendMessageToGroup(this.GroupData.groupName, this.isUserId, this.message);      
-      this.message = '';
-    }
-  }
-
+  
   private receiveMessage(senderId: string, senderName: string, message: string) {
     console.log(this.messages);
     this.messages.push({ senderId, senderName, messageText: message, messageDate: new Date() });

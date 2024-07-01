@@ -32,7 +32,6 @@ export class LoginComponent {
           localStorage.setItem('userToken',res.token);
           localStorage.setItem('displayName',res.displayName);
           localStorage.setItem('userId',res.id);
-          this.sendMail();
           this._Router.navigate(['/home']);
         }
       },
@@ -53,22 +52,5 @@ export class LoginComponent {
     } else {
       return '';
     }
-  }
-  //send mail service
-  sendMail(){
-    var token = this._AuthService.getToken();
-
-    var headers: any = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-    var userMail=this.loginForm.value.email;
-
-    this._mailService.sendMail(userMail,headers).subscribe(
-      response =>{
-        console.log('Mail sent successfully:', response);
-      },
-      error => {
-        console.error('Error Sending Mail:', error);
-      });
   }
 }

@@ -33,6 +33,7 @@ namespace Talabat.APIs.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
         private readonly IGenericRepository<Post> _repositoryPost;
+        private readonly IGenericRepository<FileNames> _repositoryFileName;
         private readonly IGenericRepository<Comment> _repositoryComment;
         private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
         private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
@@ -41,10 +42,11 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<Notification> _repositoryNotification;
 		private readonly IHubContext<MentionNotification, INotificationHub> _mentionNotification;
 		private readonly RedisCacheService _cacheService;
+        private readonly IUploadService _uploadService;
 
 
 
-		public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2, IGenericRepository<PostLikes> genericRepository3, IGenericRepository<AppUserFriend> genericRepository4, IGenericRepository<BlockList> genericRepository5, IGenericRepository<Repost> repositoryRepost, IGenericRepository<Notification> repositoryNotification, RedisCacheService cacheService)
+        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2, IGenericRepository<FileNames> genericRepository6, IGenericRepository<PostLikes> genericRepository3, IGenericRepository<AppUserFriend> genericRepository4, IGenericRepository<BlockList> genericRepository5, IGenericRepository<Repost> repositoryRepost, IGenericRepository<Notification> repositoryNotification, RedisCacheService cacheService, IUploadService uploadService)
 		{
 			_mapper = mapper;
 			_manager = manager;
@@ -56,11 +58,13 @@ namespace Talabat.APIs.Controllers
 			_repositoryRepost = repositoryRepost;
 			_repositoryNotification = repositoryNotification;
 			_cacheService = cacheService;
-		}
+            _uploadService = uploadService;
+            _repositoryFileName = genericRepository6;
+        }
 
 
-		//Get Posts by UserId
-		[Authorize]
+        //Get Posts by UserId
+        [Authorize]
         [HttpGet("GetPostByAuthorId/{authorId}")]
         public async Task<ActionResult<PostDto>> GetPostByAuthorId(string authorId)
         {
@@ -297,23 +301,37 @@ namespace Talabat.APIs.Controllers
         //Post Request
         [Authorize]
         [HttpPost("")]
-        public async Task<ActionResult<PostDto>> CreatePost(PostDto newPost)
+        public async Task<ActionResult<PostDto>> CreatePost([FromForm]PostDto newPost)
         {
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
-			
-			var post = _mapper.Map<PostDto, Post>(newPost);
-            post.AuthorId = user.Id;
-            post.Comments = null;
+            string uploadedFileName = null;
+
+            
+            var post = _mapper.Map<PostDto, Post>(newPost);
             if (post is null)
             {
                 return BadRequest(new ApiResponse(400));
             }
+            post.AuthorId = user.Id;
+            post.Comments = null;
+            if (newPost.UploadedFile != null) // Handle single file upload
+            {
+                uploadedFileName = await _uploadService.UploadFileAsync(newPost.UploadedFile, newPost.UploadedFile.FileName);
+                post.FileName = uploadedFileName;
+            }
+            else if (newPost.UploadedFiles != null && newPost.UploadedFiles.Count > 0) // Handle multiple file upload
+            {
+                var uploadedFileNames = await _uploadService.UploadFilesAsync(newPost.UploadedFiles);
+                var mappedFileNames = new List<FileNames>();
+                foreach (var file in uploadedFileNames) {
+                    mappedFileNames.Append(new FileNames { FileName = file });
+                }
+            }
 
-
-			var result = _repositoryPost.Add(post);
+            var result = _repositoryPost.Add(post);
             _repositoryPost.SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));

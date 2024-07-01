@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,5 +29,6 @@ namespace Talabat.Core.Entities.Core
 		public ICollection<PostLikes>? Likes { get; set; } = new HashSet<PostLikes>();
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
 		public ICollection<Repost>? Reposts { get; set; } = new HashSet<Repost>();
-	}
+        public string? FileName { get; set; } // For storing single uploaded filename
+    }
 }

@@ -40,7 +40,10 @@ namespace Talabat.APIs.Helpers
             CreateMap<MessageDto, Message>();
             CreateMap<Message, MessageDto>();
 
-			CreateMap<RepostDto, Repost>();
+            CreateMap<GroupMessageDto, Message>();
+            CreateMap<Message, GroupMessageDto>();
+
+            CreateMap<RepostDto, Repost>();
 			CreateMap<Repost, RepostDto>();
 
 			CreateMap<NotificationDto, Notification>();
@@ -51,6 +54,10 @@ namespace Talabat.APIs.Helpers
 
 			CreateMap<DonationDto, Donation>();
 			CreateMap<Donation, DonationDto>();
-		}
+
+
+            CreateMap<FileNameDto, FileNames>();
+            CreateMap<FileNames, FileNameDto>();
+        }
     }
 }

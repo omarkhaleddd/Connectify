@@ -14,8 +14,8 @@ import { FriendService } from 'src/app/services/friends/friend.service';
 export class MessageFriendListSidebarComponent implements OnInit {
   selectedFriendId: any | undefined;
   friends : friend[] = [];
-  public groupName: string|undefined; 
   myUserId:string;
+  public groupName: string|undefined; 
   public isConnectedToGroup: boolean = false;
 
   constructor(private _AuthService : AuthService,private sharedData:DataService , private friendService : FriendService) {
@@ -29,7 +29,12 @@ export class MessageFriendListSidebarComponent implements OnInit {
   headers : any = new HttpHeaders({
     Authorization : `Bearer ${this.token}`
   });
-
+  public joinGroup() {
+    if (this.groupName) {
+      this.isConnectedToGroup = true;
+      this.sharedData.updateGroup({isConnected:this.isConnectedToGroup , groupName : this.groupName} )
+    }
+  }
   fetchFriends(){
     this.friendService.getFriends(this.headers).subscribe(
       friends =>{
@@ -43,12 +48,6 @@ export class MessageFriendListSidebarComponent implements OnInit {
 
   onFriendSelected(friend: friend) {
     console.log("Selected friend:", friend); // Access friend properties directly
-  }
-  public joinGroup() {
-    if (this.groupName) {
-      this.isConnectedToGroup = true;
-      this.sharedData.updateGroup({isConnected:this.isConnectedToGroup , groupName : this.groupName} )
-    }
   }
 
 }

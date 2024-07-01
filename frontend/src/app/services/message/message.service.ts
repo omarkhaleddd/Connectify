@@ -15,4 +15,8 @@ export class MessageService {
     console.log(headers);
     return this.http.get<Message[]>(this.apiUrl + "getMessages/" + id, {headers: headers});
   }
+  getGroupMessages(headers:any,groupName: string ):Observable<Message[]>{
+    console.log(headers);
+    return this.http.get<Message[]>(this.apiUrl + "getGroupMessages/" + groupName, {headers: headers});
+  }
 }

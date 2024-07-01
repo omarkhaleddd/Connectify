@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MessageGeneralComponent implements OnInit{
   selectedFriendId: string | undefined;
+  public isConnectedToGroup: boolean = false;
 
   ngOnInit(): void {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.

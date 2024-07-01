@@ -45,5 +45,24 @@ namespace Talabat.APIs.Controllers
             var mappedMessage = _mapper.Map<List<Message>, List<MessageDto>>(messages.ToList());
             return Ok(mappedMessage);
         }
+        [Authorize]
+        [HttpGet("getGroupMessages/{groupName}")]
+        public async Task<ActionResult<MessageDto>> GetGrpMessages(string groupName)
+        {
+            var myUser = await _manager.GetUserAddressAsync(User);
+            if (myUser is null)
+            {
+                return Unauthorized(new ApiResponse(401));
+            }
+            var spec = new BaseSpecifications<Message>(m => m.groupName == groupName);
+            var messages = await _repositoryMessage.GetAllWithSpecAsync(spec);
+            if (messages == null)
+            {
+                return BadRequest("No Messages");
+            }
+
+            var mappedMessage = _mapper.Map<List<Message>, List<MessageDto>>(messages.ToList());
+            return Ok(mappedMessage);
+        }
     }
     }

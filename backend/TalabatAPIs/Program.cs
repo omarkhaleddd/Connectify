@@ -47,7 +47,10 @@ public class Program
         });
 
 		builder.Services.AddSingleton<RedisCacheService>();
-		builder.Services.AddTransient<IEmailService, EmailService>();
+
+        builder.Services.AddTransient<IUploadService, UploadService>();
+
+        builder.Services.AddTransient<IEmailService, EmailService>();
 
 		builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
         builder.Services.AddApplicationService();

@@ -48,7 +48,7 @@ export class FriendListComponent {
 
   ngOnInit() {
     console.log(this.showConn);
-    console.log(this.userConn);
+    // console.log(this.userConn);
     
     // if (this.userConn) {
       this.streamService.userList$.subscribe((users) => {

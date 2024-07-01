@@ -1,0 +1,27 @@
+<h3>Chat : {{ GroupData.groupName }}</h3>
+<div class="flex-grow-1 overflow-auto">
+    <div *ngFor="let msg of grpMessages" class="message">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <div class="message-content d-flex justify-content-center">
+                    <h4 class="me-3">{{ msg.displayName }} : </h4>
+                    <p class="mt-1">{{ msg.message }}</p>
+                </div>
+                <div class="message-details">
+                    <p>Date : {{ msg.sentAt | date: 'short' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 mt-auto">
+        <form class="bg-light p-3" (submit)="getGroupMessages()">
+            <div class="d-flex">
+                <textarea class="form-control resize-none me-2" rows="3" name="message" id="message"
+                    placeholder="Type your message here!" [(ngModel)]="message"></textarea>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+</div>

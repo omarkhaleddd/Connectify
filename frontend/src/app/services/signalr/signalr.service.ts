@@ -63,7 +63,7 @@ export class SignalrService {
       .catch(err => console.log(err));
   }
 
-  public addReceiveMessageListener(callback: (senderId: string, senderName: string, message: string) => void) {
-    this.connection.on('recieveMessageGrp', callback);
-  }
+public addReceiveMessageListener(callback: (senderId: string, senderName: string, message: string,sentAt: Date) => void) {
+this.connection.on('recieveMessage', callback);
+}
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Talabat.Repository.Data;
 
@@ -11,9 +12,10 @@ using Talabat.Repository.Data;
 namespace Connectify.Repository.Migrations
 {
     [DbContext(typeof(ConnectifyContext))]
-    partial class ConnectifyContextModelSnapshot : ModelSnapshot
+    [Migration("20240630233511_addedFileInPost")]
+    partial class addedFileInPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,51 +276,6 @@ namespace Connectify.Repository.Migrations
                     b.ToTable("Donations");
                 });
 
-            modelBuilder.Entity("Talabat.Core.Entities.Core.FileNames", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("DeleteBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InsertBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("InsertDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdateBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.ToTable("FileNames");
-                });
-
             modelBuilder.Entity("Talabat.Core.Entities.Core.FriendRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -499,7 +456,7 @@ namespace Connectify.Repository.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FileName")
+                    b.Property<string>("FileUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InsertBy")
@@ -708,17 +665,6 @@ namespace Connectify.Repository.Migrations
                     b.Navigation("Comment");
                 });
 
-            modelBuilder.Entity("Talabat.Core.Entities.Core.FileNames", b =>
-                {
-                    b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
-                        .WithMany("FileNames")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-                });
-
             modelBuilder.Entity("Talabat.Core.Entities.Core.PostLikes", b =>
                 {
                     b.HasOne("Talabat.Core.Entities.Core.Post", "Post")
@@ -760,8 +706,6 @@ namespace Connectify.Repository.Migrations
             modelBuilder.Entity("Talabat.Core.Entities.Core.Post", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("FileNames");
 
                     b.Navigation("Likes");
 

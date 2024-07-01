@@ -57,25 +57,35 @@ namespace Talabat.APIs.Hubs
         public async Task JoinGroup(string groupName, string userId)
         {
             var user = await _manager.GetUserByIdAsync(userId);
-            await Groups.AddToGroupAsync(groupName, user.DisplayName);
-            await Clients.OthersInGroup(groupName).SendAsync($"{user.DisplayName} joined the group");
+            if (user != null)
+            {
+                await Groups.AddToGroupAsync(groupName, user.DisplayName);
+                await Clients.OthersInGroup(groupName).SendAsync($"{user.DisplayName} joined the group");
 
-            _logger.LogInformation(Context.ConnectionId);
+                _logger.LogInformation($"User {user.DisplayName} with ConnectionId {Context.ConnectionId} joined group {groupName}");
+
+                _logger.LogInformation(Context.ConnectionId);
+            }
+            else
+            {
+                _logger.LogWarning($"User with Id {userId} not found");
+            }
         }
         public async Task SendMessageToGroup(string groupName, string senderId, string message)
         {
             var sender = await _manager.GetUserByIdAsync(senderId);
             if (sender != null)
             {
-                await Clients.Group(groupName).SendAsync("recieveMessageGrp", sender.Id, sender.DisplayName, message);
-                MessageDto msg = new MessageDto()
+                await Clients.All.SendAsync("recieveMessage", sender.Id, sender.DisplayName, message, DateTime.Now);
+                GroupMessageDto msg = new GroupMessageDto()
                 {
                     senderId = senderId,
                     senderName = sender.UserName,
                     messageText = message,
                     messageDate = DateTime.Now,
+                    groupName = groupName,
                 };
-                var mappedMsg = _mapper.Map<MessageDto, Message>(msg);
+                var mappedMsg = _mapper.Map<GroupMessageDto, Message>(msg);
                 await _repositoryMessage.Add(mappedMsg);
                 _repositoryMessage.SaveChanges();
             }

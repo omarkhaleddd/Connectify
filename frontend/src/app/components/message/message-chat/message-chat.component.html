@@ -1,33 +1,4 @@
 <div class="container d-flex flex-column vh-100">
-        <!-- <h3>Chat : {{ GroupData.groupName }}</h3>
-        <div class="flex-grow-1 overflow-auto">
-            <div *ngFor="let msg of messages" class="message">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                        <div class="message-content d-flex justify-content-center">
-                            <h4 class="me-3">{{ msg.senderName }} : </h4>
-                            <p class="mt-1">{{ msg.messageText }}</p>
-                        </div>
-                        <div class="message-details">
-                            <p>Date : {{ msg.messageDate | date: 'short' }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 mt-auto">
-            
-                <form class="bg-light p-3" (submit)="sendMessageToGroup()">
-                    <div class="d-flex">
-                        <textarea class="form-control resize-none me-2" rows="3" name="message" id="message" placeholder="Type your message here!" [(ngModel)]="message"></textarea>
-                        <button type="submit" class="btn btn-primary">Send</button>
-                    </div>
-                </form>
-                <button type="submit" class="btn btn-primary"(click)="joinGroup()" >Group</button>
-
-            </div>
-        </div> -->
         <div class="row justify-content-center">
             <div class="col-12 p-3">
                 <h4 class="text-center">{{ this.sharedDataValue.friendName }}</h4>
