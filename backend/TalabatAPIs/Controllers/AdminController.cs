@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -24,7 +25,8 @@ namespace Talabat.APIs.Controllers
         private readonly ITokenService _tokenService;
         private readonly IGenericRepository<Post> _repositoryPost;
         private readonly IGenericRepository<ReportedPost> _repositoryReportedPost;
-
+        private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _manager;
 
         public AdminController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService,IGenericRepository<ReportedPost> genericRepository5)
         {
