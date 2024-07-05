@@ -14,4 +14,14 @@
     <None Include="wwwroot\css\open-iconic\README.md" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Services\Interfaces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Talabat.Core\Connectify.Core.csproj" />
+    <ProjectReference Include="..\Talabat.Repository\Connectify.Repository.csproj" />
+    <ProjectReference Include="..\Talabat.Service\Connectify.Service.csproj" />
+  </ItemGroup>
+
 </Project>

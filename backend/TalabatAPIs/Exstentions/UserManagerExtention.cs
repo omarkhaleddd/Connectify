@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Identity;
 
 namespace Talabat.APIs.Exstentions
@@ -21,5 +22,16 @@ namespace Talabat.APIs.Exstentions
 			var user = await userManager.Users.Where(U => U.Id == id).FirstOrDefaultAsync();
 			return user;
 		}
-	}
+
+        public static async Task<IEnumerable<UserDto>> GetAllUsersAsync(this UserManager<AppUser> userManager)
+        {
+            return await userManager.Users
+                                 .Select(user => new UserDto
+                                 {
+                                     Id = user.Id,
+                                     DisplayName = user.DisplayName
+                                 })
+                                 .ToListAsync();
+        }
+    }
 }

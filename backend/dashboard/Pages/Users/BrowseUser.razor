@@ -1,5 +1,6 @@
 ﻿@page "/browse-users"
 @inject NavigationManager Navigation
+@inject UserService UserService
 
 
 <PageTitle>Browse Users</PageTitle>
@@ -10,7 +11,7 @@
     <SearchBar/>
 </div>
 
-<DataTable TItem="User" Items="users">
+<DataTable  Items="users">
     <Header>
         @foreach (var head in headers){
             <th class="text-center">@head</th>
@@ -18,18 +19,21 @@
     </Header>
     <Row>
         <td>
+            <p>@context.Id</p>
+        </td>
+        <td>
             <div class="d-flex align-items-center">
-                <img src="@context.Image" alt="" style="width: 45px; height: 45px" class="rounded-circle" />
+                @* <img src="@context.Image" alt="" style="width: 45px; height: 45px" class="rounded-circle" /> *@
                 <div class="ms-3 ">
-                    <p class="fw-bold mb-1 ">@context.Name</p>
+                    <p class="fw-bold mb-1 ">@context.DisplayName</p>
                 </div>
             </div>
         </td>
-        <td class="text-center">
+        @* <td class="text-center">
             <span class="@(context.Status == "Active" ? "custom-success-badge badge badge-success" : "custom-danger-badge badge badge-primary") rounded-pill d-inline">
                 @context.Status
             </span>
-        </td>
+        </td> *@
         <td class="text-center">
             <button class='btn btn-link btn-sm btn-rounded bg-primary text-white text-decoration-none' @onclick='() => NavigateToUserPosts(context.Id)'>View Posts</button>
             <button class='btn btn-link btn-sm btn-rounded bg-danger text-white text-decoration-none' @onclick='() => DeleteUser(context)'>Delete</button>
@@ -41,25 +45,37 @@
 </DataTable>
 
 @code {
-    private void NavigateToUserPosts(int id)
+
+    private List<User> users;
+
+    protected override async Task OnInitializedAsync()
     {
+        var userDtos = await UserService.GetUsersAsync();
+        users = userDtos.ToList();
+    }
+
+    private void NavigateToUserPosts(string id)
+    {
+
         Navigation.NavigateTo($"user-posts/{id}");
     }
     private List<string> headers = new List<string>
     {
-        "Name","Status","Actions"
+        "Id","Name","Actions"
     };
 
-    private List<User> users = new List<User>
+    @* private List<User> users = new List<User>
     {
         new User { Id = 1 , Name = "John Doe", Status = "Active", Image = "https://mdbootstrap.com/img/new/avatars/8.jpg" },
         new User { Id = 2 , Name = "Alex Ray",Status = "Inactive", Image = "https://mdbootstrap.com/img/new/avatars/6.jpg"},
         new User { Id = 3 , Name = "Kate Hunington",  Status = "Inactive", Image = "https://mdbootstrap.com/img/new/avatars/7.jpg" }
-    };
+    }; *@
 
     private void DeleteUser(User user)
     {
-        users.Remove(user);
+        @* users.Remove(user); *@
     }
+
+    
 
 }

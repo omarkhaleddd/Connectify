@@ -3,18 +3,12 @@ namespace dashboard.Entities
     public class User
     {
         public User(){}
-        public User(int id, string name, string email, string status,string image)  
+        public User(string id, string displayName)  
         {
             Id = id;
-            Name = name;
-            Email = email;
-            Status = status;
-            Image = image;
+            DisplayName = displayName;
         }
-        public int Id { get; set;}
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Status { get; set; }
-        public string Image { get; set; }
+        public string Id { get; set;}
+        public string DisplayName { get; set; }
     }
 }
