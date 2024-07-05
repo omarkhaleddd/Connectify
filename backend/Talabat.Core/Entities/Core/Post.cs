@@ -21,6 +21,7 @@ namespace Talabat.Core.Entities.Core
 			UpdateDate = DateTime.Now;
 			DeleteDate = null;
             Likes = null;
+            ReportCount = 0;
 		}
         public string content { get; set; }
         public DateTime DatePosted { get; set; } 
@@ -30,5 +31,6 @@ namespace Talabat.Core.Entities.Core
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
 		public ICollection<Repost>? Reposts { get; set; } = new HashSet<Repost>();
         public string? FileName { get; set; } // For storing single uploaded filename
+        public int ReportCount { get; set; }
     }
 }

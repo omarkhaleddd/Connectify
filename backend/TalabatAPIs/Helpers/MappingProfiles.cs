@@ -55,6 +55,8 @@ namespace Talabat.APIs.Helpers
 			CreateMap<DonationDto, Donation>();
 			CreateMap<Donation, DonationDto>();
 
+            CreateMap<ReportedPostDto, ReportedPost>();
+            CreateMap<ReportedPost, ReportedPostDto>();
 
             CreateMap<FileNameDto, FileNames>();
             CreateMap<FileNames, FileNameDto>();
