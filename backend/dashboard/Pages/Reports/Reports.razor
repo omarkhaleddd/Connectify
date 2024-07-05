@@ -1,0 +1,74 @@
+﻿@page "/reported-posts"
+
+<PageTitle>Reports</PageTitle>
+
+<h1 class="fw-bold text-secondary">Reported Posts</h1>
+
+<div class="text-center w-50 mb-3">
+    <SearchBar/>
+</div>
+
+<DataTable TItem="Report" Items="reports">
+    <Header>
+        @foreach (var head in headers){
+            <th>@head</th>
+        }
+    </Header>
+    <Row>
+        <td>
+            <p class="fw-bold mb-1">@context.ReportedBy</p>
+        </td>
+        <td>
+            <p class="text-muted mb-0">@context.PostId</p>
+        </td>
+        <td>
+            <p class="text-muted mb-0">@context.Type</p>
+        </td>
+        <td>
+            <p class="text-muted mb-0">@context.Date</p>
+        </td>
+        <td>
+            <span class="@(context.Status == "Active" ? "custom-success-badge badge badge-success" : "custom-danger-badge badge badge-primary") rounded-pill d-inline">
+                @context.Status
+            </span>
+        </td>
+        <td>
+            <button type="button" class='btn btn-link btn-sm btn-rounded bg-primary text-white text-decoration-none' data-bs-toggle="modal" data-bs-target="#reportModal">Review</button>
+            <ReportModal idName="reportModal" ModalTitle="Report Title" Report="context" />
+            <button class='btn btn-link btn-sm btn-rounded bg-red text-white text-decoration-none' @onclick='() => DeleteReport(context)'>Dismess</button>
+        </td>
+    </Row>
+    <Footer>
+        <div class=""></div>
+    </Footer>
+</DataTable>
+
+@code {
+    private List<string> headers = new List<string>
+    {
+        "PostId","Reported By","Type","Date","Status","Actions"
+    };
+
+    private List<Report> reports = new List<Report>
+    {
+        new Report { PostId = 1 ,ReportedBy = "Alex Ray", Type = "Harassment", Status = "Resolved", Date = "2-2-2003" },
+        new Report { PostId = 1 ,ReportedBy = "Kate Hunington", Type = "Offensive Content", Status = "Pending", Date = "2-2-2003" },
+        new Report { PostId = 1 ,ReportedBy = "John Doe", Type = "Spam", Status = "Under Review", Date = "2-2-2003" },
+    };
+
+    private void DeleteReport(Report report)
+    {
+        reports.Remove(report);
+    }
+
+    private void ReviewReport(Report report)
+    {
+        // Handle review logic
+    }
+
+    private void DismissReport(Report report)
+    {
+        // Handle dismiss logic
+    }
+
+}

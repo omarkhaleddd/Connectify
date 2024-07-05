@@ -1,0 +1,32 @@
+.navbar[b-132yxpepqo] {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    background: var(--theme-color);
+    color: #fff;
+    z-index: 10;
+}
+
+.navbar-left[b-132yxpepqo] {
+}
+
+.navbar-right[b-132yxpepqo] {
+    display: flex;
+    align-items: center;
+}
+
+.nav-button[b-132yxpepqo] {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 1em;
+}
+
+.nav-button i[b-132yxpepqo] {
+    font-size: 1.2em;
+}

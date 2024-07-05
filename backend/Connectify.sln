@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connectify.Repository", "Ta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connectify.Service", "Talabat.Service\Connectify.Service.csproj", "{7BDB9939-7C65-4C0A-829E-CE2D65B4146F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dashboard", "dashboard\dashboard.csproj", "{D0563035-8469-4BE1-949E-EC65DD8ACA4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7BDB9939-7C65-4C0A-829E-CE2D65B4146F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BDB9939-7C65-4C0A-829E-CE2D65B4146F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BDB9939-7C65-4C0A-829E-CE2D65B4146F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0563035-8469-4BE1-949E-EC65DD8ACA4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0563035-8469-4BE1-949E-EC65DD8ACA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0563035-8469-4BE1-949E-EC65DD8ACA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0563035-8469-4BE1-949E-EC65DD8ACA4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

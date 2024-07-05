@@ -1,0 +1,39 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+@using dashboard.Shared.Widgets
+
+<PageTitle>Index</PageTitle>
+
+<div class="container d-grid gap-3">
+    <h1 class="fw-bold">Welcome, Omar!</h1>
+    <div class="row">
+        <div class="col-4">
+            <KpiWidget/>
+        </div>
+        <div class="col-4">
+            <KpiWidget/>
+        </div>
+        <div class="col-4">
+            <KpiWidget/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <ChartWidget ChartId="myChart" />
+        </div>
+        <div class="col-6">
+            <ChartWidget ChartId="myChart1" />
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("createChart");
+        }
+    }
+}

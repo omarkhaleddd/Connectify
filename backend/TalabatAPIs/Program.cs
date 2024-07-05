@@ -1,10 +1,9 @@
-     using Connectify.Core.Services;
+using Connectify.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Talabat.APIs.Errors;
-using Talabat.APIs.Exstentions;
 using Talabat.APIs.Helpers;
 using Talabat.APIs.Hubs;
 using Talabat.APIs.MiddleWares;
@@ -13,6 +12,9 @@ using Talabat.Core.Services;
 using Talabat.Repository;
 using Talabat.Repository.Data;
 using Talabat.Repository.Identity;
+using Microsoft.Extensions.Logging;
+using System.Data.SqlClient;
+using Talabat.APIs.Exstentions;
 
 public class Program
 {
@@ -20,8 +22,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        // Configure logging
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
 
+        // Add services to the container.
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
@@ -32,9 +37,9 @@ public class Program
         });
         builder.Services.AddSignalR(options =>
         {
-            options.EnableDetailedErrors= true;
+            options.EnableDetailedErrors = true;
         });
-        
+
         builder.Services.AddDbContext<AppIdentityDbContext>(Options =>
         {
             Options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
@@ -42,17 +47,14 @@ public class Program
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(Options =>
         {
-            var ConnectionSting = builder.Configuration.GetConnectionString("RedisConnection");
-            return ConnectionMultiplexer.Connect(ConnectionSting);
+            var ConnectionString = builder.Configuration.GetConnectionString("RedisConnection");
+            return ConnectionMultiplexer.Connect(ConnectionString);
         });
 
-		builder.Services.AddSingleton<RedisCacheService>();
-
+        builder.Services.AddSingleton<RedisCacheService>();
         builder.Services.AddTransient<IUploadService, UploadService>();
-
         builder.Services.AddTransient<IEmailService, EmailService>();
-
-		builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
+        builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
         builder.Services.AddApplicationService();
         builder.Services.AddIdentityServices(builder.Configuration);
 
@@ -67,36 +69,36 @@ public class Program
             });
         });
 
-        using var app = builder.Build();
+        var app = builder.Build();
+
+        // Log server names
+        LogServerNames(app.Services.GetRequiredService<IConfiguration>(), app.Services.GetRequiredService<ILogger<Program>>());
+
         #region Update Database
 
-        //  StoreContext context=new StoreContext()
-        var Scopped = app.Services.CreateScope();
-        var services = Scopped.ServiceProvider;
-        var LoggerFactory = services.GetService<ILoggerFactory>();
+        var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
         try
         {
-
             var dbContext = services.GetRequiredService<ConnectifyContext>();
             await dbContext.Database.MigrateAsync();
 
-            var IdentityDbCOntext = services.GetRequiredService<AppIdentityDbContext>();
-            await IdentityDbCOntext.Database.MigrateAsync();
+            var identityDbContext = services.GetRequiredService<AppIdentityDbContext>();
+            await identityDbContext.Database.MigrateAsync();
             await ConnectifyContextSeed.SeedAsync(dbContext);
         }
         catch (Exception ex)
         {
-            var logger = LoggerFactory.CreateLogger<Program>();
-            logger.LogError(ex, "error while Migrations");
-
+            var logger = loggerFactory.CreateLogger<Program>();
+            logger.LogError(ex, "An error occurred during migrations.");
         }
-        #endregion
-
-        #region DataSeed
 
         #endregion
+
         app.UseRouting();
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -105,24 +107,36 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
         app.UseStaticFiles();
         app.UseStatusCodePagesWithRedirects("/errors/{0}");
-       
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapHub<ChatHub>("/chatHub");
 
         app.UseEndpoints(endpoints =>
-		{
-			//endpoints.MapHub<ChatHub>("/chat");
-			endpoints.MapHub<AccountNotificationHub>("/notification");
-			endpoints.MapHub<VideoCallHub>("/videocallhub");
-		});
+        {
+            endpoints.MapHub<AccountNotificationHub>("/notification");
+            endpoints.MapHub<VideoCallHub>("/videocallhub");
+        });
 
         app.MapControllers();
-
         app.Run();
+    }
 
+    private static void LogServerNames(IConfiguration configuration, ILogger logger)
+    {
+        var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
+        var identityConnectionString = configuration.GetConnectionString("IdentityConnection");
+
+        var defaultConnectionBuilder = new SqlConnectionStringBuilder(defaultConnectionString);
+        var identityConnectionBuilder = new SqlConnectionStringBuilder(identityConnectionString);
+
+        var defaultServerName = defaultConnectionBuilder.DataSource;
+        var identityServerName = identityConnectionBuilder.DataSource;
+
+        logger.LogInformation("Using SQL Server for DefaultConnection: {ServerName}", defaultServerName);
+        logger.LogInformation("Using SQL Server for IdentityConnection: {ServerName}", identityServerName);
     }
 }

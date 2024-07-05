@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { AuthService } from '../auth.service';
 import { HttpHeaders } from '@angular/common/http';
-import { environment } from '../enviroment/enviroment';
+import { environment } from '../enviroment';
 
 @Component({
   selector: 'app-donation',

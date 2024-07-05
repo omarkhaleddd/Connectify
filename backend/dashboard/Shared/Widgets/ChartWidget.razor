@@ -1,0 +1,20 @@
+@* @using Microsoft.JSInterop *@
+
+<div class="chart-widget">
+    <canvas id="@ChartId" width="400" height="200"></canvas>
+</div>
+
+@code {
+    [Parameter] public string ChartId {get; set;}
+
+    @* [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("createChart");
+        }
+    } *@
+}

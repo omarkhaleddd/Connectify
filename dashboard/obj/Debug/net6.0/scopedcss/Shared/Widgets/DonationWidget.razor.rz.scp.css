@@ -1,0 +1,26 @@
+.donation-widget[b-6benyu368k]{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #E0E0E0;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.donation-widget .donation-title[b-6benyu368k]{
+    font-size: 16px;
+}
+
+.donation-widget .donation-content[b-6benyu368k]{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.donation-widget .donation-content .donation-metric[b-6benyu368k]{
+    font-size: 40px;
+    font-weight: 600;
+}
+
+.donation-widget .donation-content .donation-stat[b-6benyu368k]{
+    color: #828282;
+}

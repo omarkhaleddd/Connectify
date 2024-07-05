@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootstrap@5.3.3",
+      "destination": "wwwroot/js/bootstrap/",
+      "files": [
+        "js/bootstrap.min.js"
+      ]
+    },
+    {
+      "library": "jvectormap@2.0.5",
+      "destination": "wwwroot/js/jvectormap/"
+    },
+    {
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/js/jquery/",
+      "files": [
+        "jquery.min.js"
+      ]
+    },
+    {
+      "library": "Chart.js@4.4.1",
+      "destination": "wwwroot/js/Chart.js/",
+      "files": [
+        "chart.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "chart.js@4.4.3",
+      "destination": "wwwroot/js/chart.js/",
+      "files": [
+        "dist/chart.js"
+      ]
+    }
+  ]
+}

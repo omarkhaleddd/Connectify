@@ -1,0 +1,32 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    background: var(--theme-color);
+    color: #fff;
+    z-index: 10;
+}
+
+.navbar-left {
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 1em;
+}
+
+.nav-button i {
+    font-size: 1.2em;
+}

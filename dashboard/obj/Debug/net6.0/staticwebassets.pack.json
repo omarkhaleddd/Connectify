@@ -1,0 +1,233 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\obj\\Debug\\net6.0\\scopedcss\\projectbundle\\dashboard.bundle.scp.css",
+      "PackagePath": "staticwebassets\\dashboard.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\Chart.js\\chart.min.js",
+      "PackagePath": "staticwebassets\\Chart.js\\chart.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\icons\\right-arrow.svg",
+      "PackagePath": "staticwebassets\\assets\\icons\\right-arrow.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\activity.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\activity.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\cogs.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\cogs.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\comment.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\comment.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\cookies.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\cookies.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\donation.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\donation.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\dot.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\dot.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\home.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\home.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\like.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\like.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\liked.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\liked.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\logo.png",
+      "PackagePath": "staticwebassets\\assets\\images\\logo.png"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\logo1.png",
+      "PackagePath": "staticwebassets\\assets\\images\\logo1.png"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\logo2.png",
+      "PackagePath": "staticwebassets\\assets\\images\\logo2.png"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\logout.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\logout.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\notifications.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\notifications.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\profile.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\profile.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\report.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\report.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\search.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\search.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\assets\\images\\settings.svg",
+      "PackagePath": "staticwebassets\\assets\\images\\settings.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\FONT-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\ICON-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\README.md",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\README.md"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.eot",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.eot"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.otf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.otf"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.svg",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.svg"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.ttf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.ttf"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.woff",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.woff"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jquery\\jquery.min.js",
+      "PackagePath": "staticwebassets\\jquery\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\Chart.js\\chart.min.js",
+      "PackagePath": "staticwebassets\\js\\Chart.js\\chart.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\Chart.js\\dist\\chart.js",
+      "PackagePath": "staticwebassets\\js\\Chart.js\\dist\\chart.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\bootstrap\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\js\\bootstrap\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jquery-jvectormap-world-mill.js",
+      "PackagePath": "staticwebassets\\js\\jquery-jvectormap-world-mill.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jquery\\jquery.min.js",
+      "PackagePath": "staticwebassets\\js\\jquery\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.css",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.js",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.min.css",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.min.css.map",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.min.js",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\jvectormap\\jquery-jvectormap.min.js.map",
+      "PackagePath": "staticwebassets\\js\\jvectormap\\jquery-jvectormap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.css",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.js",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.min.css",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.min.css.map",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.min.js",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\omare\\OneDrive\\Desktop\\projects\\cowork-projects\\Connectify\\dashboard\\wwwroot\\jvectormap\\jquery-jvectormap.min.js.map",
+      "PackagePath": "staticwebassets\\jvectormap\\jquery-jvectormap.min.js.map"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.dashboard.props",
+      "PackagePath": "build\\dashboard.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.dashboard.props",
+      "PackagePath": "buildMultiTargeting\\dashboard.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.dashboard.props",
+      "PackagePath": "buildTransitive\\dashboard.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.dashboard.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
