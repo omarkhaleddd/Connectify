@@ -91,6 +91,10 @@ namespace Talabat.APIs.Controllers
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
+                if (post.ReportCount == 10)
+                {
+                    continue;
+                }
                 var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
                 var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 
@@ -191,7 +195,10 @@ namespace Talabat.APIs.Controllers
 				{
 					return NotFound($"User not found for post with ID: {post.Id}");
 				}
-
+                if(post.ReportCount == 10)
+                {
+                    continue;
+                }
 				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
 				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 
@@ -273,7 +280,10 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
-
+            if (post.ReportCount == 10)
+            {
+                return NotFound();
+            }
             var author = await _manager.GetUserByIdAsync(post.AuthorId);
             if (author == null)
             {
@@ -372,6 +382,21 @@ namespace Talabat.APIs.Controllers
 
 			return Ok(post);
 
+        }
+        [Authorize]
+        [HttpPut("report-post/{id}")]
+        public async Task<ActionResult<PostDto>> ReportPost(int id)
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            var post = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
+            if (user is null)
+                return Unauthorized(new ApiResponse(401));
+            if (post is null)
+                return BadRequest(new ApiResponse(404));
+            post.ReportCount++;
+            _repositoryPost.Update(post);
+            _repositoryPost.SaveChanges();
+            return Ok("post reported");
         }
 
         //Put Request 
