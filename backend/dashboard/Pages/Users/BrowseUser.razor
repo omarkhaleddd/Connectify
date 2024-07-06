@@ -71,9 +71,11 @@
         new User { Id = 3 , Name = "Kate Hunington",  Status = "Inactive", Image = "https://mdbootstrap.com/img/new/avatars/7.jpg" }
     }; *@
 
-    private void DeleteUser(User user)
+    private async Task<string> DeleteUser(User user)
     {
-        @* users.Remove(user); *@
+        await UserService.DeleteUserAsync(user.Id);
+        users.Remove(user);
+        return "Removed";
     }
 
     

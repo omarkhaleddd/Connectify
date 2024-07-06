@@ -14,6 +14,7 @@ using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Core.Specifications;
 
+
 namespace Talabat.APIs.Controllers
 {
     [Route("api/[controller]")]
@@ -28,6 +29,7 @@ namespace Talabat.APIs.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
 
+        
         public AdminController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService,IGenericRepository<ReportedPost> genericRepository5)
         {
             _mapper = mapper;
@@ -39,15 +41,11 @@ namespace Talabat.APIs.Controllers
             _repositoryReportedPost = genericRepository5;
         }
 
-        [Authorize]
+        
         [HttpGet()]
         public async Task<ActionResult> GetReports()
         {
-            var myUser = await _manager.GetUserAddressAsync(User);
-            if (myUser is null)
-            {
-                return Unauthorized(new ApiResponse(401));
-            }
+            
 
             var spec = new ReportedPostWithPostSpecs();
             var ReportedPosts = await _repositoryReportedPost.GetAllWithSpecAsync(spec);
@@ -61,15 +59,11 @@ namespace Talabat.APIs.Controllers
             return Ok(mappedReportedPosts);
         }
 
-        [Authorize]
-        [HttpPut("dismiss-report/{id}")]
-        public async Task<ActionResult> DismissReport(int id)
+        
+        [HttpPut("action-report/{id}")]
+        public async Task<ActionResult> DismissResolveReport(int id,[FromBody] FlagDto flag)
         {
-            var myUser = await _manager.GetUserAddressAsync(User);
-            if (myUser is null)
-            {
-                return Unauthorized(new ApiResponse(401));
-            }
+            
 
             var spec = new BaseSpecifications<ReportedPost>(u => u.Id == id);
             var currReportedPost = await _repositoryReportedPost.GetEntityWithSpecAsync(spec);
@@ -83,53 +77,32 @@ namespace Talabat.APIs.Controllers
             {
                 return NotFound();
             }
-            currReportedPost.Status = "dismiss";
-            _repositoryReportedPost.Update(currReportedPost);
-            _repositoryReportedPost.SaveChanges();
-            currPost.ReportCount = 0;
-            _repositoryPost.Update(currPost);
-            _repositoryPost.SaveChanges();
-            return Ok("Report Dismissed");
-        }
-        [Authorize]
-        [HttpPut("resolve-report/{id}")]
-        public async Task<ActionResult> ResolveReport(int id)
-        {
-            var myUser = await _manager.GetUserAddressAsync(User);
-            if (myUser is null)
+            if (flag.number == 1)
             {
-                return Unauthorized(new ApiResponse(401));
+                currReportedPost.Status = "dismiss";
+                _repositoryReportedPost.Update(currReportedPost);
+                _repositoryReportedPost.SaveChanges();
+                currPost.ReportCount = 0;
+                _repositoryPost.Update(currPost);
+                _repositoryPost.SaveChanges();
+                return Ok("Report Dismissed");
+            }
+            else
+            {
+                currReportedPost.Status = "resolve";
+                _repositoryReportedPost.Update(currReportedPost);
+                _repositoryReportedPost.SaveChanges();
+                _repositoryPost.Delete(currPost);
+                _repositoryPost.SaveChanges();
+                return Ok("Report Resolved");
             }
 
-            var spec = new BaseSpecifications<ReportedPost>(u => u.Id == id);
-            var currReportedPost = await _repositoryReportedPost.GetEntityWithSpecAsync(spec);
-            if (currReportedPost is null)
-            {
-                return NotFound();
-            }
-            var postSpec = new BaseSpecifications<Post>(u => u.Id == currReportedPost.PostId);
-            var currPost = await _repositoryPost.GetEntityWithSpecAsync(postSpec);
-            if (currPost is null)
-            {
-                return NotFound();
-            }
-            currReportedPost.Status = "resolve";
-            _repositoryReportedPost.Update(currReportedPost);
-            _repositoryReportedPost.SaveChanges();
-            _repositoryPost.Delete(currPost);
-            _repositoryPost.SaveChanges();
-            return Ok("Report Resolved");
-
         }
-        [Authorize]
+
         [HttpDelete("delete-user/{id}")]
         public async Task<ActionResult> DeleteUser(string Id)
         {
-            var myUser = await _manager.GetUserAddressAsync(User);
-            if (myUser is null)
-            {
-                return Unauthorized(new ApiResponse(401));
-            }
+            
             var user = await _manager.GetUserByIdAsync(Id);
             if (user is null)
                 return NotFound(new ApiResponse(404));

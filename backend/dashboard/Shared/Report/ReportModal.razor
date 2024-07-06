@@ -1,4 +1,4 @@
-
+@using Talabat.Core.Entities.Core
 
 <div class="modal fade" id="@idName" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -8,19 +8,10 @@
             </div>
             <div class="modal-body d-grid gap-3">
                 <div class="p-2 border-red">
-                    <span>@Report.ReportedBy</span>
-                </div>
+                    <span>@Report.Post.AuthorName</span>
+                </div> 
                 <div class="p-2 border-red">
-                    <span>@Report.Type</span>
-                </div>
-                @* <div class="p-2 border-red">
-                    <span>@Report.PostId</span>
-                </div> *@
-                <div class="p-2 border-red">
-                    <span>@Report.Date</span>
-                </div>
-                <div class="p-2 border-red">
-                    <span>@Report.Status</span>
+                    <span>@Report.Post.content</span>
                 </div>
             </div>
             @* <div class="modal-footer">
@@ -34,5 +25,5 @@
 @code {
     [Parameter] public string idName { get; set; }
     [Parameter] public string ModalTitle { get; set; }
-    [Parameter] public Report Report { get; set; }
+    [Parameter] public ReportedPost Report { get; set; }
 }
