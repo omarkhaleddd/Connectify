@@ -31,7 +31,8 @@
         <td>
             <button type="button" class='btn btn-link btn-sm btn-rounded bg-primary text-white text-decoration-none' data-bs-toggle="modal" data-bs-target="#reportModal">Review</button>
             <ReportModal idName="reportModal" ModalTitle="Report Title" Report="context" />
-            <button class='btn btn-link btn-sm btn-rounded bg-red text-white text-decoration-none' @onclick='() => DeleteReport(context)'>Dismess</button>
+            <button class='btn btn-link btn-sm btn-rounded bg-red text-white text-decoration-none' @onclick='() => DeleteReport(context)'>Dismiss</button>
+            <button class='btn btn-link btn-sm btn-rounded bg-red text-white text-decoration-none' @onclick='() => ResolveReport(context)'>Resolve</button>
         </td>
     </Row>
     <Footer>
@@ -62,16 +63,16 @@
     private async void DeleteReport(ReportedPost report)
     {
         await ReportService.DismissReport(report.Id);
+        RefreshComponent();
     }
-
-    private void ReviewReport(ReportedPost report)
+    private async void ResolveReport(ReportedPost report)
     {
-        // Handle review logic
+        await ReportService.ResolveReport(report.Id);
+        RefreshComponent();
     }
-
-    private void DismissReport(ReportedPost report)
+    private async Task RefreshComponent()
     {
-        // Handle dismiss logic
+        var reportedPostsDtos = await ReportService.GetReportedPostsAsync();
+        reportedPosts = reportedPostsDtos.ToList();
     }
-
 }    

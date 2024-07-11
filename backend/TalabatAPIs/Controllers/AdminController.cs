@@ -7,6 +7,7 @@ using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.APIs.Hubs;
+using Talabat.Core;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 using Talabat.Core.Hubs.Interfaces;
@@ -24,31 +25,52 @@ namespace Talabat.APIs.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IHubContext<AccountNotificationHub, INotificationHub> _accountNotification;
         private readonly ITokenService _tokenService;
-        private readonly IGenericRepository<Post> _repositoryPost;
-        private readonly IGenericRepository<ReportedPost> _repositoryReportedPost;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
+        private readonly IUnitOfWork _unitOfWork;
 
         
-        public AdminController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService,IGenericRepository<ReportedPost> genericRepository5)
+        public AdminController(IMapper mapper,IUnitOfWork unitOfWork, UserManager<AppUser> manager, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
         {
             _mapper = mapper;
             _manager = manager;
             _signInManager = signInManager;
             _tokenService = tokenService;
-            _repositoryPost = genericRepository;
             _accountNotification = accountNotification;
-            _repositoryReportedPost = genericRepository5;
+            _unitOfWork = unitOfWork;
         }
 
-        
+        [HttpGet("home")]
+        public async Task<ActionResult> Home()
+        {
+            var spec = new BaseSpecifications<Post>();
+            var Posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
+            var users = await _manager.GetAllUsersAsync();
+            var postGraph = Posts
+                .GroupBy(p => p.InsertDate.ToString("MMMM-yyyy"))
+                .Select(g => new
+                {
+                    DateCreated = g.Key,
+                    PostCount = g.Count()
+                })
+                .ToList();
+
+            var HomeResult = new
+            {
+                postCount = Posts.Count(),
+                userCount = users.Count(),
+                PostGraph = postGraph,
+
+            };
+            return Ok(HomeResult);
+        }
         [HttpGet()]
-        public async Task<ActionResult> GetReports()
+        public async Task<ActionResult<IEnumerable<ReportedPostDto>>> GetReports()
         {
             
 
             var spec = new ReportedPostWithPostSpecs();
-            var ReportedPosts = await _repositoryReportedPost.GetAllWithSpecAsync(spec);
+            var ReportedPosts = await _unitOfWork.Repository<ReportedPost>().GetAllWithSpecAsync(spec);
             if (ReportedPosts == null)
             {
                 return BadRequest("No Reported Posts");
@@ -63,37 +85,33 @@ namespace Talabat.APIs.Controllers
         [HttpPut("action-report/{id}")]
         public async Task<ActionResult> DismissResolveReport(int id,[FromBody] FlagDto flag)
         {
-            
-
             var spec = new BaseSpecifications<ReportedPost>(u => u.Id == id);
-            var currReportedPost = await _repositoryReportedPost.GetEntityWithSpecAsync(spec);
+            var currReportedPost = await _unitOfWork.Repository<ReportedPost>().GetEntityWithSpecAsync(spec);
             if (currReportedPost is null)
             {
                 return NotFound();
             }
             var postSpec = new BaseSpecifications<Post>(u => u.Id == currReportedPost.PostId);
-            var currPost = await _repositoryPost.GetEntityWithSpecAsync(postSpec);
+            var currPost = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(postSpec);
             if (currPost is null)
             {
                 return NotFound();
             }
             if (flag.number == 1)
             {
-                currReportedPost.Status = "dismiss";
-                _repositoryReportedPost.Update(currReportedPost);
-                _repositoryReportedPost.SaveChanges();
+                currReportedPost.Status = "dismissed";
+                _unitOfWork.Repository<ReportedPost>().Update(currReportedPost);
+                _unitOfWork.Repository<ReportedPost>().SaveChanges();
                 currPost.ReportCount = 0;
-                _repositoryPost.Update(currPost);
-                _repositoryPost.SaveChanges();
+                _unitOfWork.Repository<Post>().Update(currPost);
+                _unitOfWork.Repository<Post>().SaveChanges();
                 return Ok("Report Dismissed");
             }
             else
             {
-                currReportedPost.Status = "resolve";
-                _repositoryReportedPost.Update(currReportedPost);
-                _repositoryReportedPost.SaveChanges();
-                _repositoryPost.Delete(currPost);
-                _repositoryPost.SaveChanges();
+                currReportedPost.Status = "resolved";
+                _unitOfWork.Repository<ReportedPost>().Update(currReportedPost);
+                _unitOfWork.Repository<ReportedPost>().SaveChanges();
                 return Ok("Report Resolved");
             }
 
@@ -122,7 +140,7 @@ namespace Talabat.APIs.Controllers
         }
 
         [HttpGet("GetPostsByUserId/{userId}")]
-        public async Task<ActionResult<PostDto>> GetPostsByAuthorId(string userId)
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetPostsByAuthorId(string userId)
         {
             var user = await _manager.GetUserByIdAsync(userId);
             if (user == null)
@@ -132,7 +150,7 @@ namespace Talabat.APIs.Controllers
            
             //get by id in specs
             var spec = new PostWithCommentSpecs(userId);
-            var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+            var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
 
             if (posts == null)
             {
@@ -141,6 +159,44 @@ namespace Talabat.APIs.Controllers
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
+                var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+                var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+
+                var postDto = new PostDto
+                {
+                    Id = post.Id,
+                    content = post.content,
+                    Likes = PostLikes,
+                    LikeCount = post.Likes.Count,
+                    DatePosted = post.DatePosted,
+                    Comments = comments,
+                    AuthorId = user.Id,
+                    AuthorName = user.DisplayName
+                };
+
+                postDtos.Add(postDto);
+            }
+
+            return Ok(postDtos);
+        }
+        [HttpGet("get-all-posts")]
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetPostsAdmin()
+        {
+            var spec = new PostWithCommentSpecs();
+            var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
+
+            if (posts == null)
+            {
+                return BadRequest("No posts");
+            }
+            var postDtos = new List<PostDto>();
+            foreach (var post in posts)
+            {
+                var user = await _manager.GetUserByIdAsync(post.AuthorId);
+                if (user == null)
+                {
+                    return NotFound($"User not found for post with ID: {post.Id}");
+                }
                 var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
                 var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 

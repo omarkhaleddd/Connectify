@@ -15,11 +15,11 @@ namespace dashboard.Data.Services
             return await _httpClient.GetFromJsonAsync<IEnumerable<ReportedPost>>(baseURI) ?? new List<ReportedPost>();
         }
         public async Task<string> DismissReport(int id){
-             HttpResponseMessage response = await _httpClient.PutAsJsonAsync(baseURI+$"action-post/{id}",new {number = 1});
+             HttpResponseMessage response = await _httpClient.PutAsJsonAsync(baseURI+$"action-report/{id}",new {number = 1});
              return "post dismissed";
         }
         public async Task<string> ResolveReport(int id){
-             HttpResponseMessage response = await _httpClient.PutAsJsonAsync(baseURI+$"action-post/{id}",new {number = 0});
+             HttpResponseMessage response = await _httpClient.PutAsJsonAsync(baseURI+$"action-report/{id}",new {number = 0});
              return "post resolved";
         }
     }

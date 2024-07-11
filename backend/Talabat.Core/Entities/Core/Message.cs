@@ -8,6 +8,13 @@ namespace Talabat.Core.Entities.Core
 {
     public class Message : BaseEntity
     {
+        public Message()
+        {
+            IsDeleted = false;
+            InsertDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
+            DeleteDate = null;
+        }
         public string messageText { get; set; }
         public string senderId { get; set; }
         public string senderName { get; set; }

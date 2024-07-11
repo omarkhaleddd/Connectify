@@ -10,6 +10,13 @@ namespace Talabat.Core.Entities.Core
 {
     public class AppUserFriend : BaseEntity
     {
+        public AppUserFriend()
+        {
+            IsDeleted = false;
+            InsertDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
+            DeleteDate = null;
+        }
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string FriendId { get; set; }
