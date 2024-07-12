@@ -1,7 +1,9 @@
 <div class="notification">
-    <div class="notification-content">{{ notification.content }}</div>
+    <i  *ngIf="notification.type==='Friend Request' " class="fa-solid fa-user-plus ms-1 notification-icon"></i>
+    <i *ngIf="notification.type==='Mention' " class="fa-solid fa-at ms-1 notification-icon"></i>
+    <span class="notification-type"> {{ notification.type }}</span> 
     <div class="notification-details">
-        <span class="notification-date">Received: {{ notification.date }}</span>
-        <span class="notification-type">Type: {{ notification.type }}</span>
+        <div class="notification-content">{{ notification.content }}</div>
+        <span class="notification-date">{{ notification.notificationDate }}</span>
     </div>
 </div>

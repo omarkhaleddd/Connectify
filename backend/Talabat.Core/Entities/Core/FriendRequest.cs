@@ -9,7 +9,14 @@ namespace Talabat.Core.Entities.Core
 {
 	public class FriendRequest : BaseEntity
 	{
-		public string SenderId { get; set; }
+        public FriendRequest()
+        {
+            IsDeleted = false;
+            InsertDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
+            DeleteDate = null;
+        }
+        public string SenderId { get; set; }
 		public string Recieverid { get; set; }
 	}
 }

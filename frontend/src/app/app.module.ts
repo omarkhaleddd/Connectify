@@ -38,7 +38,7 @@ import { FriendListComponent } from './components/global/friend-list/friend-list
 import { DonateModalComponent } from './components/global/donate-modal/donate-modal.component';
 import { DonationComponent } from './donation/donation.component';
 import { NgxStripeModule } from 'ngx-stripe';
-import { environment } from './enviroment';
+import { environment } from './enviroment/enviroment';
 import { MessageGrpComponent } from './components/message/message-grp/message-grp.component';
 
 @NgModule({

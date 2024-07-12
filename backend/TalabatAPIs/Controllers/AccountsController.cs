@@ -15,6 +15,7 @@ using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.APIs.Hubs;
+using Talabat.Core;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 using Talabat.Core.Hubs.Interfaces;
@@ -33,25 +34,17 @@ namespace Talabat.APIs.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IHubContext<AccountNotificationHub, INotificationHub> _accountNotification;
         private readonly ITokenService _tokenService;
-        private readonly IGenericRepository<Post> _repositoryPost;
-        private readonly IGenericRepository<FriendRequest> _repositoryFriendRequest;
-        private readonly IGenericRepository<BlockList> _repositoryBlock;
-        private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
-        private readonly IGenericRepository<Notification> _repositoryNotification;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
 
-		public AccountsController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
+		public AccountsController(IMapper mapper, UserManager<AppUser> manager,IUnitOfWork unitOfWork, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
 		{
 			_mapper = mapper;
 			_manager = manager;
 			_signInManager = signInManager;
 			_tokenService = tokenService;
-			_repositoryPost = genericRepository;
-			_repositoryFriend = genericRepository1;
-			_repositoryFriendRequest = genericRepository2;
-			_repositoryBlock = genericRepository3;
+            _unitOfWork = unitOfWork;
 			_accountNotification = accountNotification;
-			_repositoryNotification = genericRepository4;
 			_emailService = emailService;
 		}
 
@@ -195,7 +188,7 @@ namespace Talabat.APIs.Controllers
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id);
-            var blockedMe = await _repositoryBlock.GetAllWithSpecAsync(blockSpec);
+            var blockedMe = await _unitOfWork.Repository<BlockList>().GetAllWithSpecAsync(blockSpec);
             var UserStartingWithPrefix = await _manager.Users
                 .Where(N => N.DisplayName.StartsWith(DisplayName))
                 .ToListAsync();
@@ -228,13 +221,13 @@ namespace Talabat.APIs.Controllers
                 return NotFound(new ApiResponse(404));
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
-            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockSpec);
             if(isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
             }
             var spec = new PostWithCommentSpecs(id);
-            var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+            var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
 
             if (posts == null)
             {
@@ -280,7 +273,7 @@ namespace Talabat.APIs.Controllers
                 return Unauthorized(new ApiResponse(401));
             }
             var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
-            var friendsRaw = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            var friendsRaw = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(spec);
             if (friendsRaw == null || !friendsRaw.Any())
             {
                 return NotFound("No Friends found");
@@ -318,7 +311,7 @@ namespace Talabat.APIs.Controllers
                 return Unauthorized(new ApiResponse(401));
             }
             var spec = new BaseSpecifications<BlockList>(u => u.UserId == user.Id);
-            var blocks = await _repositoryBlock.GetAllWithSpecAsync(spec);
+            var blocks = await _unitOfWork.Repository<BlockList>().GetAllWithSpecAsync(spec);
             if(blocks is null)
             {
                 return NotFound();
@@ -343,42 +336,42 @@ namespace Talabat.APIs.Controllers
 
             var baseSpec = new BaseSpecifications<BlockList>();
             var spec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
-            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(spec);
+            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(spec);
             if (isBlocked is not null)
             {
                 return BadRequest("This user already blocked you");
             }
             var specBlock = new BaseSpecifications<BlockList>(u => u.BlockedId == id && u.UserId == user.Id);
-            var alreadyBlocked = await _repositoryBlock.GetEntityWithSpecAsync(specBlock);
+            var alreadyBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(specBlock);
             if(alreadyBlocked is null)
             {
                 var blockedUser = new BlockListDto { UserId = user.Id, BlockedId = id };
                 var mappedUser = _mapper.Map<BlockListDto, BlockList>(blockedUser);
-                await _repositoryBlock.Add(mappedUser);
-                _repositoryBlock.SaveChanges();
+                await _unitOfWork.Repository<BlockList>().Add(mappedUser);
+                _unitOfWork.Repository<BlockList>().SaveChanges();
                 var friendSpec = new BaseSpecifications<AppUserFriend>(u => (u.FriendId == user.Id && u.UserId == id) ||(u.UserId == user.Id && u.FriendId == id));
-                var isFriend = await _repositoryFriend.GetEntityWithSpecAsync(friendSpec);
+                var isFriend = await _unitOfWork.Repository<AppUserFriend>().GetEntityWithSpecAsync(friendSpec);
                 if (isFriend is not null)
                 {
-                    _repositoryFriend.Delete(isFriend);
-                    _repositoryFriend.SaveChanges();
+                    _unitOfWork.Repository<AppUserFriend>().Delete(isFriend);
+                    _unitOfWork.Repository<AppUserFriend>().SaveChanges();
                 }
                 var friendReqSpec = new BaseSpecifications<FriendRequest>(u => (u.SenderId == user.Id && u.Recieverid == id) || (u.Recieverid == user.Id && u.SenderId == id));
-                var isFriendReq = await _repositoryFriendRequest.GetEntityWithSpecAsync(friendReqSpec);
+                var isFriendReq = await _unitOfWork.Repository<FriendRequest>().GetEntityWithSpecAsync(friendReqSpec);
                 if (isFriendReq is not null)
                 {
-                    _repositoryFriendRequest.Delete(isFriendReq);
-                    _repositoryFriendRequest.SaveChanges();
+                    _unitOfWork.Repository<FriendRequest>().Delete(isFriendReq);
+                    _unitOfWork.Repository<FriendRequest>().SaveChanges();
                 }
-                var updatedBlockList = await _repositoryBlock.GetAllWithSpecAsync(baseSpec);
+                var updatedBlockList = await _unitOfWork.Repository<BlockList>().GetAllWithSpecAsync(baseSpec);
                 var sentResult = new { message = "unBlock", BlockList = updatedBlockList };
                 return Ok(JsonSerializer.Serialize(sentResult));
             }
             else
             {
-                _repositoryBlock.Delete(alreadyBlocked);
-                _repositoryBlock.SaveChanges();
-                var updatedBlockList = await _repositoryBlock.GetAllWithSpecAsync(baseSpec);
+                _unitOfWork.Repository<BlockList>().Delete(alreadyBlocked);
+                _unitOfWork.Repository<BlockList>().SaveChanges();
+                var updatedBlockList = await _unitOfWork.Repository<BlockList>().GetAllWithSpecAsync(baseSpec);
                 var sentResult = new { message = "block", BlockList = updatedBlockList };
                 return Ok(JsonSerializer.Serialize(sentResult));
             }
@@ -400,7 +393,7 @@ namespace Talabat.APIs.Controllers
             }
 
             var blockedUserReqSpec = new BaseSpecifications<BlockList>(u => u.UserId == user.Id && u.BlockedId == id);
-            var blockedUserRequest = await _repositoryBlock.GetEntityWithSpecAsync(blockedUserReqSpec);
+            var blockedUserRequest = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockedUserReqSpec);
 
             if (blockedUserRequest is not null)
             {
@@ -427,29 +420,29 @@ namespace Talabat.APIs.Controllers
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
-            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
             }
 
             var spec = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id || u.FriendId == user.Id);
-            var friends = await _repositoryFriend.GetAllWithSpecAsync(spec);
+            var friends = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(spec);
             var isFriend = friends.Where(f => f.FriendId == id || f.UserId == id).FirstOrDefault();
 
             var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
-            var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
+            var receivedFriendRequest = await _unitOfWork.Repository<FriendRequest>().GetEntityWithSpecAsync(receivedFriendReqSpec);
 
             var sentFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id && u.Recieverid == id);
-            var sentFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(sentFriendReqSpec);
+            var sentFriendRequest = await _unitOfWork.Repository<FriendRequest>().GetEntityWithSpecAsync(sentFriendReqSpec);
 
 
 
             if (sentFriendRequest is not null)
             {
-                _repositoryFriendRequest.Delete(sentFriendRequest);
-                _repositoryFriendRequest.SaveChanges();
-                var updatedFriendRequests = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
+                _unitOfWork.Repository<FriendRequest>().Delete(sentFriendRequest);
+                _unitOfWork.Repository<FriendRequest>().SaveChanges();
+                var updatedFriendRequests = await _unitOfWork.Repository<FriendRequest>().GetAllWithSpecAsync(sentFriendReqSpec);
                 var result = new { message = "Removed", FriendRequests = updatedFriendRequests };
                 return Ok(JsonSerializer.Serialize(result));
             }
@@ -469,9 +462,9 @@ namespace Talabat.APIs.Controllers
 
             var newFriendRequest = new FriendRequestDto { SenderId = user.Id, Recieverid = id };
             var mappedNewFriendRequest = _mapper.Map<FriendRequestDto, FriendRequest>(newFriendRequest);
-            await _repositoryFriendRequest.Add(mappedNewFriendRequest);
-            _repositoryFriendRequest.SaveChanges();
-            var updatedFriendRequestsAdd = await _repositoryFriendRequest.GetAllWithSpecAsync(sentFriendReqSpec);
+            await _unitOfWork.Repository<FriendRequest>().Add(mappedNewFriendRequest);
+            _unitOfWork.Repository<FriendRequest>().SaveChanges();
+            var updatedFriendRequestsAdd = await _unitOfWork.Repository<FriendRequest>().GetAllWithSpecAsync(sentFriendReqSpec);
             var sentResult = new { message = "Sent", FriendRequests = updatedFriendRequestsAdd };
 
 			var newNotification = new NotificationDto
@@ -484,18 +477,18 @@ namespace Talabat.APIs.Controllers
             var mappedNotification = _mapper.Map<NotificationDto, Notification>(newNotification);
 
             // Check if _accountNotification is not null before sending the notification
-            if (_accountNotification != null)
+            if (_unitOfWork.Repository<Notification>() != null)
 			{
 				// send notification to the user 
 				await _accountNotification.Clients.All.SendNotification(mappedNotification);
 			}
 
 			// Check if _repositoryNotification is not null before adding the notification
-			if (_repositoryNotification != null)
+			if (_unitOfWork.Repository<Notification>() != null)
 			{
 				// save notification in db
-				await _repositoryNotification.Add(mappedNotification);
-				_repositoryNotification.SaveChanges();
+				await _unitOfWork.Repository<Notification>().Add(mappedNotification);
+                _unitOfWork.Repository<Notification>().SaveChanges();
 			}
 
 
@@ -519,7 +512,7 @@ namespace Talabat.APIs.Controllers
 			}
 
 			var receivedFriendReqSpec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id && u.SenderId == id);
-			var receivedFriendRequest = await _repositoryFriendRequest.GetEntityWithSpecAsync(receivedFriendReqSpec);
+			var receivedFriendRequest = await _unitOfWork.Repository<FriendRequest>().GetEntityWithSpecAsync(receivedFriendReqSpec);
 
 			if (receivedFriendRequest is not null)
 			{
@@ -538,7 +531,7 @@ namespace Talabat.APIs.Controllers
 		{
 			var user = await _manager.GetUserAddressAsync(User);
 			var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
-			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+			var requests = await _unitOfWork.Repository<FriendRequest>().GetAllWithSpecAsync(spec);
 			var requestById = requests.Where(u => u.SenderId == id).FirstOrDefault();
 			if (requestById is null)
 			{
@@ -546,20 +539,20 @@ namespace Talabat.APIs.Controllers
 			}
 			if (stateDto.State == 0) // reject
 			{
-				_repositoryFriendRequest.Delete(requestById);
-				_repositoryFriendRequest.SaveChanges();
+				_unitOfWork.Repository<FriendRequest>().Delete(requestById);
+				_unitOfWork.Repository<FriendRequest>().SaveChanges();
 				var result = new { message = "Rejected" };
 				return Ok(JsonSerializer.Serialize(result));
 			}
 			else if (stateDto.State == 1)
 			{// accept
-				_repositoryFriendRequest.Delete(requestById);
-				_repositoryFriendRequest.SaveChanges();
+				_unitOfWork.Repository<FriendRequest>().Delete(requestById);
+				_unitOfWork.Repository<FriendRequest>().SaveChanges();
                 var Friend = await _manager.GetUserByIdAsync(id);
                 var friend = new AppUserFriend { UserId = requestById.SenderId,UserName = user.DisplayName , FriendId = requestById.Recieverid, FriendName = Friend.DisplayName };
 
-				await _repositoryFriend.Add(friend);
-				_repositoryFriend.SaveChanges();
+				await _unitOfWork.Repository<AppUserFriend>().Add(friend);
+                _unitOfWork.Repository<AppUserFriend>().SaveChanges();
 				var result = new { message = "Accepted" };
 				return Ok(JsonSerializer.Serialize(result));
 			}
@@ -574,7 +567,7 @@ namespace Talabat.APIs.Controllers
 		{
 			var user = await _manager.GetUserAddressAsync(User);
 			var spec = new BaseSpecifications<FriendRequest>(u => u.Recieverid == user.Id);
-			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+			var requests = await _unitOfWork.Repository<FriendRequest>().GetAllWithSpecAsync(spec);
 
 			if (requests.Any())
 			{
@@ -591,7 +584,7 @@ namespace Talabat.APIs.Controllers
 		{
 			var user = await _manager.GetUserAddressAsync(User);
 			var spec = new BaseSpecifications<FriendRequest>(u => u.SenderId == user.Id);
-			var requests = await _repositoryFriendRequest.GetAllWithSpecAsync(spec);
+			var requests = await _unitOfWork.Repository<FriendRequest>().GetAllWithSpecAsync(spec);
 
 			if (requests.Any())
 			{

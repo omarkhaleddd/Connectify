@@ -15,5 +15,11 @@ namespace dashboard.Data.Services
         {
             return await _httpClient.GetFromJsonAsync<IEnumerable<User>>(baseURI + "Users");
         }
+        public async Task<string> DeleteUserAsync(string id)
+        {
+            HttpResponseMessage response = await _httpClient.DeleteAsync(baseURI + $"delete-user/{id}");
+            return "user removed";
+        }
+        
     }
 }

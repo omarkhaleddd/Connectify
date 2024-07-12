@@ -6,8 +6,8 @@ export interface Post {
     id: number;
     content: string;
     datePosted: Date;
-    likeCount: number;
-    likes:Likes[];
+    LikeCount: number;
+    Likes:Likes[];
     authorId: string;
     authorName:string;
     comments?: Comment[];

@@ -68,10 +68,10 @@ export class PostGetComponent implements OnInit {
 
   ngOnInit(): void {
     var userId = this._AuthService.getUserId();
-    this.isLikedBtn = this.post?.likes.some((like) => like.userId === userId);
+    this.isLikedBtn = this.post?.Likes.some((Like) => Like.userId === userId);
     console.log(this.post);
-    this.likeCount = this.post?.likeCount;
-    this.likes = this.post?.likes.map((obj) => obj.userName);
+    this.likeCount = this.post?.LikeCount;
+    this.likes = this.post?.Likes.map((obj) => obj.userName);
 
     if (this.isLikedBtn) {
       this.isLiked = 'Dislike';
@@ -98,7 +98,7 @@ export class PostGetComponent implements OnInit {
 
   likePost() {
     if (this.post) {
-      console.log(this.post.likes);
+      console.log(this.post.Likes);
       this.postService.likePost(this.post.id, this.headers).subscribe(
         (res) => {
           this.isLiked = res.message;

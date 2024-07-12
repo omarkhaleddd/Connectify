@@ -24,7 +24,7 @@ namespace Talabat.Repository.Data
 		public DbSet<Message> messages { get; set; }
 		public DbSet<Notification> Notifications { get; set; }
 		public DbSet<Donation> Donations { get; set; }
-
+		public DbSet<ReportedPost> ReportedPost { get; set; }
 		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
 

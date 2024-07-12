@@ -15,6 +15,7 @@ using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
 using Talabat.APIs.Hubs;
+using Talabat.Core;
 using Talabat.Core.Entities;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
@@ -32,34 +33,19 @@ namespace Talabat.APIs.Controllers
     {
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _manager;
-        private readonly IGenericRepository<Post> _repositoryPost;
-        private readonly IGenericRepository<FileNames> _repositoryFileName;
-        private readonly IGenericRepository<Comment> _repositoryComment;
-        private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
-        private readonly IGenericRepository<AppUserFriend> _repositoryFriend;
-        private readonly IGenericRepository<BlockList> _repositoryBlock;
-        private readonly IGenericRepository<Repost> _repositoryRepost;
-        private readonly IGenericRepository<Notification> _repositoryNotification;
 		private readonly IHubContext<MentionNotification, INotificationHub> _mentionNotification;
 		private readonly RedisCacheService _cacheService;
         private readonly IUploadService _uploadService;
+        private readonly IUnitOfWork _unitOfWork;
 
 
-
-        public PostController(IMapper mapper, UserManager<AppUser> manager, IGenericRepository<Post> genericRepository, IGenericRepository<Comment> genericRepository2, IGenericRepository<FileNames> genericRepository6, IGenericRepository<PostLikes> genericRepository3, IGenericRepository<AppUserFriend> genericRepository4, IGenericRepository<BlockList> genericRepository5, IGenericRepository<Repost> repositoryRepost, IGenericRepository<Notification> repositoryNotification, RedisCacheService cacheService, IUploadService uploadService)
+        public PostController(IMapper mapper, UserManager<AppUser> manager,IUnitOfWork unitOfWork, RedisCacheService cacheService, IUploadService uploadService)
 		{
 			_mapper = mapper;
 			_manager = manager;
-			_repositoryPost = genericRepository;
-			_repositoryComment = genericRepository2;
-			_repositoryPostLikes = genericRepository3;
-			_repositoryFriend = genericRepository4;
-			_repositoryBlock = genericRepository5;
-			_repositoryRepost = repositoryRepost;
-			_repositoryNotification = repositoryNotification;
 			_cacheService = cacheService;
             _uploadService = uploadService;
-            _repositoryFileName = genericRepository6;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -75,14 +61,14 @@ namespace Talabat.APIs.Controllers
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == authorId);
-            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
             }
             //get by id in specs
             var spec = new PostWithCommentSpecs(authorId);
-            var posts = await _repositoryPost.GetAllWithSpecAsync(spec);
+            var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
             
             if (posts == null)
             {
@@ -91,6 +77,10 @@ namespace Talabat.APIs.Controllers
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
+                if (post.ReportCount == 10)
+                {
+                    continue;
+                }
                 var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
                 var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 
@@ -99,7 +89,7 @@ namespace Talabat.APIs.Controllers
                     Id = post.Id,
                     content = post.content,
                     Likes = PostLikes,
-                    LikeCount = post.Likes.Count,
+                    LikeCount = post.Likes.Count(),
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
@@ -151,8 +141,8 @@ namespace Talabat.APIs.Controllers
             var currUser = await _manager.GetUserAddressAsync(User);
             var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == currUser.Id);
             var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == currUser.Id);
-            var friendsByUserId = await _repositoryFriend.GetAllWithSpecAsync(specFriendUserId);
-            var friendsByFriendId = await _repositoryFriend.GetAllWithSpecAsync(specFriendFriendId);
+            var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
+            var friendsByFriendId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendFriendId);
             //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var postList = new List<Post>();
 			var repostList = new List<Repost>();
@@ -161,22 +151,22 @@ namespace Talabat.APIs.Controllers
 			foreach (var friendByUserId in friendsByUserId)
 			{
 				var postSpec = new PostWithCommentSpecs(friendByUserId.FriendId);
-				var posts = await _repositoryPost.GetAllWithSpecAsync(postSpec);
+				var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(postSpec);
 				postList.AddRange(posts);
 
 				var repostSpec = new RepostWithCommentSpecs(friendByUserId.FriendId);
-				var reposts = await _repositoryRepost.GetAllWithSpecAsync(repostSpec);
+				var reposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(repostSpec);
 				repostList.AddRange(reposts);
 			}
 
 			foreach (var friendByFriendId in friendsByFriendId)
 			{
 				var postSpec = new PostWithCommentSpecs(friendByFriendId.UserId);
-				var posts = await _repositoryPost.GetAllWithSpecAsync(postSpec);
+				var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(postSpec);
 				postList.AddRange(posts);
 
 				var repostSpec = new RepostWithCommentSpecs(friendByFriendId.UserId);
-				var reposts = await _repositoryRepost.GetAllWithSpecAsync(repostSpec);
+				var reposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(repostSpec);
 				repostList.AddRange(reposts);
 			}
 			if (!postList.Any() && !repostList.Any())
@@ -191,7 +181,10 @@ namespace Talabat.APIs.Controllers
 				{
 					return NotFound($"User not found for post with ID: {post.Id}");
 				}
-
+                if(post.ReportCount == 10)
+                {
+                    continue;
+                }
 				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
 				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 
@@ -201,7 +194,7 @@ namespace Talabat.APIs.Controllers
 					Id = post.Id,
 					content = post.content,
 					Likes = postLikes,
-					LikeCount = post.Likes.Count,
+					LikeCount = post.Likes.Count(),
 					DatePosted = post.DatePosted,
 					Comments = comments,
 					AuthorId = user.Id,
@@ -226,7 +219,7 @@ namespace Talabat.APIs.Controllers
                     Id = repost.Id,
                     content = repost.content,
                     Likes = repostLikes,
-                    LikeCount = repost.Likes.Count,
+                    LikeCount = repost.Likes.Count(),
                     DatePosted = repost.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
@@ -262,9 +255,9 @@ namespace Talabat.APIs.Controllers
             }
             //get by id in specs
             var spec = new PostWithCommentSpecs(id);
-            var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
+            var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(spec);
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == myUser.Id && u.UserId == post.AuthorId);
-            var isBlocked = await _repositoryBlock.GetEntityWithSpecAsync(blockSpec);
+            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockSpec);
             if (isBlocked is not null)
             {
                 return BadRequest("You are Blocked");
@@ -273,7 +266,10 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
-
+            if (post.ReportCount == 10)
+            {
+                return NotFound();
+            }
             var author = await _manager.GetUserByIdAsync(post.AuthorId);
             if (author == null)
             {
@@ -287,7 +283,7 @@ namespace Talabat.APIs.Controllers
             {
                 Id = post.Id,
                 content = post.content,
-                LikeCount = post.Likes.Count,
+                LikeCount = post.Likes.Count(),
                 Likes = PostLikes,
                 DatePosted = post.DatePosted,
                 Comments = comments,
@@ -331,8 +327,8 @@ namespace Talabat.APIs.Controllers
                 }
             }
 
-            var result = _repositoryPost.Add(post);
-            _repositoryPost.SaveChanges();
+            var result = _unitOfWork.Repository<Post>().Add(post);
+            _unitOfWork.Repository<Post>().SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
 
@@ -360,11 +356,11 @@ namespace Talabat.APIs.Controllers
 					}
 
 					// Check if _repositoryNotification is not null before adding the notification
-					if (_repositoryNotification != null)
+					if (_unitOfWork.Repository<Notification>() != null)
 					{
 						// save notification in db
-						await _repositoryNotification.Add(mappedNotification);
-						_repositoryNotification.SaveChanges();
+						await _unitOfWork.Repository<Notification>().Add(mappedNotification);
+                        _unitOfWork.Repository<Notification>().SaveChanges();
 					}
 				}
 			}
@@ -373,6 +369,21 @@ namespace Talabat.APIs.Controllers
 			return Ok(post);
 
         }
+        [Authorize]
+        [HttpPut("report-post/{id}")]
+        public async Task<ActionResult<PostDto>> ReportPost(int id)
+        {
+            var user = await _manager.GetUserAddressAsync(User);
+            var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
+            if (user is null)
+                return Unauthorized(new ApiResponse(401));
+            if (post is null)
+                return BadRequest(new ApiResponse(404));
+            post.ReportCount++;
+            _unitOfWork.Repository<Post>().Update(post);
+            _unitOfWork.Repository<Post>().SaveChanges();
+            return Ok("post reported");
+        }
 
         //Put Request 
         [Authorize]
@@ -380,7 +391,7 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<PostDto>> UpdatePost(PostDto newPost, int id)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
+            var oldPost = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
@@ -392,8 +403,8 @@ namespace Talabat.APIs.Controllers
                 return Unauthorized(new ApiResponse(401));
 
             oldPost.content = newPost.content;
-            _repositoryPost.Update(oldPost);
-            _repositoryPost.SaveChanges();
+            _unitOfWork.Repository<Post>().Update(oldPost);
+            _unitOfWork.Repository<Post>().SaveChanges();
 
             return Ok(oldPost);
         }
@@ -405,7 +416,7 @@ namespace Talabat.APIs.Controllers
         {
             //get by id in specs
             var spec = new BaseSpecifications<Post>(P => P.Id == id);
-            var post = await _repositoryPost.GetEntityWithSpecAsync(spec);
+            var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(spec);
             var user = await _manager.GetUserAddressAsync(User);
 
             if (user is null)
@@ -421,11 +432,11 @@ namespace Talabat.APIs.Controllers
             {
                 foreach (Comment comment in post.Comments)
                 {
-                    _repositoryComment.Delete(comment);
+                    _unitOfWork.Repository<Comment>().Delete(comment);
                 }
             }
-            _repositoryPost.Delete(post);
-            _repositoryPost.SaveChanges();
+            _unitOfWork.Repository<Post>().Delete(post);
+            _unitOfWork.Repository<Post>().SaveChanges();
 
             return Ok("Post deleted");
         }
@@ -436,7 +447,7 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<PostDto>> LikePost(int PostId)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == PostId));
+            var oldPost = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == PostId));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
@@ -444,7 +455,7 @@ namespace Talabat.APIs.Controllers
                 return BadRequest(new ApiResponse(404));
 
             var spec = new BaseSpecifications<PostLikes>(P => P.PostId == PostId);
-            var postLikes = await _repositoryPostLikes.GetAllWithSpecAsync(spec);
+            var postLikes = await _unitOfWork.Repository<PostLikes>().GetAllWithSpecAsync(spec);
 
 
             var isLiked = postLikes.Where(L => L.userId == user.Id).FirstOrDefault();
@@ -453,26 +464,26 @@ namespace Talabat.APIs.Controllers
             {
                 var newPostLikes = new PostLikesDto { userId= user.Id, PostId=  PostId, userName= user.DisplayName };
                 var mappedPostLikes = _mapper.Map<PostLikesDto, PostLikes > (newPostLikes);
-                await _repositoryPostLikes.Add(mappedPostLikes);
-                _repositoryPostLikes.SaveChanges();
+                await _unitOfWork.Repository<PostLikes>().Add(mappedPostLikes);
+                _unitOfWork.Repository<PostLikes>().SaveChanges();
                 // hena ba3ml retreive ll post b3d el update
                 var specLikes = new PostWithCommentSpecs(PostId);
-                var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
+                var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(specLikes);
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-                var response = new { message = "Dislike", likeCount = retPostLikes.Count, likes = retPostLikes };
+                var response = new { message = "Dislike", likeCount = retPostLikes.Count(), likes = retPostLikes };
                 
                 return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
             else
             {
-                _repositoryPostLikes.Delete(isLiked);
-                _repositoryPostLikes.SaveChanges();
+                _unitOfWork.Repository<PostLikes>().Delete(isLiked);
+                _unitOfWork.Repository<PostLikes>().SaveChanges();
                 // hena ba3ml retreive ll post b3d el update w 3ayz avalidate hena la2no ka by3ml remove fa momken yrg3lo zero 
                 var specLikes = new PostWithCommentSpecs(PostId);
-                var post = await _repositoryPost.GetEntityWithSpecAsync(specLikes);
+                var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(specLikes);
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post?.Likes);
 
-                var response = new { message = "Like", likeCount = retPostLikes.Count, likes = retPostLikes };
+                var response = new { message = "Like", likeCount = retPostLikes.Count(), likes = retPostLikes };
 
 				return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
@@ -500,8 +511,8 @@ namespace Talabat.APIs.Controllers
 			{
 				return BadRequest(new ApiResponse(400));
 			}
-			var result = _repositoryRepost.Add(repost);
-			_repositoryRepost.SaveChanges();
+			var result = _unitOfWork.Repository<Repost>().Add(repost);
+            _unitOfWork.Repository<Repost>().SaveChanges();
 			if (!result.IsCompletedSuccessfully)
 				return BadRequest(new ApiResponse(400));
 
