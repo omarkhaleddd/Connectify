@@ -308,9 +308,6 @@ namespace Talabat.APIs.Controllers
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-
-            string uploadedFileName = null;
-
             
             var post = _mapper.Map<PostDto, Post>(newPost);
             if (post is null)

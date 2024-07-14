@@ -12,9 +12,6 @@ namespace Talabat.APIs.Controllers
     [ApiController]
     public class MailController : APIBaseController
     {
-        private readonly SmtpClient _smtpClient;
-        private readonly string _senderName;
-        private readonly string _senderEmail;
         private readonly UserManager<AppUser> _manager;
         private readonly IConfiguration _configuration;
 
@@ -53,7 +50,7 @@ namespace Talabat.APIs.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return BadRequest();
+                    return BadRequest(ex);
                 }
 
             }
