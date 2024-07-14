@@ -181,7 +181,7 @@ namespace Talabat.APIs.Controllers
 				var user = await _manager.GetUserByIdAsync(post.AuthorId);
 				if (user == null)
 				{
-					return NotFound($"User not found for post with ID: {post.Id}");
+					//return NotFound($"User not found for post with ID: {post.Id}");
 				}
                 if(post.ReportCount == 10)
                 {
@@ -199,9 +199,9 @@ namespace Talabat.APIs.Controllers
 					LikeCount = post.Likes.Count(),
 					DatePosted = post.DatePosted,
 					Comments = comments,
-					AuthorId = user.Id,
-					AuthorName = user.DisplayName,
-                    AuthorImage = user.ProfileImageUrl,
+					AuthorId = user?.Id??"null",
+					AuthorName = user?.DisplayName??"null",
+                    AuthorImage = user?.ProfileImageUrl??"null",
                     UploadedFileNames = PostImages
 
                 };
