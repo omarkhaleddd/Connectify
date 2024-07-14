@@ -188,9 +188,9 @@ namespace Talabat.APIs.Controllers
                 }
 				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
 				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
 
-
-				var postDto = new PostDto
+                var postDto = new PostDto
 				{
 					Id = post.Id,
 					content = post.content,
@@ -199,8 +199,10 @@ namespace Talabat.APIs.Controllers
 					DatePosted = post.DatePosted,
 					Comments = comments,
 					AuthorId = user.Id,
-					AuthorName = user.DisplayName
-				};
+					AuthorName = user.DisplayName,
+                    UploadedFileNames = PostImages
+
+                };
 
 				postDtos.Add(postDto);
 			}
@@ -279,7 +281,7 @@ namespace Talabat.APIs.Controllers
 
             var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
             var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-
+            var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
             var postDto = new PostDto
             {
                 Id = post.Id,
@@ -289,7 +291,8 @@ namespace Talabat.APIs.Controllers
                 DatePosted = post.DatePosted,
                 Comments = comments,
                 AuthorId = author.Id,
-                AuthorName = author.DisplayName
+                AuthorName = author.DisplayName,
+                UploadedFileNames = PostImages
             };
 
             return Ok(postDto);

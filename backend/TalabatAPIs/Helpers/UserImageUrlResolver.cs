@@ -17,7 +17,7 @@ namespace Talabat.APIs.Helpers
         public string Resolve(AppUser source, AppUserDto destination, string destMember, ResolutionContext context)
         {
             if (!string.IsNullOrEmpty(source.ProfileImageUrl))
-                return $"{_configuration["ApiBaseUrl"]}{source.ProfileImageUrl}";
+                return $"{_configuration["ApiBaseUrl"]}\\Images\\Users\\{source.ProfileImageUrl}";
             return string.Empty;
 
         }

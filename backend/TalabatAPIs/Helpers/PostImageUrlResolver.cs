@@ -18,7 +18,7 @@ namespace Talabat.APIs.Helpers
         {
             if (!string.IsNullOrEmpty(source.FileName))
 
-                return $"{_configuration["ApiBaseUrl"]}{source.FileName}";
+                return $"{_configuration["ApiBaseUrl"]}\\Images\\Posts\\{source.FileName}";
             return string.Empty;
 
         }
