@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System.IO.MemoryMappedFiles;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.Controllers;
@@ -313,26 +314,27 @@ namespace Talabat.APIs.Controllers
             }
             post.AuthorId = user.Id;
             post.Comments = null;
-            if (newPost.UploadedFile != null) // Handle single file upload
-            {
-                uploadedFileName = await _uploadService.UploadFileAsync(newPost.UploadedFile, newPost.UploadedFile.FileName);
-                post.FileName = uploadedFileName;
-            }
-            else if (newPost.UploadedFiles != null && newPost.UploadedFiles.Count > 0) // Handle multiple file upload
-            {
-                var uploadedFileNames = await _uploadService.UploadFilesAsync(newPost.UploadedFiles);
-                var mappedFileNames = new List<FileNames>();
-                foreach (var file in uploadedFileNames) {
-                    mappedFileNames.Append(new FileNames { FileName = file });
-                }
-            }
 
             var result = _unitOfWork.Repository<Post>().Add(post);
             _unitOfWork.Repository<Post>().SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
-
-			if (newPost.mentions is not null)
+            var mappedFileNames = new List<FileNames>();
+            if (newPost.UploadedFiles != null && newPost.UploadedFiles.Count > 1) // Handle multiple file upload
+            {
+                var uploadedFileNames = await _uploadService.UploadFilesAsync(newPost.UploadedFiles,"Posts");
+                foreach (var file in uploadedFileNames) {
+                    mappedFileNames.Add(new FileNames { FileName = file, PostId = post.Id, Post = post });
+                }
+            }
+            foreach (var file in mappedFileNames)
+            {
+            var resultFile = _unitOfWork.Repository<FileNames>().Add(file);
+            _unitOfWork.Repository<FileNames>().SaveChanges();
+             if (!resultFile.IsCompletedSuccessfully)
+                   return BadRequest(new ApiResponse(400));
+            }
+            if (newPost.mentions is not null)
 			{
 				foreach (var mention in newPost.mentions)
 				{

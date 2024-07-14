@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Talabat.Core.Entities;
 using Talabat.Core.Entities.Identity;
@@ -30,7 +31,7 @@ namespace Talabat.Core.Entities.Core
 		public ICollection<PostLikes>? Likes { get; set; } = new HashSet<PostLikes>();
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
 		public ICollection<Repost>? Reposts { get; set; } = new HashSet<Repost>();
-        public string? FileName { get; set; } // For storing single uploaded filename
+        public ICollection<FileNames>? FileName { get; set; } = new HashSet<FileNames>(); // navigational property
         public int ReportCount { get; set; }
     }
 }

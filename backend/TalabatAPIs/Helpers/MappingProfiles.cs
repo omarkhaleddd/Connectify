@@ -59,7 +59,9 @@ namespace Talabat.APIs.Helpers
             CreateMap<ReportedPost, ReportedPostDto>();
 
             CreateMap<FileNameDto, FileNames>();
-            CreateMap<FileNames, FileNameDto>();
+            CreateMap<FileNames, FileNameDto>()
+                .ForMember(f => f.FileName, o => o.MapFrom<PostImageUrlResolver>());
+            
         }
     }
 }

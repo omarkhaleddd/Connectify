@@ -10,8 +10,8 @@ namespace Talabat.Core.Services
 {
     public interface IUploadService
     {
-        public Task<string> UploadFileAsync(IFormFile file, string fileName);
-        public Task<IEnumerable<string>> UploadFilesAsync(IFormFileCollection files);
+        public Task<string> UploadFileAsync(IFormFile file, string fileName , string folder);
+        public Task<IEnumerable<string>> UploadFilesAsync(List<IFormFile> files, string folder);
 
     }
 }

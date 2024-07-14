@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,21 @@ namespace Talabat.Core.Services
     public class UploadService : IUploadService
     {
         private readonly string _uploadFolder= "wwwroot/Images/Posts";
-
-        public async Task<string> UploadFileAsync(IFormFile file, string fileName)
+        private IHostingEnvironment _hostingEnvironment;
+        public UploadService(IHostingEnvironment hostingEnvironment)
+        {
+            _hostingEnvironment = hostingEnvironment;
+        }
+        public async Task<string> UploadFileAsync(IFormFile file, string fileName ,string folder)
         {
             if (file != null && file.Length > 0)
             {
-                var filePath = Path.Combine(_uploadFolder, fileName);
+                string path = _hostingEnvironment.WebRootPath + $"\\Images\\{folder}";
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                var filePath = Path.Combine(path, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
@@ -26,7 +36,7 @@ namespace Talabat.Core.Services
             return null;
         }
 
-        public async Task<IEnumerable<string>> UploadFilesAsync(IFormFileCollection files)
+        public async Task<IEnumerable<string>> UploadFilesAsync(List<IFormFile>  files , string folder)
         {
             var uploadedFileNames = new List<string>();
             foreach (var file in files)
@@ -34,11 +44,12 @@ namespace Talabat.Core.Services
                 if (file != null && file.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    await UploadFileAsync(file, fileName); // Call the single file upload method
+                    await UploadFileAsync(file, fileName,folder); // Call the single file upload method
                     uploadedFileNames.Add(fileName);
                 }
             }
             return uploadedFileNames;
         }
+
     }
 }

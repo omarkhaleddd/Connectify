@@ -166,6 +166,7 @@ namespace Talabat.APIs.Controllers
             var appuser = _mapper.Map<UserDto, AppUser>(updateUser);
             user.DisplayName = updateUser.DisplayName;
             user.Id = updateUser.Id;
+            //image handler logic here for deleting old image for the user if exists and adding new picture
             var result = await _manager.UpdateAsync(user);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             return Ok(updateUser);
