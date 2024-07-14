@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Talabat.Core.Entities.Core;
 namespace Talabat.Core.Services
@@ -17,7 +18,24 @@ namespace Talabat.Core.Services
         {
             _hostingEnvironment = hostingEnvironment;
         }
-        public async Task<string> UploadFileAsync(IFormFile file, string fileName ,string folder)
+
+        public string DeleteFile(string fileName, string folder)
+        {
+            string path = _hostingEnvironment.WebRootPath + $"\\Images\\{folder}";
+            var filePath = Path.Combine(path, fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                return $"File {fileName} successfully deleted.";
+            }
+            else
+            {
+                return $"File {fileName} not found.";
+            }
+        }
+
+        public async Task<string> UploadFileAsync(IFormFile file,string folder)
         {
             if (file != null && file.Length > 0)
             {
@@ -26,6 +44,7 @@ namespace Talabat.Core.Services
                 {
                     Directory.CreateDirectory(path);
                 }
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                 var filePath = Path.Combine(path, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
@@ -43,9 +62,8 @@ namespace Talabat.Core.Services
             {
                 if (file != null && file.Length > 0)
                 {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    await UploadFileAsync(file, fileName,folder); // Call the single file upload method
-                    uploadedFileNames.Add(fileName);
+                    // Call the single file upload method
+                    uploadedFileNames.Add(await UploadFileAsync(file, folder));
                 }
             }
             return uploadedFileNames;

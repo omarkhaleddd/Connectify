@@ -6,18 +6,18 @@ using Talabat.Core.Entities.Identity;
 
 namespace Talabat.APIs.Helpers
 {
-    public class UserImageUrlResolver : IValueResolver<AppUser, AppUserDto, string?>
+    public class CoverImageUrlResolver : IValueResolver<AppUser, AppUserDto, string?>
     {
         private readonly IConfiguration _configuration;
 
-        public UserImageUrlResolver(IConfiguration configuration)
+        public CoverImageUrlResolver(IConfiguration configuration)
         {
             _configuration = configuration;
         }
         public string Resolve(AppUser source, AppUserDto destination, string destMember, ResolutionContext context)
         {
-            if (!string.IsNullOrEmpty(source.ProfileImageUrl) )
-                return $"{_configuration["ApiBaseUrl"]}\\Images\\Users\\{source.ProfileImageUrl}";
+            if (!string.IsNullOrEmpty(source.CoverImageUrl))
+                return $"{_configuration["ApiBaseUrl"]}\\Images\\Users\\{source.CoverImageUrl}";
             return string.Empty;
 
         }

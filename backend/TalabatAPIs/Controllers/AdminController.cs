@@ -130,13 +130,14 @@ namespace Talabat.APIs.Controllers
             return Ok();
         }
         [HttpGet("Users")]
-        public async Task<ActionResult<UserDto>> GetUsers()
+        public async Task<ActionResult<AppUserDto>> GetUsers()
         {
             var users = await _manager.GetAllUsersAsync();
+            var mappedUsers = _mapper.Map<List<AppUser>,List<AppUserDto>>(users.ToList());
             if (users is null)
                 return NotFound(new ApiResponse(404));
             
-            return Ok(users);
+            return Ok(mappedUsers);
         }
 
         [HttpGet("GetPostsByUserId/{userId}")]
@@ -171,7 +172,9 @@ namespace Talabat.APIs.Controllers
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
-                    AuthorName = user.DisplayName
+                    AuthorName = user.DisplayName,
+                    AuthorImage = user.ProfileImageUrl
+
                 };
 
                 postDtos.Add(postDto);

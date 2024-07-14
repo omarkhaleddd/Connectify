@@ -23,13 +23,15 @@ namespace Talabat.APIs.Exstentions
 			return user;
 		}
 
-        public static async Task<IEnumerable<UserDto>> GetAllUsersAsync(this UserManager<AppUser> userManager)
+        public static async Task<IEnumerable<AppUser>> GetAllUsersAsync(this UserManager<AppUser> userManager)
         {
             return await userManager.Users
-                                 .Select(user => new UserDto
+                                 .Select(user => new AppUser
                                  {
                                      Id = user.Id,
-                                     DisplayName = user.DisplayName
+                                     DisplayName = user.DisplayName,
+                                     ProfileImageUrl = user.ProfileImageUrl,
+                                    
                                  })
                                  .ToListAsync();
         }

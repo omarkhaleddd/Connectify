@@ -17,10 +17,14 @@ namespace Talabat.APIs.Helpers
 			CreateMap<Address, AddressDto>();
 
 			CreateMap<UserDto, AppUser>();
-			CreateMap<AppUser, UserDto>();
+            CreateMap<AppUser, UserDto>();
+
+            
 
             CreateMap<AppUserDto, AppUser>();
-            CreateMap<AppUser, AppUserDto>();
+            CreateMap<AppUser, AppUserDto>()
+                .ForMember(U => U.ProfileImageUrl, o => o.MapFrom<UserImageUrlResolver>())
+                .ForMember(U => U.CoverImageUrl, o => o.MapFrom<CoverImageUrlResolver>());
 
             CreateMap<PostDto, Post>();
             CreateMap<Post, PostDto>();

@@ -94,7 +94,8 @@ namespace Talabat.APIs.Controllers
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
-                    AuthorName = user.DisplayName
+                    AuthorName = user.DisplayName,
+                    AuthorImage = user.ProfileImageUrl
                 };
 
                 postDtos.Add(postDto);
@@ -200,6 +201,7 @@ namespace Talabat.APIs.Controllers
 					Comments = comments,
 					AuthorId = user.Id,
 					AuthorName = user.DisplayName,
+                    AuthorImage = user.ProfileImageUrl,
                     UploadedFileNames = PostImages
 
                 };
@@ -348,7 +350,7 @@ namespace Talabat.APIs.Controllers
 					{
 						content = $"The User {user.UserName} mentioned you in a post ",
 						userId = mentionedUser.Id,
-						type = "Friend Mention",
+                        type = "Friend Mention",
 					};
 
 					var mappedNotification = _mapper.Map<NotificationDto, Notification>(newNotification);
@@ -432,7 +434,13 @@ namespace Talabat.APIs.Controllers
 
             if (post.AuthorId != user.Id)
                 return Unauthorized(new ApiResponse(401));
-
+            if(post.FileName != null && post.FileName.Count() > 0)
+            {
+                foreach (var item in post.FileName)
+                {
+                    _uploadService.DeleteFile(item.FileName,"Posts");
+                }
+            }
             if (post.Comments != null)
             {
                 foreach (Comment comment in post.Comments)

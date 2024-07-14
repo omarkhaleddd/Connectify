@@ -36,8 +36,9 @@ namespace Talabat.APIs.Controllers
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUploadService _uploadService;
 
-		public AccountsController(IMapper mapper, UserManager<AppUser> manager,IUnitOfWork unitOfWork, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
+		public AccountsController(IMapper mapper,IUploadService uploadService, UserManager<AppUser> manager,IUnitOfWork unitOfWork, IGenericRepository<Post> genericRepository, IGenericRepository<AppUserFriend> genericRepository1, IGenericRepository<FriendRequest> genericRepository2, IGenericRepository<BlockList> genericRepository3, IGenericRepository<Notification> genericRepository4, SignInManager<AppUser> signInManager, ITokenService tokenService, IHubContext<AccountNotificationHub, INotificationHub> accountNotification, IEmailService emailService)
 		{
 			_mapper = mapper;
 			_manager = manager;
@@ -46,6 +47,7 @@ namespace Talabat.APIs.Controllers
             _unitOfWork = unitOfWork;
 			_accountNotification = accountNotification;
 			_emailService = emailService;
+            _uploadService = uploadService;
 		}
 
 		[HttpPost("Register")]
@@ -60,7 +62,9 @@ namespace Talabat.APIs.Controllers
                 DisplayName = model.DisplayName,
                 Email = model.Email,
                 UserName = model.Email.Split('@')[0],
-                PhoneNumber = model.PhoneNumber
+                PhoneNumber = model.PhoneNumber,
+                ProfileImageUrl = "defaultProfileImage.jpg",
+                CoverImageUrl = "defaultCoverImage.jpg"
             };
             var result = await _manager.CreateAsync(user, model.Password);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
@@ -166,11 +170,94 @@ namespace Talabat.APIs.Controllers
             var appuser = _mapper.Map<UserDto, AppUser>(updateUser);
             user.DisplayName = updateUser.DisplayName;
             user.Id = updateUser.Id;
-            //image handler logic here for deleting old image for the user if exists and adding new picture
             var result = await _manager.UpdateAsync(user);
             if (!result.Succeeded) return BadRequest(new ApiResponse(400));
             return Ok(updateUser);
         }
+        [Authorize]
+        [HttpDelete("DeleteCoverImage")]
+        public async Task<ActionResult<UserDto>> DeleteCoverImage()
+        {
+            //example of how to use get user main async
+            var userId = await _manager.GetUserAddressAsync(User);
+
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401, $" ggg {user}"));
+            if (user.CoverImageUrl != null)
+            {
+                if (user.ProfileImageUrl != "defaultCoverImage.jpg")
+                    _uploadService.DeleteFile(user.CoverImageUrl, "Users");
+            }
+            user.CoverImageUrl = "defaultCoverImage.jpg";
+            var result = await _manager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            return Ok(user);
+        }
+        [Authorize]
+        [HttpDelete("DeleteProfileImage")]
+        public async Task<ActionResult<UserDto>> DeleteProfileImage()
+        {
+            //example of how to use get user main async
+            var userId = await _manager.GetUserAddressAsync(User);
+
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401, $" ggg {user}"));
+            if (user.ProfileImageUrl != null)
+            {
+                if (user.ProfileImageUrl != "defaultProfileImage.jpg")
+                    _uploadService.DeleteFile(user.ProfileImageUrl, "Users");
+            }
+            user.ProfileImageUrl = "defaultProfileImage.jpg";
+            var result = await _manager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            return Ok(user);
+        }
+        [Authorize]
+        [HttpPatch("UpdateCoverImage")]
+        public async Task<ActionResult<UserDto>> UpdateCoverImage([FromForm]IFormFile CoverImage)
+        {
+            //example of how to use get user main async
+            var userId = await _manager.GetUserAddressAsync(User);
+
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401, $" ggg {user}"));
+            if(user.CoverImageUrl != null)
+            {
+                if (user.ProfileImageUrl != "defaultCoverImage.jpg")
+                    _uploadService.DeleteFile(user.CoverImageUrl, "Users");
+            }
+            if (user.CoverImageUrl != "defaultCoverImage.jpg")
+                user.CoverImageUrl = await _uploadService.UploadFileAsync(CoverImage, "Users");
+            var result = await _manager.UpdateAsync(user);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            return Ok(user);
+        }
+        [Authorize]
+        [HttpPatch("UpdateProfileImage")]
+        public async Task<ActionResult<UserDto>> UpdateProfileImage([FromForm] IFormFile ProfileImage)
+        {          
+            //example of how to use get user main async
+            var userId = await _manager.GetUserAddressAsync(User);
+
+            var user = await _manager.GetUserAddressAsync(User);
+            if (user is null)
+                return Unauthorized(new ApiResponse(401, $" ggg {user}"));
+            if (user.ProfileImageUrl != null)
+            {
+                if(user.ProfileImageUrl != "defaultProfileImage.jpg")   
+                     _uploadService.DeleteFile(user.ProfileImageUrl, "Users");
+            }
+            if (user.ProfileImageUrl != "defaultProfileImage.jpg")
+                user.ProfileImageUrl = await _uploadService.UploadFileAsync(ProfileImage, "Users");
+            var result = await _manager.UpdateAsync(user);
+            
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+            return Ok(user);
+        }
+
         [HttpGet("EmailExist")]
         public async Task<ActionResult<bool>> checkDuplicateEmail(string email)
         {
