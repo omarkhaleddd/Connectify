@@ -12,6 +12,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ReportService>();
+builder.Services.AddScoped<HomeService>();
 
 var app = builder.Build();
 
