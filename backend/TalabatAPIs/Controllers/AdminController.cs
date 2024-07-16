@@ -130,13 +130,14 @@ namespace Talabat.APIs.Controllers
             return Ok();
         }
         [HttpGet("Users")]
-        public async Task<ActionResult<UserDto>> GetUsers()
+        public async Task<ActionResult<AppUserDto>> GetUsers()
         {
             var users = await _manager.GetAllUsersAsync();
+            var mappedUsers = _mapper.Map<List<AppUser>,List<AppUserDto>>(users.ToList());
             if (users is null)
                 return NotFound(new ApiResponse(404));
             
-            return Ok(users);
+            return Ok(mappedUsers);
         }
 
         [HttpGet("GetPostsByUserId/{userId}")]
@@ -171,7 +172,9 @@ namespace Talabat.APIs.Controllers
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
-                    AuthorName = user.DisplayName
+                    AuthorName = user.DisplayName,
+                    AuthorImage = user.ProfileImageUrl
+
                 };
 
                 postDtos.Add(postDto);
@@ -193,13 +196,14 @@ namespace Talabat.APIs.Controllers
             foreach (var post in posts)
             {
                 var user = await _manager.GetUserByIdAsync(post.AuthorId);
-                if (user == null)
-                {
-                    return NotFound($"User not found for post with ID: {post.Id}");
-                }
+                string defaultValue = "null";
+                //if (user == null)
+                //{
+                //    return NotFound($"User not found for post with ID: {post.Id}");
+                //}
                 var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
                 var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-
+                var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
                 var postDto = new PostDto
                 {
                     Id = post.Id,
@@ -208,8 +212,9 @@ namespace Talabat.APIs.Controllers
                     LikeCount = post.Likes.Count,
                     DatePosted = post.DatePosted,
                     Comments = comments,
-                    AuthorId = user.Id,
-                    AuthorName = user.DisplayName
+                    AuthorId = user?.Id?? defaultValue,
+                    AuthorName = user?.DisplayName??defaultValue,
+                    UploadedFileNames = PostImages
                 };
 
                 postDtos.Add(postDto);

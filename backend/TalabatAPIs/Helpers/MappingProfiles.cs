@@ -3,7 +3,6 @@ using Connetify.APIs.DTO;
 using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
-using Talabat.APIs.DTO;
 using Talabat.Core.Entities.Core.Donation;
 
 namespace Talabat.APIs.Helpers
@@ -17,10 +16,14 @@ namespace Talabat.APIs.Helpers
 			CreateMap<Address, AddressDto>();
 
 			CreateMap<UserDto, AppUser>();
-			CreateMap<AppUser, UserDto>();
+            CreateMap<AppUser, UserDto>();
+
+            
 
             CreateMap<AppUserDto, AppUser>();
-            CreateMap<AppUser, AppUserDto>();
+            CreateMap<AppUser, AppUserDto>()
+                .ForMember(U => U.ProfileImageUrl, o => o.MapFrom<UserImageUrlResolver>())
+                .ForMember(U => U.CoverImageUrl, o => o.MapFrom<CoverImageUrlResolver>());
 
             CreateMap<PostDto, Post>();
             CreateMap<Post, PostDto>();
@@ -59,7 +62,9 @@ namespace Talabat.APIs.Helpers
             CreateMap<ReportedPost, ReportedPostDto>();
 
             CreateMap<FileNameDto, FileNames>();
-            CreateMap<FileNames, FileNameDto>();
+            CreateMap<FileNames, FileNameDto>()
+                .ForMember(f => f.FileName, o => o.MapFrom<PostImageUrlResolver>());
+            
         }
     }
 }

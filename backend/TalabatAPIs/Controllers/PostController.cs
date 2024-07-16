@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System.IO.MemoryMappedFiles;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.Controllers;
@@ -93,7 +94,8 @@ namespace Talabat.APIs.Controllers
                     DatePosted = post.DatePosted,
                     Comments = comments,
                     AuthorId = user.Id,
-                    AuthorName = user.DisplayName
+                    AuthorName = user.DisplayName,
+                    AuthorImage = user.ProfileImageUrl
                 };
 
                 postDtos.Add(postDto);
@@ -179,7 +181,7 @@ namespace Talabat.APIs.Controllers
 				var user = await _manager.GetUserByIdAsync(post.AuthorId);
 				if (user == null)
 				{
-					return NotFound($"User not found for post with ID: {post.Id}");
+					//return NotFound($"User not found for post with ID: {post.Id}");
 				}
                 if(post.ReportCount == 10)
                 {
@@ -187,9 +189,9 @@ namespace Talabat.APIs.Controllers
                 }
 				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
 				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
 
-
-				var postDto = new PostDto
+                var postDto = new PostDto
 				{
 					Id = post.Id,
 					content = post.content,
@@ -197,9 +199,12 @@ namespace Talabat.APIs.Controllers
 					LikeCount = post.Likes.Count(),
 					DatePosted = post.DatePosted,
 					Comments = comments,
-					AuthorId = user.Id,
-					AuthorName = user.DisplayName
-				};
+					AuthorId = user?.Id??"null",
+					AuthorName = user?.DisplayName??"null",
+                    AuthorImage = user?.ProfileImageUrl??"null",
+                    UploadedFileNames = PostImages
+
+                };
 
 				postDtos.Add(postDto);
 			}
@@ -278,7 +283,7 @@ namespace Talabat.APIs.Controllers
 
             var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
             var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-
+            var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
             var postDto = new PostDto
             {
                 Id = post.Id,
@@ -288,7 +293,8 @@ namespace Talabat.APIs.Controllers
                 DatePosted = post.DatePosted,
                 Comments = comments,
                 AuthorId = author.Id,
-                AuthorName = author.DisplayName
+                AuthorName = author.DisplayName,
+                UploadedFileNames = PostImages
             };
 
             return Ok(postDto);
@@ -302,9 +308,6 @@ namespace Talabat.APIs.Controllers
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-
-            string uploadedFileName = null;
-
             
             var post = _mapper.Map<PostDto, Post>(newPost);
             if (post is null)
@@ -313,26 +316,27 @@ namespace Talabat.APIs.Controllers
             }
             post.AuthorId = user.Id;
             post.Comments = null;
-            if (newPost.UploadedFile != null) // Handle single file upload
-            {
-                uploadedFileName = await _uploadService.UploadFileAsync(newPost.UploadedFile, newPost.UploadedFile.FileName);
-                post.FileName = uploadedFileName;
-            }
-            else if (newPost.UploadedFiles != null && newPost.UploadedFiles.Count > 0) // Handle multiple file upload
-            {
-                var uploadedFileNames = await _uploadService.UploadFilesAsync(newPost.UploadedFiles);
-                var mappedFileNames = new List<FileNames>();
-                foreach (var file in uploadedFileNames) {
-                    mappedFileNames.Append(new FileNames { FileName = file });
-                }
-            }
 
             var result = _unitOfWork.Repository<Post>().Add(post);
             _unitOfWork.Repository<Post>().SaveChanges();
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
-
-			if (newPost.mentions is not null)
+            var mappedFileNames = new List<FileNames>();
+            if (newPost.UploadedFiles != null && newPost.UploadedFiles.Count > 1) // Handle multiple file upload
+            {
+                var uploadedFileNames = await _uploadService.UploadFilesAsync(newPost.UploadedFiles,"Posts");
+                foreach (var file in uploadedFileNames) {
+                    mappedFileNames.Add(new FileNames { FileName = file, PostId = post.Id, Post = post });
+                }
+            }
+            foreach (var file in mappedFileNames)
+            {
+            var resultFile = _unitOfWork.Repository<FileNames>().Add(file);
+            _unitOfWork.Repository<FileNames>().SaveChanges();
+             if (!resultFile.IsCompletedSuccessfully)
+                   return BadRequest(new ApiResponse(400));
+            }
+            if (newPost.mentions is not null)
 			{
 				foreach (var mention in newPost.mentions)
 				{
@@ -343,7 +347,7 @@ namespace Talabat.APIs.Controllers
 					{
 						content = $"The User {user.UserName} mentioned you in a post ",
 						userId = mentionedUser.Id,
-						type = "Friend Mention",
+                        type = "Friend Mention",
 					};
 
 					var mappedNotification = _mapper.Map<NotificationDto, Notification>(newNotification);
@@ -427,7 +431,13 @@ namespace Talabat.APIs.Controllers
 
             if (post.AuthorId != user.Id)
                 return Unauthorized(new ApiResponse(401));
-
+            if(post.FileName != null && post.FileName.Count() > 0)
+            {
+                foreach (var item in post.FileName)
+                {
+                    _uploadService.DeleteFile(item.FileName,"Posts");
+                }
+            }
             if (post.Comments != null)
             {
                 foreach (Comment comment in post.Comments)

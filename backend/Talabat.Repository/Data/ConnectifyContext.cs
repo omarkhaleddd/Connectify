@@ -25,7 +25,9 @@ namespace Talabat.Repository.Data
 		public DbSet<Notification> Notifications { get; set; }
 		public DbSet<Donation> Donations { get; set; }
 		public DbSet<ReportedPost> ReportedPost { get; set; }
-		public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
+        public DbSet<FileNames> FileNames { get; set; }
+
+        public ConnectifyContext(DbContextOptions<ConnectifyContext> options) : base(options)
 		{
 
 		}
@@ -38,12 +40,19 @@ namespace Talabat.Repository.Data
 				.WithOne(C => C.Post)
 				.HasForeignKey(C => C.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Post>()
+            
+			modelBuilder.Entity<Post>()
 				.HasMany(P => P.Likes)
 				.WithOne(L => L.Post)
 				.HasForeignKey(L => L.PostId)
 				.OnDelete(DeleteBehavior.Cascade);
-
+			
+			modelBuilder.Entity<Post>()
+				.HasMany(P => P.FileName)
+				.WithOne(F => F.Post)
+				.HasForeignKey(C => C.PostId)
+				.OnDelete(DeleteBehavior.Cascade);
+            
 			modelBuilder.Entity<Post>()
 				.HasMany(P => P.Reposts)
 				.WithOne(R => R.Post)

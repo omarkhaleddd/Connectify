@@ -17,6 +17,6 @@ namespace Talabat.Core.Specifications
 		public PostWithAuthor(int postId) : base(p => p.Id == postId)
 		{
 			Includes.Add(P => P.AuthorId);
-		}
-	}
+        }
+    }
 }

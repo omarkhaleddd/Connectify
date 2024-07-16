@@ -14,16 +14,19 @@ namespace Talabat.Core.Specifications
         {
             Includes.Add(P=>P.Comments);
             Includes.Add(P => P.Likes);
+            Includes.Add(P => P.FileName);
         }
         public PostWithCommentSpecs(int postId): base(P => P.Id == postId)
         {
 			Includes.Add(P => P.Comments);
             Includes.Add(P => P.Likes);
+            Includes.Add(P => P.FileName);
         }
         public PostWithCommentSpecs(string authorId) : base(P => P.AuthorId == authorId)
         {
             Includes.Add(P => P.Comments);
             Includes.Add(P => P.Likes);
+            Includes.Add(P => P.FileName);
         }
     }
 }

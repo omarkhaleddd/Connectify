@@ -10,6 +10,7 @@ namespace Talabat.APIs.DTO
         public DateTime DatePosted { get; set; }
         public string AuthorId { get; set; } = string.Empty;
 		public string AuthorName { get; set; } = string.Empty;
+        public string? AuthorImage { get; set; }
 		public int LikeCount { get; set; }
 		public ICollection<CommentLikesDto>? Likes { get; set; } = new HashSet<CommentLikesDto>();
 		public int PostId { get; set; }
