@@ -14,5 +14,13 @@ namespace Talabat.Repository.Identity
         public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> Options) :base(Options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AppUser>()
+                .Property(u => u.DateCreated)
+                .HasDefaultValueSql("GETDATE()");
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace Talabat.Core.Entities.Core
 		public ICollection<PostLikes>? Likes { get; set; } = new HashSet<PostLikes>();
         public ICollection<Comment>? Comments { get; set; } = new HashSet<Comment>();
 		public ICollection<Repost>? Reposts { get; set; } = new HashSet<Repost>();
+        [JsonIgnore]
         public ICollection<FileNames>? FileName { get; set; } = new HashSet<FileNames>(); // navigational property
         public int ReportCount { get; set; }
     }

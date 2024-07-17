@@ -4,11 +4,11 @@
         <div class="col-12">
             <div class="d-flex justify-content-between">
                 <div class="message-content d-flex justify-content-center">
-                    <h4 class="me-3">{{ msg.displayName }} : </h4>
-                    <p class="mt-1">{{ msg.message }}</p>
+                    <h4 class="me-3">{{ msg.senderName }} : </h4>
+                    <p class="mt-1">{{ msg.messageText }}</p>
                 </div>
                 <div class="message-details">
-                    <p>Date : {{ msg.sentAt | date: 'short' }}</p>
+                    <p>Date : {{ msg.messageDate | date: 'short' }}</p>
                 </div>
             </div>
         </div>
