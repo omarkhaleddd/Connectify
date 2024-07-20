@@ -23,6 +23,7 @@ namespace Talabat.Core.Entities.Core
 			DeleteDate = null;
             Likes = null;
             ReportCount = 0;
+            Privacy = 1; // 0 : only me , 1 : friends only , 2 : public
 		}
         public string content { get; set; }
         public DateTime DatePosted { get; set; } 
@@ -34,5 +35,6 @@ namespace Talabat.Core.Entities.Core
         [JsonIgnore]
         public ICollection<FileNames>? FileName { get; set; } = new HashSet<FileNames>(); // navigational property
         public int ReportCount { get; set; }
+        public int Privacy { get; set; }
     }
 }

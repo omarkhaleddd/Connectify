@@ -46,6 +46,9 @@ namespace Talabat.Repository.Data
                 .Property(u => u.InsertDate)
                 .HasDefaultValueSql("GETDATE()");
             modelBuilder.Entity<Post>()
+                .Property(u => u.DatePosted)
+                .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<Post>()
 				.HasMany(P => P.Comments)
 				.WithOne(C => C.Post)
 				.HasForeignKey(C => C.PostId)

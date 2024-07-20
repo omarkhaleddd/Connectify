@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using Talabat.APIs.Controllers;
@@ -75,9 +76,36 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
+            var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id);
+            var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == user.Id);
+            var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
+            var friendsByFriendId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendFriendId);
+            var friendsList = new List<string>();
+            foreach (var friendByUserId in friendsByUserId)
+            {
+                friendsList.Add(friendByUserId.FriendId);
+            }
+
+            foreach (var friendByFriendId in friendsByFriendId)
+            {
+
+                friendsList.Add(friendByFriendId.UserId);
+            }
+
+
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
+                //handled only me 
+                if (post.Privacy == 0)
+                {
+                    continue;
+                }
+                bool found = friendsList.Contains(post.AuthorId);
+                //handle the friends only by checking on the friend list
+                if (post.Privacy == 2 || found || post.AuthorId == user.Id)
+                {
+                   
                 if (post.ReportCount == 10)
                 {
                     continue;
@@ -99,6 +127,7 @@ namespace Talabat.APIs.Controllers
                 };
 
                 postDtos.Add(postDto);
+                }
             }
 
             return Ok(postDtos);
@@ -121,92 +150,104 @@ namespace Talabat.APIs.Controllers
 			var resultDtos = new List<object>();
 			var cachedResultDtos = new List<object>();
 
-			var cachedPostsKey = $"posts - {myUser.Id}";
-			var cachedRepostsKey = $"reposts - {myUser.Id}";
+            var cachedPostsKey = $"posts - {myUser.Id}";
+            var cachedRepostsKey = $"reposts - {myUser.Id}";
 
-			// Try to get the posts and reposts from the cache
-			var cachedPosts = await _cacheService.GetStringAsync(cachedPostsKey);
-			var cachedReposts = await _cacheService.GetStringAsync(cachedRepostsKey);
+            // Try to get the posts and reposts from the cache
+            var cachedPosts = await _cacheService.GetStringAsync(cachedPostsKey);
+            var cachedReposts = await _cacheService.GetStringAsync(cachedRepostsKey);
 
-			if (cachedPosts != null || cachedReposts != null)
-			{
-				var cachedPostDtos = JsonConvert.DeserializeObject<List<PostDto>>(cachedPosts);
-				var cachedRepostDtos = JsonConvert.DeserializeObject<List<RepostDto>>(cachedReposts);
+            if (cachedPosts != null || cachedReposts != null)
+            {
+                var cachedPostDtos = JsonConvert.DeserializeObject<List<PostDto>>(cachedPosts);
+                var cachedRepostDtos = JsonConvert.DeserializeObject<List<RepostDto>>(cachedReposts);
 
-				cachedResultDtos.AddRange(cachedPostDtos);
-				cachedResultDtos.AddRange(cachedRepostDtos);
+                cachedResultDtos.AddRange(cachedPostDtos);
+                cachedResultDtos.AddRange(cachedRepostDtos);
 
-				return Ok(cachedResultDtos);
-			}
+                return Ok(cachedResultDtos);
+            }
 
-			
+
+            //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var currUser = await _manager.GetUserAddressAsync(User);
             var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == currUser.Id);
             var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == currUser.Id);
             var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
             var friendsByFriendId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendFriendId);
-            //b3d kda hangeb el posts ely el author id bta3hom 3aks ba3d
             var postList = new List<Post>();
 			var repostList = new List<Repost>();
+            var userPostsSpec = new PostWithCommentSpecs(currUser.Id);
+            var userPosts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(userPostsSpec);
+            postList.AddRange(userPosts);
+            var userRepostSpec = new RepostWithCommentSpecs(currUser.Id);
+            var userReposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(userRepostSpec);
+            repostList.AddRange(userReposts);
+            var friendsList = new List<string>();
 
-
-			foreach (var friendByUserId in friendsByUserId)
+            foreach (var friendByUserId in friendsByUserId)
 			{
-				var postSpec = new PostWithCommentSpecs(friendByUserId.FriendId);
-				var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(postSpec);
-				postList.AddRange(posts);
-
-				var repostSpec = new RepostWithCommentSpecs(friendByUserId.FriendId);
-				var reposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(repostSpec);
-				repostList.AddRange(reposts);
+                friendsList.Add(friendByUserId.FriendId);
 			}
 
 			foreach (var friendByFriendId in friendsByFriendId)
 			{
-				var postSpec = new PostWithCommentSpecs(friendByFriendId.UserId);
-				var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(postSpec);
-				postList.AddRange(posts);
 
-				var repostSpec = new RepostWithCommentSpecs(friendByFriendId.UserId);
-				var reposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(repostSpec);
-				repostList.AddRange(reposts);
+                friendsList.Add(friendByFriendId.UserId); 
 			}
-			if (!postList.Any() && !repostList.Any())
+
+            foreach ( var friendId in friendsList)
+            {
+                var postSpec = new PostWithCommentSpecs(friendId);
+                var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(postSpec);
+                postList.AddRange(posts);
+
+                var repostSpec = new RepostWithCommentSpecs(friendId);
+                var reposts = await _unitOfWork.Repository<Repost>().GetAllWithSpecAsync(repostSpec);
+                repostList.AddRange(reposts);
+            }
+
+            if (!postList.Any() && !repostList.Any())
 			{
 				return NotFound("No posts or reposts found");
 			}
 
 			foreach (var post in postList)
 			{
-				var user = await _manager.GetUserByIdAsync(post.AuthorId);
-				if (user == null)
-				{
-					//return NotFound($"User not found for post with ID: {post.Id}");
-				}
-                if(post.ReportCount == 10)
+                //if the post isnt only me privacy then do the logic
+                if (post.Privacy != 0 || post.AuthorId == currUser.Id)
                 {
-                    continue;
+                    var user = await _manager.GetUserByIdAsync(post.AuthorId);
+                    if (user == null)
+                    {
+                        //return NotFound($"User not found for post with ID: {post.Id}");
+                    }
+                    if (post.ReportCount == 10)
+                    {
+                        continue;
+                    }
+                    var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+                    var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                    var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
+
+                    var postDto = new PostDto
+                    {
+                        Id = post.Id,
+                        content = post.content,
+                        Likes = postLikes,
+                        Privacy = post.Privacy,
+                        LikeCount = post.Likes.Count(),
+                        DatePosted = post.DatePosted,
+                        Comments = comments,
+                        AuthorId = user?.Id ?? "null",
+                        AuthorName = user?.DisplayName ?? "null",
+                        AuthorImage = user?.ProfileImageUrl ?? "null",
+                        UploadedFileNames = PostImages
+                        
+                    };
+
+                    postDtos.Add(postDto);
                 }
-				var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
-				var postLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-                var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
-
-                var postDto = new PostDto
-				{
-					Id = post.Id,
-					content = post.content,
-					Likes = postLikes,
-					LikeCount = post.Likes.Count(),
-					DatePosted = post.DatePosted,
-					Comments = comments,
-					AuthorId = user?.Id??"null",
-					AuthorName = user?.DisplayName??"null",
-                    AuthorImage = user?.ProfileImageUrl??"null",
-                    UploadedFileNames = PostImages
-
-                };
-
-				postDtos.Add(postDto);
 			}
 			foreach (var repost in repostList)
 			{
@@ -236,10 +277,13 @@ namespace Talabat.APIs.Controllers
 				repostDtos.Add(repostDto);
 			}
 
+            var arrangedPosts = postDtos.OrderByDescending(p => p.DatePosted);
+            var arrangedReposts = repostDtos.OrderByDescending(p => p.DatePosted);
 
-
-			// Cache the result
-			await _cacheService.SetStringAsync(cachedPostsKey, JsonConvert.SerializeObject(postDtos));
+            resultDtos.Add(arrangedPosts);
+            resultDtos.Add(repostDtos);
+            // Cache the result
+            await _cacheService.SetStringAsync(cachedPostsKey, JsonConvert.SerializeObject(postDtos));
 			await _cacheService.SetStringAsync(cachedRepostsKey, JsonConvert.SerializeObject(repostDtos));
 
 			return Ok(resultDtos);
@@ -271,6 +315,23 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
+            //handle if the user is ur friend show the post and the privacy != 0
+            var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == myUser.Id);
+            var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == myUser.Id);
+            var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
+            var friendsByFriendId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendFriendId);
+            var friendsList = new List<string>();
+            foreach (var friendByUserId in friendsByUserId)
+            {
+                friendsList.Add(friendByUserId.FriendId);
+            }
+
+            foreach (var friendByFriendId in friendsByFriendId)
+            {
+
+                friendsList.Add(friendByFriendId.UserId);
+            }
+            bool found = friendsList.Contains(post.AuthorId);
             if (post.ReportCount == 10)
             {
                 return NotFound();
@@ -280,24 +341,31 @@ namespace Talabat.APIs.Controllers
             {
                 return NotFound("User not found");
             }
-
-            var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
-            var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
-            var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
-            var postDto = new PostDto
+           
+            if (found || post.Privacy == 2 || author.Id == myUser.Id)
             {
-                Id = post.Id,
-                content = post.content,
-                LikeCount = post.Likes.Count(),
-                Likes = PostLikes,
-                DatePosted = post.DatePosted,
-                Comments = comments,
-                AuthorId = author.Id,
-                AuthorName = author.DisplayName,
-                UploadedFileNames = PostImages
-            };
+                var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+                var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                var PostImages = _mapper.Map<ICollection<FileNames>, ICollection<FileNameDto>>(post.FileName);
+                var postDto = new PostDto
+                {
+                    Id = post.Id,
+                    content = post.content,
+                    LikeCount = post.Likes.Count(),
+                    Likes = PostLikes,
+                    DatePosted = post.DatePosted,
+                    Comments = comments,
+                    AuthorId = author.Id,
+                    AuthorName = author.DisplayName,
+                    UploadedFileNames = PostImages
+                };
 
-            return Ok(postDto);
+                return Ok(postDto);
+            }
+            else
+            {
+                return BadRequest("Not in your friends list!");
+            }
         }
 
         //Post Request
