@@ -1,0 +1,30 @@
+.notification {
+    border-bottom: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.notification-content {
+    margin-left: 10px;
+    color: #3f3f3f;
+}
+
+.notification-details {
+    font-size: 0.9em;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+}
+.notification-date {
+    margin-right: 10px;
+}
+.notification-icon{
+    color: #150AA1;
+}
+.notification-type {
+    margin-left: 5px;
+    font-weight: bold;
+    color: #150AA1;
+    margin-bottom: 5px;
+}

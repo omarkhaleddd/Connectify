@@ -1,0 +1,41 @@
+@typeparam TItem
+
+@if (Items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!Items.Any())
+{
+    <p><em>No users found.</em></p>
+}
+else{
+    <table class="table align-middle mb-0 bg-white">
+    <thead class="bg-light">
+        <tr>
+            @Header
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                @Row(item)
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            @Footer
+        </tr>
+    </tfoot>
+</table>
+}
+
+
+@code {
+    [Parameter] public RenderFragment Header { get; set; }
+    [Parameter] public RenderFragment<TItem> Row { get; set; }
+    [Parameter] public RenderFragment Footer { get; set; }
+    [Parameter] public IReadOnlyList<TItem> Items { get; set; }
+
+}

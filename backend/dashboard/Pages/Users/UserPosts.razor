@@ -1,0 +1,66 @@
+@page "/user-posts/{Id}"
+@using Talabat.Core.Entities.Core
+@inject PostService PostService
+
+<PageTitle>User Posts</PageTitle>
+
+<div class="border-bottom w-100 px-4 pb-2">
+    <div class="d-flex  justify-content-between">
+        <div class="">
+            @* <h4 class="fw-bold text-secondary">@currentUser.DisplayName</h4> *@
+        </div>
+        <div class="w-25 d-flex justify-content-between">
+            <div class="actions-tab">         
+                <button class='btn btn-link btn-sm btn-rounded bg-gray text-decoration-none'>
+                    <img src="assets/images/settings.svg" width="30" alt="">
+                </button>
+                <button
+                    class='btn btn-link btn-sm custom-btn bg-red text-white'>Remove</button>
+            </div>
+            <div class="profile-image">
+                <img src="https://mdbootstrap.com/img/new/avatars/3.jpg" width="40" height="40" class="rounded-pill" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row  justify-content-center">
+        <div class="col-6 mt-4 d-grid gap-3">
+            @if (posts == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else if (!posts.Any())
+            {
+                <p><em>No posts found.</em></p>
+            }
+            else{
+                @foreach (var post in posts)
+                {
+                    <PostComp post="post"/>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    private List<Post> posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Id.ToString()))
+        {
+            var postDtos = await PostService.GetPostsByUserIdAsync(id: Id.ToString());
+            posts = postDtos?.ToList();
+        }
+        else
+        {
+            posts = new List<Post>();
+        }
+    }
+
+}

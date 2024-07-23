@@ -1,0 +1,7 @@
+<div>
+    <h2>Create a New Post</h2>
+    <form (submit)="createRepost()">
+        <textarea [(ngModel)]="repostContent" name="postContent" placeholder="Write your post here..." rows="5"></textarea>
+        <button type="submit">Create Repost</button>
+    </form>
+</div>

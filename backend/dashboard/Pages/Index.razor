@@ -1,0 +1,52 @@
+﻿@page "/"
+@inject IJSRuntime JS
+@inject HomeService HomeService
+@using dashboard.Shared.Widgets
+
+<PageTitle>Home</PageTitle>
+
+<div class="container d-grid gap-3">
+    <h1 class="fw-bold">Welcome, Omar!</h1>
+    <div class="row">
+        <div class="col-4">
+            <KpiWidget  ModalNumber = "@postCount"/>
+        </div>
+        <div class="col-4">
+            <KpiWidget ModalNumber = "@userCount"/>
+        </div>
+        <div class="col-4">
+            <KpiWidget ModalNumber = "@NACount"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <ChartWidget ChartId="myChart" />
+        </div>
+        <div class="col-6">
+            <ChartWidget ChartId="myChart1" />
+        </div>
+    </div>
+</div>
+
+@code {
+    string postCount = "0";
+    string userCount = "0";
+    string NACount = "0";
+    protected override async Task OnInitializedAsync()
+    {
+        var HomeData = await HomeService.GetHomeDataAsync();
+        postCount = HomeData.GetProperty("postCount").ToString();
+        userCount = HomeData.GetProperty("userCount").ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("createChart");
+        }
+    }
+    
+
+
+}

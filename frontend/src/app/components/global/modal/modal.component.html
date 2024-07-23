@@ -1,0 +1,17 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div *ngIf="showTitle" class="modal-header">
+            <h3>{{ modalTitle }}</h3>
+            <button class="close-button" *ngIf="showCloseButton" (click)="closeModal()">X</button>
+        </div>
+        <ng-container *ngIf="users; else noUsers">
+            <app-search-user *ngFor="let user of users" [user]="user"></app-search-user>
+        </ng-container>
+
+        <ng-template #noUsers>
+            <div class="modal-body">
+                {{ modalBody }}
+            </div>
+        </ng-template>
+    </div>
+</div>

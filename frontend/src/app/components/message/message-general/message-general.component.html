@@ -1,0 +1,17 @@
+<div class="container-fluid ">
+    <div class="row justify-content-center ">
+        <div class = "row vh-100">
+            <div class="col-md-4 border-end border-3">
+                <app-message-friend-list-sidebar (friendSelected)="onFriendSelected($event)"></app-message-friend-list-sidebar>
+            </div>
+            <div class="col-md-8">
+              <ng-container *ngIf="isConnectedToGroup; else elseTemplate">
+                <app-message-chat [selectedFriendId]="selectedFriendId"></app-message-chat>
+              </ng-container>
+              <ng-template #elseTemplate>
+                <app-message-grp></app-message-grp>
+              </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

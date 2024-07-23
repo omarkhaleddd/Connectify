@@ -1,0 +1,142 @@
+<!-- <div class="post-container">
+    <div class="post-settings">
+        <button (click)="toggleDropdown()" class="three-dot-btn rounded-5 px-2 py-1">⋮</button>
+
+        <div *ngIf="showDropDown" class="dropdown-menu">
+            <a href="#" (click)="editPost(post)">Edit</a>
+            <a href="#" (click)="deletePost(post)">Delete</a>
+            <a href="#" (click)="reportPost(post)">Report</a>
+            <button href="#" (click)="openModal()">Donate</button>
+        </div>
+        <app-donate-modal [isVisible]="isModalVisible" [title]="'Donate to this post\'s author'" [showFooter]="true"
+            [buttons]="modalButtons">
+            <form (ngSubmit)="submitDonation()">
+                <label for="donationAmount">Donation Amount:</label>
+                <input type="number" id="donationAmount" [(ngModel)]="donationAmount" name="donationAmount" required />
+            </form>
+        </app-donate-modal>
+    </div>
+    <div class="post-header">
+        <div class="author-info">
+            <span>{{ post?.authorName }}</span>
+            <span class="post-date">{{ post?.datePosted }}</span>
+        </div>
+    </div>
+    <div class="post-content" (click)="onPostClick(post)">
+        <p>{{ post?.content }}</p>
+        <div *ngIf="post?.post">
+            <app-post-get [post]="post?.post"></app-post-get>
+        </div>
+    </div>
+    <div class="post-footer">
+        <button class="me-1" (click)="likePost()">
+            {{ isLiked }}
+        </button>
+
+        <span class="position-relative" (mouseenter)="showModal = true" (mouseleave)="showModal = false">{{ likeCount}}
+            Likes</span>
+        <app-modal class="position-absolute" [modalBody]="likes" [emptyMsg]="emptyMsg" [showTitle]="true"
+            [showCloseButton]="false" *ngIf="showModal"></app-modal>
+        <button class="ms-1" (click)="commentPost()">Comment</button>
+        <button class="ms-1" (click)="repost(post)">Share</button>
+    </div>
+</div> -->
+
+<div class="post-container">
+    <div class="post-header d-flex  justify-content-between">
+        <div class="post-info d-flex">
+            <div class="post-author-img mt-1 me-2">
+                <img src="../../../../assets/notfound.png" class="rounded-pill" alt="">
+            </div>
+            <div class="post-author  flex-column">
+                <p class="fw-bold text-black mb-0">{{ post?.authorName }}</p>
+                <p class="text-muted">3h ago . <svg viewBox="0 0 16 16" width="12" height="12"
+                        fill="currentColor" title="Shared with Public"
+                        class="x19dipnz x1lliihq x1tzjh5l x1k90msu x2h7rmj x1qfuztq"
+                        style="--color: var(--secondary-icon);">
+                        <title>Shared with Public</title>
+                        <g fill-rule="evenodd" transform="translate(-448 -544)">
+                            <g>
+                                <path
+                                    d="M109.5 408.5c0 3.23-2.04 5.983-4.903 7.036l.07-.036c1.167-1 1.814-2.967 2-3.834.214-1 .303-1.3-.5-1.96-.31-.253-.677-.196-1.04-.476-.246-.19-.356-.59-.606-.73-.594-.337-1.107.11-1.954.223a2.666 2.666 0 0 1-1.15-.123c-.007 0-.007 0-.013-.004l-.083-.03c-.164-.082-.077-.206.006-.36h-.006c.086-.17.086-.376-.05-.529-.19-.214-.54-.214-.804-.224-.106-.003-.21 0-.313.004l-.003-.004c-.04 0-.084.004-.124.004h-.037c-.323.007-.666-.034-.893-.314-.263-.353-.29-.733.097-1.09.28-.26.863-.8 1.807-.22.603.37 1.166.667 1.666.5.33-.11.48-.303.094-.87a1.128 1.128 0 0 1-.214-.73c.067-.776.687-.84 1.164-1.2.466-.356.68-.943.546-1.457-.106-.413-.51-.873-1.28-1.01a7.49 7.49 0 0 1 6.524 7.434"
+                                    transform="translate(354 143.5)"></path>
+                                <path
+                                    d="M104.107 415.696A7.498 7.498 0 0 1 94.5 408.5a7.48 7.48 0 0 1 3.407-6.283 5.474 5.474 0 0 0-1.653 2.334c-.753 2.217-.217 4.075 2.29 4.075.833 0 1.4.561 1.333 2.375-.013.403.52 1.78 2.45 1.89.7.04 1.184 1.053 1.33 1.74.06.29.127.65.257.97a.174.174 0 0 0 .193.096"
+                                    transform="translate(354 143.5)"></path>
+                                <path fill-rule="nonzero"
+                                    d="M110 408.5a8 8 0 1 1-16 0 8 8 0 0 1 16 0zm-1 0a7 7 0 1 0-14 0 7 7 0 0 0 14 0z"
+                                    transform="translate(354 143.5)"></path>
+                            </g>
+                        </g>
+                    </svg></p>
+            </div>
+        </div>
+        <div class="post-actions-top d-flex align-items-start">
+            <div class="settings me-2">
+                <svg viewBox="0 0 20 20" width="20" height="20" fill="currentColor"
+                    class="x19dipnz x1lliihq x1tzjh5l x1k90msu x2h7rmj x1qfuztq" style="--color: #e0e0e0;">
+                    <g fill-rule="evenodd" transform="translate(-446 -350)">
+                        <path
+                            d="M458 360a2 2 0 1 1-4 0 2 2 0 0 1 4 0m6 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0">
+                        </path>
+                    </g>
+                </svg>
+            </div>
+            <div class="close">
+                <svg viewBox="0 0 20 20" width="20" height="20" fill="currentColor"
+                    class="x19dipnz x1lliihq x1tzjh5l x1k90msu x2h7rmj x1qfuztq" style="--color: #e0e0e0;">
+                    <g fill-rule="evenodd" transform="translate(-446 -350)">
+                        <g fill-rule="nonzero">
+                            <path
+                                d="m95.334 195.249 12.917 12.917a1 1 0 0 0 1.415-1.415l-12.917-12.917a1 1 0 0 0-1.415 1.415z"
+                                transform="translate(353.5 159)"></path>
+                            <path
+                                d="m108.251 193.834-12.917 12.917a1 1 0 0 0 1.415 1.415l12.917-12.917a1 1 0 0 0-1.415-1.415z"
+                                transform="translate(353.5 159)"></path>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="post-content">
+        <p>
+            {{ post?.content }}
+        </p>
+    </div>
+    <div class="post-reactions d-flex justify-content-between">
+        <div class="likes">
+            <img src="../../../../assets/like.svg" width="20" alt="">
+            <span class="ms-1">{{ likeCount}}</span>
+        </div>
+        <div class="comments">
+            <span class="me-1">55</span>
+            <img src="../../../../assets/comments.svg" width="22" alt="">
+        </div>
+    </div>
+    <div class="post-actions">
+        <hr class="m-0 mb-1">
+        <div class="post-actions-inner">
+            <div class="action-container">
+                <button>
+                    <img src="../../../../assets/like-action.svg" width="25" alt="">
+                    <span class="ms-1">Like</span>
+                </button>
+            </div>
+            <div class="action-container">
+                <button>
+                    <img src="../../../../assets/comment-action.svg" width="25" alt="">
+                    <span class="ms-1">Comment</span>
+                </button>
+            </div>
+            <div class="action-container">
+                <button>
+                    <img src="../../../../assets/send-action.svg" width="25" alt="">
+                    <span class="ms-1">Share</span>
+                </button>
+            </div>
+        </div>
+        <hr class="m-0 mt-1">
+    </div>
+    <div class="comment-section"></div>
+</div>

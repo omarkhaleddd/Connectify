@@ -1,0 +1,29 @@
+@using Talabat.Core.Entities.Core
+
+<div class="post-container">
+    <div class="d-flex">
+        <div class="img-container">
+            @* <img src="@user.Image" width="40" height="40" class="rounded-pill" alt=""> *@
+        </div>
+        <div class="post-inner-container ">
+            <div class="post-content">
+                <span>
+                    @post.content
+                </span>
+            </div>
+            <div class="post-actions">
+                <button class="action-btn"><img src="assets/images/like.svg" width="20" alt=""> <span>@post.Likes.Count</span>
+                    Likes</button>
+                <button type="button" class="action-btn" data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="assets/images/comment.svg" width="20" alt=""> <span>@post.Comments.Count</span>
+                    Comments</button>
+                <Modal  idName="exampleModal" ModalTitle="Comments" items="@post.Comments" />
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Post post {get; set;}
+
+}

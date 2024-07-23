@@ -1,0 +1,50 @@
+<div class="w-100 vh-100 bg-info-subtle">
+    <div class="w-75 m-auto py-5 ">
+        <form [formGroup]="registerForm" (ngSubmit)="registerUser(registerForm)">
+            <div *ngIf="errorMsg" class="alert alert-danger">
+                {{errorMsg}}
+            </div>
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('DisplayName')?.invalid && (registerForm.get('DisplayName')?.dirty || registerForm.get('DisplayName')?.touched)">
+                {{ getErrorMessage('DisplayName') }}
+            </div>
+
+            <label for="DisplayName" class="text-capitalize my-1">name</label>
+            <input formControlName="DisplayName" class="form-control" type="text" id="DisplayName">
+
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)">
+                {{ getErrorMessage('email') }}
+            </div>
+
+            <label for="email" class="text-capitalize my-1">email</label>
+            <input formControlName="email" class="form-control" type="text" id="email">
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)">
+                {{ getErrorMessage('password') }}
+            </div>
+
+            <label for="password" class="text-capitalize my-1">password</label>
+            <input formControlName="password" class="form-control" type="password" id="password">
+
+            <div class="alert alert-danger"
+                *ngIf="registerForm.get('PhoneNumber')?.invalid && (registerForm.get('PhoneNumber')?.dirty || registerForm.get('PhoneNumber')?.touched)">
+                {{ getErrorMessage('PhoneNumber') }}
+            </div>
+
+            <label for="PhoneNumber" class="text-capitalize my-1">PhoneNumber</label>
+            <input formControlName="PhoneNumber" class="form-control" type="text" id="PhoneNumber">
+            <div class="text-end text-center d-flex justify-content-end ">
+                <p class="my-3 px-2 ">Already have account?<a class="text-decoration-none" routerLink="/login"> Login </a></p>
+            
+                <button [disabled]="registerForm.invalid" type="submit" class="btn btn-primary my-2">
+                    <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
+                    <span *ngIf="!isLoading">Register</span> 
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

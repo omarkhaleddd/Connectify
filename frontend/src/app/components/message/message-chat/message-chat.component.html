@@ -1,0 +1,41 @@
+<div class="container d-flex flex-column vh-100">
+        <div class="row justify-content-center">
+            <div class="col-12 p-3">
+                <h4 class="text-center">{{ this.sharedDataValue.friendName }}</h4>
+            </div>
+        </div>
+        <div class="flex-grow-1 overflow-auto">
+            <div *ngFor="let item of sharedMessages" class="col-12">
+                <div class="d-flex justify-content-between">
+                    <div class="message-content d-flex justify-content-center">
+                        <h4 class="me-3">{{ item.recieverName }} : </h4>
+                        <p class="mt-1">{{ item.messageText }}</p>
+                    </div>
+                    <div class="message-details">
+                        <p>Date : {{ item.messageDate }}</p>
+                    </div>
+                </div>
+            </div>
+            <div *ngFor="let item of messages" class="col-12">
+                <div class="d-flex justify-content-between">
+                    <div class="message-content d-flex justify-content-center">
+                        <h4 class="me-3">{{ item.recieverName }} : </h4>
+                        <p class="mt-1">{{ item.message }}</p>
+                    </div>
+                    <div class="message-details">
+                        <p>Date : {{ item.sentAt }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-auto">
+                <form class="bg-light p-3" (submit)="sendMessage()">
+                    <div class="d-flex">
+                        <textarea class="form-control resize-none me-2" rows="3" name="message" id="message" placeholder="Type your message here!" [(ngModel)]="message"></textarea>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+</div>

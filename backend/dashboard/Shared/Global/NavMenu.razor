@@ -1,0 +1,127 @@
+﻿<div class="sidebar @NavMenuCssClass">
+    <div class="top-row position-relative ps-1 navbar navbar-dark">
+        <a class="navbar-brand d-flex align-items-center" href="">
+            <img src="assets/images/logo2.png" height="50" alt="">
+            <span class="logo-text fs-3 ms-2">Connectify</span>
+        </a>
+
+        <button class="btn btn-primary toggleBtn" @onclick="ToggleNavMenu">
+            <img src="assets/icons/right-arrow.svg" class="@ArrowCssClass" width="12" alt="">
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+        <nav class="inner-content">
+            @foreach (var route in routes)
+            {
+                <div class="nav-item">
+                    <NavLink class="custom-nav-link" href="@route.Href" Match="NavLinkMatch.All">
+                        @* <span class="@privateRoute.Icon" aria-hidden="true"></span>  *@
+                        <img src="assets/images/@route.Icon" width="20" alt="">
+                        <span class="route-name">@route.Name</span>
+                    </NavLink>
+                </div>
+            }
+        </nav>
+        <hr class="my-2 mx-auto" />
+
+        <div class="profile-content">
+            <div class="inner-content">
+                @foreach (var privateRoute in privateRoutes)
+                {
+                    <div class="nav-item ">
+                        <NavLink class="custom-nav-link" href="@privateRoute.Href" Match="NavLinkMatch.All">
+                            @* <span class="@privateRoute.Icon" aria-hidden="true"></span>  *@
+                            <img src="assets/images/@privateRoute.Icon" width="20" alt="">
+                            <span class="route-name">@privateRoute.Name</span>
+                        </NavLink>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool collapseNavMenu = false;
+    private Route openDropdownRoute;
+
+    private string NavMenuCssClass => collapseNavMenu ? "sidebar-collapse" : string.Empty;
+    private string ArrowCssClass => collapseNavMenu ? "arrow-collapse" : "arrow";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void ToggleDropDownMenu(Route route)
+    {
+        if (openDropdownRoute == route)
+        {
+            openDropdownRoute = null;
+        }
+        else
+        {
+            openDropdownRoute = route;
+        }
+    }
+
+    
+
+    private Route[] routes = new Route[]
+    {
+        new Route { Href = "", Name = "Home", Icon = "home.svg" },
+        new Route 
+        { 
+            Href = "browse-users", 
+            Name = "Browse Users", 
+            Icon = "search.svg",
+            Children = new Route[]
+            {
+                new Route { Href = "subcounter1", Name = "Sub Counter 1", Icon = "oi oi-minus" },
+                new Route { Href = "subcounter2", Name = "Sub Counter 2", Icon = "oi oi-minus" }
+            }
+        },
+        new Route 
+        { 
+            Href = "reported-posts", 
+            Name = "Reported Posts", 
+            Icon = "report.svg",
+            Children = new Route[]
+            {
+                new Route { Href = "subcounter1", Name = "Sub Counter 1", Icon = "oi oi-minus" },
+                new Route { Href = "subcounter2", Name = "Sub Counter 2", Icon = "oi oi-minus" }
+            }
+        },
+        new Route 
+        { 
+            Href = "donations", 
+            Name = "Donations", 
+            Icon = "donation.svg",
+            Children = new Route[]
+            {
+                new Route { Href = "subcounter1", Name = "Sub Counter 1", Icon = "oi oi-minus" },
+                new Route { Href = "subcounter2", Name = "Sub Counter 2", Icon = "oi oi-minus" }
+            }
+        },
+        new Route 
+        { 
+            Href = "cookies", 
+            Name = "Cookies", 
+            Icon = "cookies.svg",
+            Children = new Route[]
+            {
+                new Route { Href = "subcounter1", Name = "Sub Counter 1", Icon = "oi oi-minus" },
+                new Route { Href = "subcounter2", Name = "Sub Counter 2", Icon = "oi oi-minus" }
+            }
+        },
+    };
+
+    private Route[] privateRoutes = new Route[]
+    {
+        new Route { Href = "profile", Name = "My profile", Icon = "profile.svg" },
+        new Route { Href = "settings", Name = "Settings", Icon = "cogs.svg" },
+        new Route { Href = "logout", Name = "Logout", Icon = "logout.svg" },
+    };
+
+}
