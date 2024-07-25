@@ -76,6 +76,7 @@ namespace Talabat.APIs.Controllers
             {
                 return BadRequest("No posts");
             }
+            // in a service that gives us the friends of a userid
             var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id);
             var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == user.Id);
             var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
