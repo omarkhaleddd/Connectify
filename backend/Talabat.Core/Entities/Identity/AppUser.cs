@@ -11,6 +11,7 @@ namespace Talabat.Core.Entities.Identity
     {
         public string DisplayName { get; set; }
         public Address Address { get; set; }
+        public DateTime? DateCreated { get; set; } = DateTime.Now;
         public string ProfileImageUrl  { get; set; }
         public string CoverImageUrl { get; set; }
     }

@@ -101,8 +101,9 @@ export class MessageGrpComponent implements OnInit {
     this._messageService.getGroupMessages(this.headers,this.GroupData.groupName).subscribe(messages => {
       // this.messages.push({ messages.recieverId, recieverName, message, sentAt })
       console.log(messages)
+      this.grpMessages = messages;
       this.updateSharedMessages(messages);
-
+      this.sendMessageToGroup();
     }, error => {
       console.error('Error fetching messages:', error);
     });

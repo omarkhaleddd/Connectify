@@ -35,7 +35,20 @@ namespace Talabat.Repository.Data
 		{
 			// modelBuilder.ApplyConfiguration(new ProductConfig());
 			modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-			modelBuilder.Entity<Post>()
+
+            modelBuilder.Entity<AppUserFriend>()
+                .Property(u => u.InsertDate)
+                .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<FriendRequest>()
+                .Property(u => u.InsertDate)
+                .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<Comment>()
+                .Property(u => u.InsertDate)
+                .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<Post>()
+                .Property(u => u.DatePosted)
+                .HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<Post>()
 				.HasMany(P => P.Comments)
 				.WithOne(C => C.Post)
 				.HasForeignKey(C => C.PostId)

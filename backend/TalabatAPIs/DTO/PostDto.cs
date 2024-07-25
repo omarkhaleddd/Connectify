@@ -17,6 +17,6 @@ namespace Talabat.APIs.DTO
         public ICollection<string> mentions { get; set; } = new HashSet<string>();
         public ICollection<FileNameDto>? UploadedFileNames { get; set; } = new HashSet<FileNameDto>(); 
         public List<IFormFile>? UploadedFiles { get; set; }
-
+        public int Privacy { get; set; }
     }
 }

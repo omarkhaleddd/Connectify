@@ -19,8 +19,6 @@ export class MessageGeneralComponent implements OnInit{
   onFriendSelected(friendId: any) {
     console.log(friendId.target.value);
     console.log(friendId);
-    
-    
     this.selectedFriendId = friendId;
     console.log('Selected Friend ID:', friendId);
   }

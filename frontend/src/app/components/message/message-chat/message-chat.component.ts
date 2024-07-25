@@ -48,6 +48,8 @@ export class MessageChatComponent implements OnInit {
 
   ngOnInit() {
     // this.chatService.addReceiveMessageListener(this.receiveMessage.bind(this));
+console.log("HI");
+console.log(this.selectedFriendId);
 
     console.log(this.selectedFriendId);
     if(this._AuthService.getUserId()==this.sharedDataValue.friendId){

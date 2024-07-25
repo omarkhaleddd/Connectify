@@ -36,6 +36,7 @@ export class MessageFriendComponent  implements OnInit{
     Authorization: `Bearer ${this.token}`
   });
   clickFriend(newData:any){
+    
     this.updateSharedData(newData);
     this.getMessages();
   }
@@ -46,6 +47,7 @@ export class MessageFriendComponent  implements OnInit{
   updateSharedMessages(messages:any) {
     // Update shared data through the service    
     this.dataService.updateSharedMessages(messages);
+
   }
   getMessages(){
     console.log(this.friendData?.friendId);
