@@ -19,7 +19,7 @@ using Talabat.Core.Specifications;
 namespace Talabat.APIs.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController] 
     public class AdminController : APIBaseController
     {
         private readonly SignInManager<AppUser> _signInManager;
@@ -40,8 +40,8 @@ namespace Talabat.APIs.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("home")]
-        public async Task<ActionResult> Home()
+        [HttpGet("home/{daysGrowth}")]
+        public async Task<ActionResult> Home( int daysGrowth)
         {
             var spec = new BaseSpecifications<Post>();
             var Posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
@@ -54,12 +54,62 @@ namespace Talabat.APIs.Controllers
                     PostCount = g.Count()
                 })
                 .ToList();
+            var usersGraph = users
+                .Where(u => u.DateCreated.HasValue)
+                  .GroupBy(p => p.DateCreated.HasValue ? p.DateCreated.Value.ToString("MMMM-yyyy") : "No Date") 
+                .Select(g => new
+                {
+                    DateCreated = g.Key,
+                    usersCount = g.Count()
+                })
+                .ToList();
+            var postGraphX = new List<string>();
+            var postGraphY = new List<int>();
+            foreach (var post in postGraph) {
+                postGraphX.Add(post.DateCreated);
+                postGraphY.Add(post.PostCount);
+            }
+            var userGraphX = new List<string>();
+            var userGraphY = new List<int>();
+            foreach (var user in usersGraph)
+            {
+                if(user.DateCreated is null)
+                {
+                    continue;
+                }
+                userGraphX.Add(user.DateCreated);
+                userGraphY.Add(user.usersCount);
+            }
+
+            var DaysAgo = DateTime.Now.AddDays(-daysGrowth).Date;
+            var countPosts = Posts.Count(x=> x.InsertDate.Date <= DaysAgo);
+            var countUsers = users.Count(x => x.DateCreated.HasValue ? x.DateCreated.Value.Date <= DaysAgo : false);
+            var totalUserCount = users.Count();
+            var totalPostCount = Posts.Count();
+            double postGrowth;
+            double usersGrowth;
+
+            if (countPosts == 0)
+            {
+                postGrowth = totalPostCount == 0 ? 0 : 100; 
+            }
+            else
+                postGrowth = Math.Round(((double)(totalPostCount - countPosts) / countPosts) * 100 , 2);
+            if (countUsers == 0)
+            {
+                usersGrowth = totalUserCount == 0 ? 0 : 100;
+            }
+            else
+                usersGrowth = Math.Round(((double)(totalUserCount - countUsers) / countUsers) * 100, 2);
 
             var HomeResult = new
             {
-                postCount = Posts.Count(),
-                userCount = users.Count(),
-                PostGraph = postGraph,
+                postCount = totalPostCount,
+                postGrowth,
+                userCount = totalUserCount,
+                usersGrowth,
+                PostGraph = new { GraphX = postGraphX , GraphY = postGraphY },
+                usersGraph = new { GraphX = userGraphX, GraphY = userGraphY },
 
             };
             return Ok(HomeResult);

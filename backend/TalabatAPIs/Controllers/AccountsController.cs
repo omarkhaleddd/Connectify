@@ -504,7 +504,7 @@ namespace Talabat.APIs.Controllers
             }
             if (id == user.Id)
             {
-                return BadRequest();
+                return BadRequest("You are sending friend request to yourself");
             }
             //check if the this user added me in the blockList
             var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == id);
