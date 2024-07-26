@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Connectify.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +22,19 @@ namespace Talabat.APIs.Controllers
         private readonly IGenericRepository<Comment> _repositoryComment;
         private readonly IGenericRepository<Post> _repositoryPost;
         private readonly UserManager<AppUser> _manager;
+        private readonly RedisCacheService _cacheService;
         private readonly IMapper _mapper;
 		private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
 
-		public CommentController(IGenericRepository<Comment> genericRepository, IGenericRepository<Post> genericRepositoryPost, UserManager<AppUser> manager, IMapper autoMapper, IGenericRepository<PostLikes> repositoryPostLikes) { 
+        public CommentController(IGenericRepository<Comment> genericRepository, IGenericRepository<Post> genericRepositoryPost, UserManager<AppUser> manager, IMapper autoMapper, IGenericRepository<PostLikes> repositoryPostLikes, RedisCacheService cacheService)
+        {
             _repositoryComment = genericRepository;
             _repositoryPost = genericRepositoryPost;
             _mapper = autoMapper;
             _manager = manager;
-			_repositoryPostLikes = repositoryPostLikes;
-		}
+            _repositoryPostLikes = repositoryPostLikes;
+            _cacheService = cacheService;
+        }
         //Get Comments by PostId
         [Authorize]
         [HttpGet("GetCommentsByPostId/{id}")]
@@ -57,6 +61,9 @@ namespace Talabat.APIs.Controllers
             var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == newComment.PostId));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
+
+            
+
             if (oldPost is null)
                 return BadRequest(new ApiResponse(404));
             newComment.AuthorId = user.Id;
@@ -67,6 +74,20 @@ namespace Talabat.APIs.Controllers
             if (!result.IsCompletedSuccessfully)
                 return BadRequest(new ApiResponse(400));
             _repositoryComment.SaveChanges();
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
             return Ok(newComment);
         }
         //Put Request 
@@ -92,6 +113,20 @@ namespace Talabat.APIs.Controllers
 
             _repositoryComment.Update(oldComment);
             _repositoryComment.SaveChanges();
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
             return Ok(newComment);
         }
         //Delete Post
@@ -111,6 +146,20 @@ namespace Talabat.APIs.Controllers
             }
             _repositoryComment.Delete(comment);
             _repositoryComment.SaveChanges();
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
             return Ok("Comment Deleted");
         }
 

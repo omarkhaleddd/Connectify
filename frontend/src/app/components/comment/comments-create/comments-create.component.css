@@ -1,33 +1,33 @@
-div {
-    margin: 20px 0;
-}
-
-h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-form {
+.comment-create .comment-create-form{
     display: flex;
-    flex-direction: column;
+    padding: 10px 15px;
+    background: #e4e4e4;
+    border-radius: 35px;
+    align-items: center;
+    width: 100%;
 }
 
-textarea {
-    resize: vertical;
-    padding: 5px;
-    margin-bottom: 10px;
+.comment-create{
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.comment-create-form textarea{
+    width: 100%;
 }
 
 button {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: #fff;
     border: none;
     padding: 8px 12px;
     border-radius: 5px;
+    font-size: small;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-color);
 }

@@ -12,6 +12,7 @@ import { Post } from 'src/app/models/post.model';
 export class CommentsCreateComponent {
   commentContent: string = '';
   @Input() post: Post | undefined;
+  message: string = '';
 
   constructor(private _AuthService:AuthService ,private commentService: CommentService) { }
 
@@ -29,5 +30,9 @@ export class CommentsCreateComponent {
     }, error => {
       console.error('Error creating comment:', error);
     });
+  }
+
+  checkInput(){
+
   }
 }

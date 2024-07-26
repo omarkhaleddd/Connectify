@@ -1,0 +1,21 @@
+.searchbar{
+    display: flex;
+    border: 2px solid #e4e4e4;
+    border-radius: 35px;
+    padding: 5px 15px;
+}
+
+.searchbar:focus-within{
+    border-color: var(--primary-color);
+    background: #fff;
+}
+
+.searchbar input:focus + span svg g,
+.searchbar:focus-within span svg g {
+    stroke: var(--primary-color);
+}
+
+.searchbar input{
+    padding: 5px;
+    width: 100%;
+}

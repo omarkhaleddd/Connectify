@@ -372,11 +372,16 @@ namespace Talabat.APIs.Controllers
         //Post Request
         [Authorize]
         [HttpPost("")]
-        public async Task<ActionResult<PostDto>> CreatePost([FromForm]PostDto newPost)
+        public async Task<ActionResult<PostDto>> CreatePost(PostDto newPost)
         {
             var user = await _manager.GetUserAddressAsync(User);
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
+
+            
+
+            string uploadedFileName = null;
+
             
             var post = _mapper.Map<PostDto, Post>(newPost);
             if (post is null)
@@ -438,8 +443,22 @@ namespace Talabat.APIs.Controllers
 				}
 			}
 
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
 
-			return Ok(post);
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
+
+
+            return Ok(post);
 
         }
         [Authorize]
@@ -468,6 +487,7 @@ namespace Talabat.APIs.Controllers
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
+
             if (oldPost is null)
                 return BadRequest(new ApiResponse(404));
 
@@ -478,6 +498,19 @@ namespace Talabat.APIs.Controllers
             oldPost.content = newPost.content;
             _unitOfWork.Repository<Post>().Update(oldPost);
             _unitOfWork.Repository<Post>().SaveChanges();
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
 
             return Ok(oldPost);
         }
@@ -517,6 +550,21 @@ namespace Talabat.APIs.Controllers
             _unitOfWork.Repository<Post>().Delete(post);
             _unitOfWork.Repository<Post>().SaveChanges();
 
+
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
             return Ok("Post deleted");
         }
         
@@ -550,7 +598,20 @@ namespace Talabat.APIs.Controllers
                 var post = await _unitOfWork.Repository<Post>().GetEntityWithSpecAsync(specLikes);
                 var retPostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
                 var response = new { message = "Dislike", likeCount = retPostLikes.Count(), likes = retPostLikes };
-                
+
+                var cachedPostsKey = $"posts - {user.Id}";
+                var cachedRepostsKey = $"reposts - {user.Id}";
+
+                if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+                {
+                    // Delete cached posts
+                    await _cacheService.RemoveAsync(cachedPostsKey);
+
+                    // Delete cached reposts
+                    await _cacheService.RemoveAsync(cachedRepostsKey);
+
+                }
+
                 return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
             else
@@ -564,7 +625,20 @@ namespace Talabat.APIs.Controllers
 
                 var response = new { message = "Like", likeCount = retPostLikes.Count(), likes = retPostLikes };
 
-				return Ok(System.Text.Json.JsonSerializer.Serialize(response));
+                var cachedPostsKey = $"posts - {user.Id}";
+                var cachedRepostsKey = $"reposts - {user.Id}";
+
+                if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+                {
+                    // Delete cached posts
+                    await _cacheService.RemoveAsync(cachedPostsKey);
+
+                    // Delete cached reposts
+                    await _cacheService.RemoveAsync(cachedRepostsKey);
+
+                }
+
+                return Ok(System.Text.Json.JsonSerializer.Serialize(response));
             }
 
         }
@@ -578,8 +652,7 @@ namespace Talabat.APIs.Controllers
 			if (user is null)
 				return Unauthorized(new ApiResponse(401));
 
-
-			var repost = _mapper.Map<RepostDto, Repost>(newRepost);
+            var repost = _mapper.Map<RepostDto, Repost>(newRepost);
 			repost.AuthorId = user.Id;
             repost.AuthorName = user.DisplayName;
 			repost.Comments = null;
@@ -596,7 +669,21 @@ namespace Talabat.APIs.Controllers
 				return BadRequest(new ApiResponse(400));
 
 			var repostDto = _mapper.Map<RepostDto>(repost);
-			return Ok(repost);
+
+            var cachedPostsKey = $"posts - {user.Id}";
+            var cachedRepostsKey = $"reposts - {user.Id}";
+
+            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            {
+                // Delete cached posts
+                await _cacheService.RemoveAsync(cachedPostsKey);
+
+                // Delete cached reposts
+                await _cacheService.RemoveAsync(cachedRepostsKey);
+
+            }
+
+            return Ok(repost);
 
 		}
 	}

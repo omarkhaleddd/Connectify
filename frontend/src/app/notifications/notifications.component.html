@@ -1,5 +1,11 @@
-<h3 class="notification-header">Notifications</h3>
-<div class="p-1">
-    <app-notification *ngFor="let notification of notificationsHistory" [notification]="notification"></app-notification>
-    <app-notification *ngFor="let notification of notifications" [notification]="notification"></app-notification>
+<div class="full-height position-relative br-gray">
+    <h3 class="notification-header p-2">Notifications</h3>
+    <div class="pt-2">
+        <app-filteration-bar></app-filteration-bar>
+    </div>
+    <div class="">
+        <app-notification *ngFor="let notification of notificationsHistory"
+            [notification]="notification"></app-notification>
+        <app-notification *ngFor="let notification of notifications" [notification]="notification"></app-notification>
+    </div>
 </div>

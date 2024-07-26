@@ -1,0 +1,16 @@
+<div class="">
+    <div class="feed-filter mt-1">
+        <div class="">
+            <span>All</span>
+        </div>
+
+        <div class="filter">
+            <button class="filter-btn">
+                filter
+            </button>
+        </div>
+    </div>
+    <div class="feed-container">
+        <app-get-post *ngFor="let post of posts" [post]="post"></app-get-post>
+    </div>
+</div>

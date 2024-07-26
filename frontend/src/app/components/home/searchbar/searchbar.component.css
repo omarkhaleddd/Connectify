@@ -1,0 +1,15 @@
+.searchbar{
+    display: flex;
+    border: 2px solid #e4e4e4;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.searchbar:focus-within{
+    border-color: var(--primary-color);
+}
+
+.searchbar input{
+    padding: 5px;
+    width: 100%;
+}

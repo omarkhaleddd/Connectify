@@ -1,0 +1,51 @@
+.create-container{
+    padding: 1rem;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    border-color: #e4e4e4;
+}
+
+.create-content{
+    background: #f9f9f9;
+    border-radius: 5px;
+    border-color: #e4e4e4;
+    margin-bottom: 10px;
+}
+
+.create-content .inner-content{
+    padding: 10px;
+}
+
+.content-container{
+    padding: 8px;
+}
+
+.attach-containers{
+    display: flex;
+}
+
+.attach-containers .attach{
+    margin: 0 5px;
+}
+
+.create-actions{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.create-actions button{
+    padding: 9px 35px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.create-actions .post-btn{
+    margin-left: 5px;
+    background: var(--secondary-color);
+    color: white;
+}
+
+.create-actions .post-later-btn{
+    margin-left: 5px;
+    color: var(--secondary-color);
+}

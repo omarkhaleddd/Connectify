@@ -1,0 +1,9 @@
+<div class="chats-list" *ngIf="friends.length > 0; else noChats">
+    <app-chat-friend *ngFor="let friend of friends" [friend]="friend" ></app-chat-friend>
+</div>
+<ng-template #noChats>
+    <p>
+        No friends to display.
+    </p>
+</ng-template>
+

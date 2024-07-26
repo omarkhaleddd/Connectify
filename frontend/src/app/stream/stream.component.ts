@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-stream',
@@ -7,11 +8,23 @@ import { Component } from '@angular/core';
 })
 export class StreamComponent {
   selectedFriendData: any;
+  selectedFriendId: any;
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      this.selectedFriendId = params['friendId'];
+    });
+  }
 
   onFriendSelected(friend: any) {
     console.log(friend);
 
-    //Z3ydkRUD5IoMrjhSenm2Ng  user 1
+    if (this.selectedFriendId === friend) {
+      console.log("online");
+      
+    }
     
     this.selectedFriendData = friend;
     console.log(this.selectedFriendData);

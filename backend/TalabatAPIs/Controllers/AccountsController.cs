@@ -94,6 +94,7 @@ namespace Talabat.APIs.Controllers
             });
 
         }
+        
         [Authorize]
         [HttpGet("GetCurrentUser")]
         public async Task<ActionResult<UserDto>> GetCurrentUser()

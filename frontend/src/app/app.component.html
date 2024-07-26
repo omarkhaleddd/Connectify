@@ -1,4 +1,17 @@
-<app-navbar></app-navbar>
-<div class="light-theme container-fluid">
-    <router-outlet></router-outlet>
+
+<div class="home-container">
+    <div class="">
+        <app-banner></app-banner>
+    </div>
+    <div class="w-100 container-md mx-0 mx-md-auto">
+        <div class="row">
+            <div class="col-md-3 col-1 p-md-0 p-2 br-gray position-relative">
+                <app-sidebar></app-sidebar>
+            </div>
+            <div class="col-md-9 col-11 ps-0">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </div>
+    
 </div>

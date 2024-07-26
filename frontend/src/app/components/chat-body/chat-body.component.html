@@ -1,0 +1,64 @@
+<ng-container *ngIf="isConnectedToGroup; else elseTemplate">
+<div class="chat-body full-height position-relative d-flex flex-column">
+    <div class=" chat-bar w-100">
+        <div class="p-3 d-flex justify-content-between">
+            <div class="d-flex">
+                <div class="status-badge me-2">
+                    <img src="../../../assets/fol1.png" class="rounded-pill " width="50" height="50" alt="">
+                </div>
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">Nancy Howards</span>
+                    <span>Online</span>
+                </div>
+            </div>
+            <div class="chat-actions">
+                <a class="video-chat d-inline-block" routerLink="/message/stream" routerLinkActive="active" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                        <g fill="none" stroke="#a8a8a8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="m16 13l5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+                            <rect width="14" height="12" x="2" y="6" rx="2" />
+                        </g>
+                    </svg>
+                </a>
+                <button class="chat-settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 256 256">
+                        <path fill="#a8a8a8"
+                            d="M112 60a16 16 0 1 1 16 16a16 16 0 0 1-16-16m16 52a16 16 0 1 0 16 16a16 16 0 0 0-16-16m0 68a16 16 0 1 0 16 16a16 16 0 0 0-16-16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-content ">
+        <div class="message-sent">
+            <div class="content-sent">
+                <span>this was message received from the sender hello!!</span>
+            </div>
+        </div>
+        <div class="message-received">
+            <img src="../../../assets/fol1.png" class="rounded-pill me-2" width="35" height="35" alt="">
+            <div class="content-received">
+                <span>this was message received from the sender hello!!</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message position-absolute bottom-0 w-100">
+        <div class=" p-3 message-body">
+            <div class=" message-content">
+                <input type="text" placeholder="Message">
+                <button class="message-send">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 1792 1792">
+                        <path fill="var(--primary-color)"
+                            d="M1764 11q33 24 27 64l-256 1536q-5 29-32 45q-14 8-31 8q-11 0-24-5l-453-185l-242 295q-18 23-49 23q-13 0-22-4q-19-7-30.5-23.5T640 1728v-349l864-1059l-1069 925l-395-162q-37-14-40-55q-2-40 32-59L1696 9q15-9 32-9q20 0 36 11" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</ng-container>
+<ng-template #elseTemplate>
+    <app-message-grp></app-message-grp>
+</ng-template>

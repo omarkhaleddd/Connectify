@@ -1,0 +1,16 @@
+<div class="chat-sidebar d-flex flex-column d-grid gap-1">
+    <div class="chat-sidebar-header p-2 d-flex flex-column">
+        <div class="chat-search mb-2 ">
+            <app-chat-search></app-chat-search>
+        </div>
+        <div class="">
+            <h5 class="fw-bold text-custom-secondary">Messages</h5>
+        </div>
+    </div>
+    <div class="filterbar-container" >
+        <app-filteration-bar></app-filteration-bar>
+    </div>
+    <div class="chats-list-container">
+        <app-chats-list [friends]="friends"></app-chats-list>
+    </div>
+</div>

@@ -18,8 +18,9 @@ using Talabat.Core.Specifications;
 
 namespace Talabat.APIs.Controllers
 {
+    [Authorize(Roles = "Admin")]
+    [ApiController]
     [Route("api/[controller]")]
-    [ApiController] 
     public class AdminController : APIBaseController
     {
         private readonly SignInManager<AppUser> _signInManager;
@@ -114,11 +115,11 @@ namespace Talabat.APIs.Controllers
             };
             return Ok(HomeResult);
         }
+
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<ReportedPostDto>>> GetReports()
         {
             
-
             var spec = new ReportedPostWithPostSpecs();
             var ReportedPosts = await _unitOfWork.Repository<ReportedPost>().GetAllWithSpecAsync(spec);
             if (ReportedPosts == null)

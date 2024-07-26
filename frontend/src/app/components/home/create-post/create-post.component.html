@@ -1,0 +1,33 @@
+<div class="create-container">
+    <form class="create-inner-container" (submit)="createPost()">
+        <div class="create-content">
+            <div class="inner-content ">
+                <div class="content-container mb-2">
+                    <textarea (input)="onPostContentChange($event)" [(ngModel)]="postContent" name="postContent" class="w-100 overflow-hidden" placeholder="Compose new post" rows="2"></textarea>
+                    <app-modal class="position-absolute w-75 z-9999" [users]="searchResults" [modalBody]="modalBody" [emptyMsg]="emptyMsg" [showTitle]="true" [showCloseButton]="false"  *ngIf="showSearchComponent" ></app-modal>            
+                </div>
+                <div class="attach-containers">
+                    <div class="attach">
+                        <button>
+                            <img src="../../../../assets/image.svg"  width="30"  alt="">
+                        </button>
+                    </div>
+                    <div class="attach">
+                        <button>
+                            <img src="../../../../assets/video.svg"  width="30" alt="">
+                        </button>
+                    </div>
+                    <div class="attach">
+                        <button>
+                            <img src="../../../../assets/dollar.svg" width="30"  alt="">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="create-actions">
+            <button class="post-later-btn">Post Later</button>
+            <button type="submit" class="post-btn">Post</button>
+        </div>
+    </form>
+</div>

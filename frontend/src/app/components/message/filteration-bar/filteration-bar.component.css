@@ -1,0 +1,17 @@
+.filter-bar{
+    display: flex;
+    padding: 0 10px 10px;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.filter-pill{
+    background-color: #F1F1F1;
+    border-radius: 60px;
+    padding: 5px 15px;
+    color: #545454;
+    margin-right: 10px;
+}
+
+.filter-pill.active{
+    background-color: var(--shade-color);
+}

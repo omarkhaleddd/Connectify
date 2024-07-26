@@ -15,6 +15,7 @@ using Talabat.Repository.Identity;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 using Talabat.APIs.Exstentions;
+using Talabat.Core.Entities.Identity;
 
 public class Program
 {
@@ -87,7 +88,11 @@ public class Program
 
             var identityDbContext = services.GetRequiredService<AppIdentityDbContext>();
             await identityDbContext.Database.MigrateAsync();
-            await ConnectifyContextSeed.SeedAsync(dbContext);
+
+            var userManager = services.GetRequiredService<UserManager<AppUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+            await AppIdentityDbContextSeed.SeedUsersAsync(userManager, roleManager);
         }
         catch (Exception ex)
         {

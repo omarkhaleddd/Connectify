@@ -1,0 +1,65 @@
+.get-post-container{
+    padding: 16px;
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.footer-start{
+    display: flex;
+}
+
+.footer-action{
+    margin-right: 10px;
+}
+
+.post-settings{
+    text-align: end;
+}
+
+.three-dot-btn {
+    display: block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 5px 8px;
+}
+
+.three-dot-btn:hover{
+    background-color: var(--shade-color);
+}
+
+.three-dot-btn svg path:hover {
+    fill: var(--primary-color); 
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 0;
+    right: 1em;
+    display: block;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.dropdown-menu button{
+    width: 100%;
+    text-align: start;
+    background: 0;
+    border: 0;
+    padding: 8px 12px;
+}
+
+.dropdown-menu a:hover, .dropdown-menu button:hover {
+    background-color: #f1f1f1;
+} 

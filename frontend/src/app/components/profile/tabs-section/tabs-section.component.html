@@ -1,0 +1,13 @@
+<div class="">
+    <div class="profile-nav">
+        <ul>
+            <li><a href="#">Posts</a></li>
+            <li><a href="#">Comments</a></li>
+            <li><a href="#">Reposts</a></li>
+            <li><a href="#">Likes</a></li>
+        </ul>
+    </div>
+    <div class="posts-list">
+        <app-get-post *ngFor="let post of postData" [post]="post"></app-get-post>
+    </div>
+</div>

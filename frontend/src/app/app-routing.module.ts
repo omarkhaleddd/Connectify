@@ -15,6 +15,8 @@ import { MessageGeneralComponent } from './components/message/message-general/me
 import { RepostComponent } from './repost/repost.component';
 import { StreamComponent } from './stream/stream.component';
 import { DonationComponent } from './donation/donation.component';
+import { ChatComponent } from './chat/chat.component';
+import { ChatBodyComponent } from './components/chat-body/chat-body.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -22,7 +24,18 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   {path: 'profile' , component: ProfileComponent},
-  {path: 'message' , component: MessageGeneralComponent},
+  {path: 'message',
+    component: ChatComponent,
+    children: [
+      {
+        path: '',
+        component: ChatBodyComponent
+      },
+      {
+        path: 'stream',
+        component: StreamComponent
+      }
+  ]},
   {path: 'post/:id' , component: PostComponent},
   {path: 'search/:query' , component: SearchComponent},
   {path: 'user/:id' , component: UserComponent},

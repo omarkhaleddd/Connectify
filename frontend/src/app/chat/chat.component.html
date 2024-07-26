@@ -1,0 +1,12 @@
+<div class="row mx-0">
+    <div class="col-md-4 col-12  px-0 position-relative">
+        <div class="full-height br-gray">
+            <app-chat-sidebar (friendSelected)="onFriendSelected($event)"></app-chat-sidebar>
+        </div>
+    </div>
+    <div class="col-8 d-sm-block d-none px-0 position-relative">
+        <div class="full-height br-gray">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

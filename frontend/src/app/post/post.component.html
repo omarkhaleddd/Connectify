@@ -1,4 +1,18 @@
-<p>post works!</p>
-<app-post-get [post]="post"></app-post-get>
-<app-comments-create [post]="post"></app-comments-create>
-<app-comments-display [comments]="post?.comments"></app-comments-display>
+<div class="row mx-0">
+    <div class="col-lg-8 col-md-12 br-gray px-0 ">
+        <app-back-bar></app-back-bar>
+        <div class=" d-grid gap-3">
+            <app-get-post [post]="post"></app-get-post>
+            <app-comments-create [post]="post"></app-comments-create>
+        </div>
+        <div class="d-grid gap-3">
+            <app-comments-display [comments]="post?.comments"></app-comments-display>
+        </div>
+    </div> 
+    <div class="col-4 d-lg-block d-none">
+        <div class="aside-container py-3">
+            <app-searchbar></app-searchbar>
+            <app-suggestion-list></app-suggestion-list>
+        </div>
+    </div>
+</div>

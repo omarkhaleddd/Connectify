@@ -1,0 +1,56 @@
+.chat-actions button, .chat-actions a{
+    margin-right: 10px;
+    padding: 10px;
+    border-radius: 50%;
+    border: 1px solid #e4e4e4;
+}
+
+.chat-bar{
+    border-bottom: 1px solid #e4e4e4;
+    height: fit-content;
+}
+
+.chat-content {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.chat-content .content-received,
+.chat-content .content-sent
+{
+    background: #e4e4e4;
+    border-radius: 35px;
+    padding: 10px 15px;
+}
+
+.chat-content .message-sent,
+.chat-content .message-received{
+    margin-bottom: 20px;
+    
+}
+
+.chat-content .message-sent{
+    display: flex;
+    justify-content: end;
+}
+
+.chat-content .message-received{
+    display: flex;
+    align-items: center;
+}
+
+
+
+.message-body{
+}
+
+.message-content{
+    display: flex;
+    justify-content: space-between;
+    background: #e4e4e4;
+    border-radius: 35px;
+    padding: 10px 15px;
+}

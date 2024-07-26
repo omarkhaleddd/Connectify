@@ -142,19 +142,12 @@ export class VideoCallComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    //Called once, before the instance is destroyed.
-    //Add 'implements OnDestroy' to the class.
-      // Stop all tracks in the local stream
       if (this.localStream) {
         this.localStream.getTracks().forEach(track => track.stop());
       }
-  
-      // Close the peer connection
       if (this.peerConnection) {
         this.peerConnection.close();
       }
-  
       console.log('VideoCallComponent destroyed');
-    
   }
 }

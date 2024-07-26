@@ -1,2 +1,20 @@
-<app-post-create></app-post-create>
-<app-posts-display></app-posts-display>
+<div class="row mx-0">
+    <div class="col-lg-8 col-md-12 br-gray px-0 ">
+        <div class=" d-grid gap-3 px-3">
+            <h3 class="text-custom-secondary fw-bold mt-2 mb-0">Home</h3>
+            <div class="banner bg-custom-primary d-flex justify-content-center">
+                <img src="../../assets/logo-temp.png" width="77" alt="">
+            </div>
+            <app-create-post></app-create-post>
+        </div>
+        <div class="d-grid gap-3">
+            <app-post-list></app-post-list>
+        </div>
+    </div> 
+    <div class="col-4 d-lg-block d-none">
+        <div class="aside-container py-3">
+            <app-searchbar></app-searchbar>
+            <app-suggestion-list></app-suggestion-list>
+        </div>
+    </div>
+</div>

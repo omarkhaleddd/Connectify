@@ -38,8 +38,28 @@ import { FriendListComponent } from './components/global/friend-list/friend-list
 import { DonateModalComponent } from './components/global/donate-modal/donate-modal.component';
 import { DonationComponent } from './donation/donation.component';
 import { NgxStripeModule } from 'ngx-stripe';
-import { environment } from './enviroment/enviroment';
+import { environment } from './enviroment';
 import { MessageGrpComponent } from './components/message/message-grp/message-grp.component';
+import { BannerComponent } from './components/home/banner/banner.component';
+import { SidebarComponent } from './components/home/sidebar/sidebar.component';
+import { CreatePostComponent } from './components/home/create-post/create-post.component';
+import { FollowerSuggestionComponent } from './components/home/follower-suggestion/follower-suggestion.component';
+import { SearchbarComponent } from './components/home/searchbar/searchbar.component';
+import { PostListComponent } from './components/home/post-list/post-list.component';
+import { SuggestionListComponent } from './components/home/suggestion-list/suggestion-list.component';
+import { GetPostComponent } from './components/home/get-post/get-post.component';
+import { BackBarComponent } from './components/profile/back-bar/back-bar.component';
+import { ProfileSectionComponent } from './components/profile/profile-section/profile-section.component';
+import { TabsSectionComponent } from './components/profile/tabs-section/tabs-section.component';
+import { FilterationBarComponent } from './components/message/filteration-bar/filteration-bar.component';
+import { ChatComponent } from './chat/chat.component';
+import { ChatSidebarComponent } from './components/chat-sidebar/chat-sidebar.component';
+import { ChatBodyComponent } from './components/chat-body/chat-body.component';
+import { ChatSearchComponent } from './components/chat-search/chat-search.component';
+import { ChatsListComponent } from './components/chats-list/chats-list.component';
+import { ChatFriendComponent } from './chat-friend/chat-friend.component';
+import { BackBtnComponent } from './back-btn/back-btn.component';
+import { InputMessageComponent } from './components/input-message/input-message.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +96,27 @@ import { MessageGrpComponent } from './components/message/message-grp/message-gr
     FriendListComponent,
     DonateModalComponent,
     DonationComponent,
-    MessageGrpComponent
+    MessageGrpComponent,
+    BannerComponent,
+    SidebarComponent,
+    CreatePostComponent,
+    FollowerSuggestionComponent,
+    SearchbarComponent,
+    PostListComponent,
+    SuggestionListComponent,
+    GetPostComponent,
+    BackBarComponent,
+    ProfileSectionComponent,
+    TabsSectionComponent,
+    FilterationBarComponent,
+    ChatComponent,
+    ChatSidebarComponent,
+    ChatBodyComponent,
+    ChatSearchComponent,
+    ChatsListComponent,
+    ChatFriendComponent,
+    BackBtnComponent,
+    InputMessageComponent
   ],
   imports: [
     BrowserModule,

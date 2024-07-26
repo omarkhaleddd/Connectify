@@ -22,6 +22,7 @@ export class MessageGrpComponent implements OnInit {
   isUserId: string;
   grpMessages: any;
   FirstTime:boolean = true;
+  
   constructor(private _AuthService: AuthService,private _messageService:MessageService ,private dataService: DataService, private chatService: SignalrService) {
     this.dataService.sharedData$.subscribe(data => {
       this.sharedDataValue = data;

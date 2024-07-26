@@ -13,23 +13,34 @@ namespace Talabat.Repository.Identity
  
     public static class AppIdentityDbContextSeed
     {
-        public static async Task SeedUseAsync(UserManager<AppUser> manager)
+        public static async Task SeedUsersAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-
-            if (!manager.Users.Any())
+            if (!await roleManager.RoleExistsAsync("Admin"))
             {
-                var User = new AppUser()
-                {
-                    DisplayName = "Aml Mohamed",
-                    Email = "amlmohamed60@gmil.com",
-                    UserName = "amlmohamed60",
-                    PhoneNumber = "01063915165" ,
-                   
-                };
-        
-                await manager.CreateAsync(User, "Pa$$w0rd");
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
             }
-            
+
+            if (!await roleManager.RoleExistsAsync("User"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("User"));
+            }
+
+            var adminUser = new AppUser
+            {
+                UserName = "admin",
+                Email = "admin@test.com",
+                DisplayName = "Admin User"
+            };
+
+            if (userManager.Users.All(u => u.Email != adminUser.Email))
+            {
+                var result = await userManager.CreateAsync(adminUser, "Pa$$w0rd");
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                }
+            }
         }
+
     }
 }

@@ -1,7 +1,9 @@
-<div>
-    <h2>Create a New Comment</h2>
-    <form (submit)="createComment()">
-        <textarea [(ngModel)]="commentContent" name="commentContent" placeholder="Write your comment here..." rows="3"></textarea>
-        <button type="submit">Create comment</button>
+<div class="comment-create px-3 pb-3">
+    <form class="comment-create-form" (submit)="createComment()">
+        <textarea [(ngModel)]="message" (input)="checkInput()"  name="commentContent" placeholder="Write your comment here..."
+            rows="1"></textarea>
+        <button [disabled]="!message" type="submit">
+            Reply
+        </button>
     </form>
 </div>

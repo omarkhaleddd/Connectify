@@ -1,0 +1,25 @@
+
+.profile-nav {
+    border-top: 1px solid #e1e8ed;
+    padding: 10px 0;
+    background-color: #fff;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.profile-nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.profile-nav ul li a {
+    text-decoration: none;
+    color: #1da1f2;
+    padding: 10px 0;
+    display: block;
+}
+
+.profile-nav ul li a:hover {
+    background-color: #e8f5fd;
+}

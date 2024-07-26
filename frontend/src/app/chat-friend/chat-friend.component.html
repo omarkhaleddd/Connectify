@@ -1,0 +1,18 @@
+<button class="chat-item" (click)="clickFriend(friendData)" *ngIf="friend?.friendName?.length" >
+    <div class="chat-image px-2" >
+        <div class="status-badge">
+            <img src="../../../assets/fol1.png" class="rounded-pill" width="50" height="50">
+        </div>
+    </div>
+    <div class="chat-preview d-flex flex-column">
+        <div class="chat-preview-header d-flex justify-content-between">
+            <span class="fw-bold">{{ friend?.friendName }}</span>
+            <span class="text-custom-primary">March 3</span>
+        </div>
+        <div class="chat-preview-content">
+            <span>
+                I just subscribed your profile. Do you wanna do a collab?
+            </span>
+        </div>
+    </div>
+</button>

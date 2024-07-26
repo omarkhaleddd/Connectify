@@ -1,4 +1,5 @@
-﻿using Talabat.Core.Entities.Core;
+﻿using System.ComponentModel.DataAnnotations;
+using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 
 namespace Talabat.APIs.DTO

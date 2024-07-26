@@ -9,6 +9,7 @@ import { Comment } from 'src/app/models/comment.model';
 export class CommentGetComponent {
 
   @Input() comment: Comment | undefined;
+  showDropDown = false;
 
   likeComment() {
     if (this.comment) {
@@ -16,9 +17,20 @@ export class CommentGetComponent {
     }
   }
 
+  deleteComment(arg0: Comment | undefined) {
+    throw new Error('Method not implemented.');
+  }
+  editComment(arg0: Comment | undefined) {
+    throw new Error('Method not implemented.');
+  }
+
   commentPost() {
     if (this.comment) {
       console.log('Commenting on post:', this.comment.authorId);
     }
+  }
+
+  toggleDropdown(){
+    this.showDropDown = !this.showDropDown
   }
 }

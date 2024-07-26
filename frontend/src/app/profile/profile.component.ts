@@ -45,7 +45,6 @@ export class ProfileComponent implements OnInit {
     console.log(id);
     
     if (id) {
-      console.log("hgjgh");
       
       this.postService.getPostsByAuthorId(id,this.headers).subscribe(posts => {
         this.userPosts = posts;

@@ -1,0 +1,21 @@
+.sugg-container{
+    padding: 1rem;
+    background-image: url("../../../../assets/fol1-bg.jpg");
+    background-position: center center;
+    color: white;
+}
+
+.sugg-img img{
+    border: 1px solid var(--accent-color);
+}
+
+.sugg-content{
+    display: flex;
+    flex-direction: column;
+}
+
+.sugg-content .sugg-details{
+    display: flex;
+    flex-direction: column;
+}
+
