@@ -63,3 +63,17 @@
 .dropdown-menu a:hover, .dropdown-menu button:hover {
     background-color: #f1f1f1;
 } 
+
+.like-action{
+    padding: 12px 6px;
+    border: 0;
+    border-radius: 25px;
+}
+
+.like-action:hover svg path{
+    fill: rgb(85, 85, 216);
+}
+
+.like-action:hover{
+    background: #ddd7f3;
+}

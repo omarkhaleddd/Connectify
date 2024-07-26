@@ -53,7 +53,6 @@ export class GetPostComponent {
   }
 
   saveChanges() {
-    // Implement your save logic here
     this.donateToPost(this.post)
     console.log('Changes saved!');
     this.closeModal();
@@ -67,12 +66,13 @@ export class GetPostComponent {
 
   ngOnInit(): void {
     console.log(this.post);
+    console.log(this.post?.comments);
     
     var userId = this._AuthService.getUserId();
-    this.isLikedBtn = this.post?.Likes?.some((like) => like.userId === userId);
+    this.isLikedBtn = this.post?.likes?.some((like) => like.userId === userId);
     console.log(this.post);
-    this.likeCount = this.post?.LikeCount;
-    this.likes = this.post?.Likes?.map((obj) => obj.userName);
+    this.likeCount = this.post?.likes?.length;
+    this.likes = this.post?.likes?.map((obj) => obj.userName);
 
     if (this.isLikedBtn) {
       this.isLiked = 'Dislike';
@@ -85,10 +85,7 @@ export class GetPostComponent {
 
   donateToPost(post: Post | undefined) {
     console.log(this.donationAmount);
-    
-    // this.router.navigate(['/donation/' + post?.id, { queryParams: { donAmount: this.donationAmount } } ])
     this.router.navigate(['/donation/' + post?.id], { queryParams: { donAmount: this.donationAmount } });
-
   }
 
   token: any = this._AuthService.getToken();
@@ -99,7 +96,7 @@ export class GetPostComponent {
 
   likePost() {
     if (this.post) {
-      console.log(this.post.Likes);
+      console.log(this.post.likes,"hkkhkj");
       this.postService.likePost(this.post.id, this.headers).subscribe(
         (res) => {
           this.isLiked = res.message;

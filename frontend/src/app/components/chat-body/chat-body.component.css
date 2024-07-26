@@ -34,7 +34,7 @@
 
 .chat-content .message-sent{
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
 .chat-content .message-received{
