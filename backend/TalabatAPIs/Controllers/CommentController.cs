@@ -8,9 +8,11 @@ using Talabat.APIs.Controllers;
 using Talabat.APIs.DTO;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Exstentions;
+using Talabat.Core;
 using Talabat.Core.Entities.Core;
 using Talabat.Core.Entities.Identity;
 using Talabat.Core.Repositories;
+using Talabat.Core.Services;
 using Talabat.Core.Specifications;
 
 namespace Talabat.APIs.Controllers
@@ -19,20 +21,19 @@ namespace Talabat.APIs.Controllers
     [ApiController]
     public class CommentController : APIBaseController
     {
-        private readonly IGenericRepository<Comment> _repositoryComment;
-        private readonly IGenericRepository<Post> _repositoryPost;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICommentService _commentService;
         private readonly UserManager<AppUser> _manager;
         private readonly RedisCacheService _cacheService;
         private readonly IMapper _mapper;
-		private readonly IGenericRepository<PostLikes> _repositoryPostLikes;
 
-        public CommentController(IGenericRepository<Comment> genericRepository, IGenericRepository<Post> genericRepositoryPost, UserManager<AppUser> manager, IMapper autoMapper, IGenericRepository<PostLikes> repositoryPostLikes, RedisCacheService cacheService)
+
+        public CommentController(IUnitOfWork unitOfWork, ICommentService commentService,UserManager<AppUser> manager, IMapper autoMapper, RedisCacheService cacheService)
         {
-            _repositoryComment = genericRepository;
-            _repositoryPost = genericRepositoryPost;
+            _unitOfWork = unitOfWork;
+            _commentService = commentService;
             _mapper = autoMapper;
             _manager = manager;
-            _repositoryPostLikes = repositoryPostLikes;
             _cacheService = cacheService;
         }
         //Get Comments by PostId
@@ -41,16 +42,17 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<CommentDto>> GetCommentsByPostId(int id)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var currPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == id));
-            var currComments = await _repositoryComment.GetAllWithSpecAsync(new BaseSpecifications<Comment>(C => C.PostId == id));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-            if (currPost is null)
-                return BadRequest(new ApiResponse(404));
-            if (currComments is null)
-                return BadRequest(new ApiResponse(404));
-            var mappedComments = _mapper.Map<IReadOnlyList<Comment>, List<CommentDto>>(currComments);
-            return Ok(mappedComments);
+            try { 
+                var currComments = _commentService.GetComments(id).Result;
+                var mappedComments = _mapper.Map<IReadOnlyList<Comment>, List<CommentDto>>(currComments);
+                return Ok(mappedComments);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
         //Post Request 
         [Authorize]
@@ -58,37 +60,36 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<CommentDto>> AddComment(CommentDto newComment)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == newComment.PostId));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-
-            
-
-            if (oldPost is null)
-                return BadRequest(new ApiResponse(404));
-            newComment.AuthorId = user.Id;
-            var mappedComment = _mapper.Map<CommentDto, Comment>(newComment);
-            mappedComment.AuthorId = user.Id;
-            mappedComment.AuthorName = user.DisplayName;
-            var result = _repositoryComment.Add(mappedComment);
-            if (!result.IsCompletedSuccessfully)
-                return BadRequest(new ApiResponse(400));
-            _repositoryComment.SaveChanges();
-
-            var cachedPostsKey = $"posts - {user.Id}";
-            var cachedRepostsKey = $"reposts - {user.Id}";
-
-            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            var comment = _mapper.Map<CommentDto, Comment>(newComment);
+            comment.AuthorId = user.Id;
+            comment.AuthorName = user.DisplayName;
+            try
             {
-                // Delete cached posts
-                await _cacheService.RemoveAsync(cachedPostsKey);
+                var Result = _commentService.AddComment(comment).Result;
+                var mappedComment = _mapper.Map<Comment,CommentDto>(Result);
+                mappedComment.AuthorImage = user.ProfileImageUrl;
+                var cachedPostsKey = $"posts - {user.Id}";
+                var cachedRepostsKey = $"reposts - {user.Id}";
 
-                // Delete cached reposts
-                await _cacheService.RemoveAsync(cachedRepostsKey);
+                if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+                {
+                    // Delete cached posts
+                    await _cacheService.RemoveAsync(cachedPostsKey);
 
+                    // Delete cached reposts
+                    await _cacheService.RemoveAsync(cachedRepostsKey);
+
+                }
+
+                return Ok(mappedComment);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
 
-            return Ok(newComment);
         }
         //Put Request 
         [Authorize]
@@ -96,38 +97,34 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<CommentDto>> UpdateComment(CommentDto newComment)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var oldPost = await _repositoryPost.GetEntityWithSpecAsync(new BaseSpecifications<Post>(P => P.Id == newComment.PostId));
-            var oldComment = await _repositoryComment.GetEntityWithSpecAsync(new BaseSpecifications<Comment>(C => C.Id == newComment.Id));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-            if (oldPost is null)
-                return BadRequest(new ApiResponse(404));
-            if (oldComment is null)
-                return BadRequest(new ApiResponse(404));
-            if (!newComment.AuthorId.Equals(user.Id))
+            var comment = _mapper.Map<CommentDto , Comment>(newComment);
+            comment.AuthorName = user.DisplayName;
+            comment.AuthorId = user.Id;
+            try
             {
-                return Unauthorized(new ApiResponse(401));
+                var Result = _commentService.UpdateComment(comment, user.Id).Result;
+                var mappedResult = _mapper.Map<Comment,CommentDto>(Result);
+                mappedResult.AuthorImage = user.ProfileImageUrl;
+                var cachedPostsKey = $"posts - {user.Id}";
+                var cachedRepostsKey = $"reposts - {user.Id}";
+
+                if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+                {
+                    // Delete cached posts
+                    await _cacheService.RemoveAsync(cachedPostsKey);
+
+                    // Delete cached reposts
+                    await _cacheService.RemoveAsync(cachedRepostsKey);
+
+                }
+                return Ok(mappedResult);
             }
-            newComment.AuthorId = user.Id;
-			oldComment.content = newComment.content;
-
-            _repositoryComment.Update(oldComment);
-            _repositoryComment.SaveChanges();
-
-            var cachedPostsKey = $"posts - {user.Id}";
-            var cachedRepostsKey = $"reposts - {user.Id}";
-
-            if (await _cacheService.KeyExistsAsync(cachedPostsKey) && await _cacheService.KeyExistsAsync(cachedPostsKey))
+            catch (Exception e)
             {
-                // Delete cached posts
-                await _cacheService.RemoveAsync(cachedPostsKey);
-
-                // Delete cached reposts
-                await _cacheService.RemoveAsync(cachedRepostsKey);
-
+                return BadRequest(e.Message);
             }
-
-            return Ok(newComment);
         }
         //Delete Post
         [Authorize]
@@ -135,17 +132,14 @@ namespace Talabat.APIs.Controllers
         public async Task<ActionResult<PostDto>> DeleteComment(int id)
         {
             var user = await _manager.GetUserAddressAsync(User);
-            var comment = await _repositoryComment.GetEntityWithSpecAsync(new BaseSpecifications<Comment>(C => C.Id == id));
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
-            if (comment is null)
+            var comment = await _unitOfWork.Repository<Comment>().GetEntityWithSpecAsync(new BaseSpecifications<Comment>(C => C.Id == id));
+            if (comment is null || comment.AuthorId.Equals(user.Id))
                 return BadRequest(new ApiResponse(404));
-            if (comment.AuthorId.Equals(user.Id))
-            {
-                return Unauthorized(new ApiResponse(401));
-            }
-            _repositoryComment.Delete(comment);
-            _repositoryComment.SaveChanges();
+
+            _unitOfWork.Repository<Comment>().Delete(comment);
+            _unitOfWork.Repository<Comment>().SaveChanges();
 
             var cachedPostsKey = $"posts - {user.Id}";
             var cachedRepostsKey = $"reposts - {user.Id}";

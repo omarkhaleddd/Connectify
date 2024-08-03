@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 using Talabat.APIs.Exstentions;
 using Talabat.Core.Entities.Identity;
+using Talabat.Service.Services;
 
 public class Program
 {
@@ -55,6 +56,8 @@ public class Program
         builder.Services.AddSingleton<RedisCacheService>();
         builder.Services.AddTransient<IUploadService, UploadService>();
         builder.Services.AddTransient<IEmailService, EmailService>();
+        builder.Services.AddScoped<ICommentService, CommentService>();
+
         builder.Services.AddAutoMapper(x => x.AddProfile<MappingProfiles>());
         builder.Services.AddApplicationService();
         builder.Services.AddIdentityServices(builder.Configuration);
