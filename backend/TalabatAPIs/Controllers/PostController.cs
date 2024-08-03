@@ -38,16 +38,18 @@ namespace Talabat.APIs.Controllers
 		private readonly IHubContext<MentionNotification, INotificationHub> _mentionNotification;
 		private readonly RedisCacheService _cacheService;
         private readonly IUploadService _uploadService;
+        private readonly IPostService _postService; 
         private readonly IUnitOfWork _unitOfWork;
 
 
-        public PostController(IMapper mapper, UserManager<AppUser> manager,IUnitOfWork unitOfWork, RedisCacheService cacheService, IUploadService uploadService)
-		{
-			_mapper = mapper;
-			_manager = manager;
-			_cacheService = cacheService;
+        public PostController(IMapper mapper, UserManager<AppUser> manager, IUnitOfWork unitOfWork, RedisCacheService cacheService, IUploadService uploadService, IPostService postService)
+        {
+            _mapper = mapper;
+            _manager = manager;
+            _cacheService = cacheService;
             _uploadService = uploadService;
             _unitOfWork = unitOfWork;
+            _postService = postService;
         }
 
 
@@ -62,72 +64,51 @@ namespace Talabat.APIs.Controllers
                 return NotFound($"User not found");
             }
             //check if the this user added me in the blockList
-            var blockSpec = new BaseSpecifications<BlockList>(u => u.BlockedId == user.Id && u.UserId == authorId);
-            var isBlocked = await _unitOfWork.Repository<BlockList>().GetEntityWithSpecAsync(blockSpec);
-            if (isBlocked is not null)
+            
+            if (await _postService.CheckBlockStatus(authorId))
             {
                 return BadRequest("You are Blocked");
             }
             //get by id in specs
-            var spec = new PostWithCommentSpecs(authorId);
-            var posts = await _unitOfWork.Repository<Post>().GetAllWithSpecAsync(spec);
+            var posts = (List<Post>)await _postService.GetPostsByAuthorIdAsync(authorId);
             
             if (posts == null)
             {
                 return BadRequest("No posts");
             }
-            // in a service that gives us the friends of a userid
-            var specFriendUserId = new BaseSpecifications<AppUserFriend>(u => u.UserId == user.Id);
-            var specFriendFriendId = new BaseSpecifications<AppUserFriend>(u => u.FriendId == user.Id);
-            var friendsByUserId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendUserId);
-            var friendsByFriendId = await _unitOfWork.Repository<AppUserFriend>().GetAllWithSpecAsync(specFriendFriendId);
-            var friendsList = new List<string>();
-            foreach (var friendByUserId in friendsByUserId)
-            {
-                friendsList.Add(friendByUserId.FriendId);
-            }
-
-            foreach (var friendByFriendId in friendsByFriendId)
-            {
-
-                friendsList.Add(friendByFriendId.UserId);
-            }
-
-
             var postDtos = new List<PostDto>();
             foreach (var post in posts)
             {
                 //handled only me 
-                if (post.Privacy == 0)
+                if (_postService.CheckPrivatePrivacy(post))
                 {
                     continue;
                 }
-                bool found = friendsList.Contains(post.AuthorId);
                 //handle the friends only by checking on the friend list
-                if (post.Privacy == 2 || found || post.AuthorId == user.Id)
+                if (await _postService.CheckOnlyFriendsPrivacy(authorId, post))
                 {
                    
-                if (post.ReportCount == 10)
-                {
-                    continue;
-                }
-                var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
-                var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
+                    if (post.ReportCount == 10)
+                    {
+                        continue;
+                    }
+                    var comments = _mapper.Map<ICollection<Comment>, ICollection<CommentDto>>(post.Comments);
+                    var PostLikes = _mapper.Map<ICollection<PostLikes>, ICollection<PostLikesDto>>(post.Likes);
 
-                var postDto = new PostDto
-                {
-                    Id = post.Id,
-                    content = post.content,
-                    Likes = PostLikes,
-                    LikeCount = post.Likes.Count(),
-                    DatePosted = post.DatePosted,
-                    Comments = comments,
-                    AuthorId = user.Id,
-                    AuthorName = user.DisplayName,
-                    AuthorImage = user.ProfileImageUrl
-                };
+                    var postDto = new PostDto
+                    {
+                        Id = post.Id,
+                        content = post.content,
+                        Likes = PostLikes,
+                        LikeCount = post.Likes.Count(),
+                        DatePosted = post.DatePosted,
+                        Comments = comments,
+                        AuthorId = user.Id,
+                        AuthorName = user.DisplayName,
+                        AuthorImage = user.ProfileImageUrl
+                    };
 
-                postDtos.Add(postDto);
+                    postDtos.Add(postDto);
                 }
             }
 
@@ -289,9 +270,6 @@ namespace Talabat.APIs.Controllers
 
 			return Ok(resultDtos);
 		}
-
-
-
 
 		//Get Post by id
 		[Authorize]
@@ -461,6 +439,7 @@ namespace Talabat.APIs.Controllers
             return Ok(post);
 
         }
+        
         [Authorize]
         [HttpPut("report-post/{id}")]
         public async Task<ActionResult<PostDto>> ReportPost(int id)

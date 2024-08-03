@@ -6,6 +6,7 @@ using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Repository;
 using Talabat.Service;
+using Talabat.Service.Services;
 
 namespace Talabat.APIs.Exstentions
 {
@@ -14,6 +15,8 @@ namespace Talabat.APIs.Exstentions
         public static IServiceCollection AddApplicationService(this IServiceCollection Services)
         {
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            Services.AddScoped<IPostService, PostService>();
+            Services.AddScoped<IFriendService, FriendService>();
             Services.AddScoped( typeof(IPaymentService) ,typeof(PaymentService)); 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             Services.AddAutoMapper(typeof(MappingProfiles));
