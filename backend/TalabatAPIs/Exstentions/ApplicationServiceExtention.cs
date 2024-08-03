@@ -6,6 +6,7 @@ using Talabat.Core.Repositories;
 using Talabat.Core.Services;
 using Talabat.Repository;
 using Talabat.Service;
+using Talabat.Service.Services;
 
 namespace Talabat.APIs.Exstentions
 {
@@ -16,6 +17,8 @@ namespace Talabat.APIs.Exstentions
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped( typeof(IPaymentService) ,typeof(PaymentService)); 
             Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            Services.AddScoped<ICommentService, CommentService>();
+            Services.AddScoped<IAdminService, AdminService>();
             Services.AddAutoMapper(typeof(MappingProfiles));
             Services.Configure<ApiBehaviorOptions>(options =>
             {
