@@ -1,5 +1,5 @@
 # Connectify
-### Social Network Platform for connecting people.
+### Social Network Platform for connecting people & Dashboard.
 Website Features: Chatting, Video Call, Notification system, Payment, Mail Server, Caching.
 
 ## Current Status
